@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Base ── */
+html {
+  scroll-behavior: smooth;
+}
+
+::selection {
+  background: #8DB76A;
+  color: #0a120a;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 3px;
+}
+::-webkit-scrollbar-track {
+  background: #080f08;
+}
+::-webkit-scrollbar-thumb {
+  background: #2a4420;
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8DB76A;
+}
+
+/* ── Typography ── */
+.font-display {
+  font-family: var(--font-playfair), serif;
+}
+.font-mono-data {
+  font-family: 'SF Mono', 'Fira Code', 'Fira Mono', 'Roboto Mono', monospace;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Utilities ── */
+@layer utilities {
+  .tech-grid {
+    background-image:
+      linear-gradient(rgba(141, 183, 106, 0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(141, 183, 106, 0.028) 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(
+      circle,
+      rgba(141, 183, 106, 0.045) 1px,
+      transparent 1px
+    );
+    background-size: 36px 36px;
+  }
+
+  .glow-green {
+    box-shadow: 0 0 32px rgba(141, 183, 106, 0.25);
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+
+/* ── Framer Motion ── */
+/* Prevent layout shift during hydration */
+[data-framer-appear] {
+  opacity: 0;
+}
