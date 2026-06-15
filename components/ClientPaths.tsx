@@ -43,7 +43,7 @@ export default function ClientPaths() {
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section className="py-32 lg:py-44 px-6 bg-[#0b160b]/50">
+    <section className="py-32 lg:py-44 px-6 bg-[#1D1D1B]">
       <div className="max-w-7xl mx-auto">
         <div ref={ref} className="mb-20">
           <motion.div
@@ -52,8 +52,8 @@ export default function ClientPaths() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-7"
           >
-            <div className="w-7 h-px bg-[#8DC63F]/70" />
-            <span className="text-[#8DC63F] text-[10px] tracking-[0.32em] uppercase font-medium">
+            <div className="w-7 h-px bg-[#95C11F]/70" />
+            <span className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium">
               ¿Cuál es tu camino?
             </span>
           </motion.div>
@@ -65,7 +65,7 @@ export default function ClientPaths() {
             className="font-display text-[clamp(2.8rem,6vw,5rem)] font-semibold leading-tight max-w-3xl"
           >
             Dos caminos,{' '}
-            <em className="text-[#8DC63F] not-italic">un mismo destino</em>
+            <em className="text-[#95C11F] not-italic">un mismo destino</em>
           </motion.h2>
         </div>
 
@@ -78,7 +78,7 @@ export default function ClientPaths() {
               transition={{ duration: 0.95, delay: 0.2 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
               className={`relative p-10 lg:p-14 rounded-3xl border transition-all duration-500 overflow-hidden ${
                 path.primary
-                  ? 'bg-[#8DC63F]/[0.06] border-[#8DC63F]/20 hover:bg-[#8DC63F]/[0.1]'
+                  ? 'bg-[#95C11F]/[0.06] border-[#95C11F]/20 hover:bg-[#95C11F]/[0.1]'
                   : 'bg-white/[0.015] border-white/[0.06] hover:border-white/10 hover:bg-white/[0.03]'
               }`}
             >
@@ -86,14 +86,14 @@ export default function ClientPaths() {
               <div
                 className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] tracking-[0.18em] uppercase mb-8 ${
                   path.primary
-                    ? 'bg-[#8DC63F]/20 text-[#8DC63F]'
+                    ? 'bg-[#95C11F]/20 text-[#95C11F]'
                     : 'bg-white/[0.06] text-white/40'
                 }`}
               >
                 {path.badge}
               </div>
 
-              <div className="text-[#8DC63F] text-[10px] tracking-[0.28em] uppercase mb-3 font-medium">
+              <div className="text-[#95C11F] text-[10px] tracking-[0.28em] uppercase mb-3 font-medium">
                 {path.type}
               </div>
 
@@ -106,7 +106,7 @@ export default function ClientPaths() {
               <ul className="space-y-3 mb-10">
                 {path.features.map((feat) => (
                   <li key={feat} className="flex items-start gap-3 text-sm text-white/60">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#8DC63F] shrink-0" />
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#95C11F] shrink-0" />
                     {feat}
                   </li>
                 ))}
@@ -118,7 +118,7 @@ export default function ClientPaths() {
                 rel={path.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className={`inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-105 ${
                   path.primary
-                    ? 'bg-[#8DC63F] text-[#0a120a] hover:bg-[#a3d45a] hover:shadow-[0_0_24px_rgba(141,198,63,0.35)]'
+                    ? 'bg-[#95C11F] text-[#1D1D1B] hover:bg-[#a6d42a] hover:shadow-[0_0_24px_rgba(149,193,31,0.35)]'
                     : 'border border-white/15 text-white/80 hover:border-white/30 hover:bg-white/[0.05]'
                 }`}
               >
@@ -136,7 +136,7 @@ export default function ClientPaths() {
 
               {/* Decorative corner glow for primary */}
               {path.primary && (
-                <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full bg-[#8DC63F]/[0.07] blur-2xl pointer-events-none" />
+                <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full bg-[#95C11F]/[0.07] blur-2xl pointer-events-none" />
               )}
             </motion.div>
           ))}

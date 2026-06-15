@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
@@ -21,7 +21,7 @@ export default function Hero() {
       className="relative h-screen min-h-[700px] overflow-hidden flex items-center justify-center"
     >
       {/* Base bg */}
-      <div className="absolute inset-0 bg-[#0a120a]" />
+      <div className="absolute inset-0 bg-[#1D1D1B]" />
 
       {/* Video background */}
       <video
@@ -49,18 +49,18 @@ export default function Hero() {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(141,198,63,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(141,198,63,0.018) 1px, transparent 1px)',
+            'linear-gradient(rgba(149,193,31,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(149,193,31,0.018) 1px, transparent 1px)',
           backgroundSize: '80px 80px',
         }}
       />
 
       {/* Radial ambient glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[600px] h-[600px] rounded-full bg-[#8DC63F]/[0.06] blur-[140px]" />
+        <div className="w-[600px] h-[600px] rounded-full bg-[#95C11F]/[0.06] blur-[140px]" />
       </div>
 
       {/* Vignette top/bottom */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0a120a]/70 via-transparent to-[#0a120a] pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#1D1D1B]/70 via-transparent to-[#1D1D1B] pointer-events-none" />
 
       {/* ── Technical corner overlays ── */}
 
@@ -68,7 +68,7 @@ export default function Hero() {
         initial={{ opacity: 0, x: -12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, delay: 2.2 }}
-        className="absolute top-24 left-6 lg:left-12 z-10 font-mono text-[10px] text-[#8DC63F]/50 tracking-widest hidden lg:block"
+        className="absolute top-24 left-6 lg:left-12 z-10 font-mono text-[10px] text-[#95C11F]/50 tracking-widest hidden lg:block"
       >
         <div>LAT · 04°09′N</div>
         <div>LON · 73°38′O</div>
@@ -79,7 +79,7 @@ export default function Hero() {
         initial={{ opacity: 0, x: 12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, delay: 2.4 }}
-        className="absolute top-24 right-6 lg:right-12 z-10 font-mono text-[10px] text-[#8DC63F]/50 tracking-widest text-right hidden lg:block"
+        className="absolute top-24 right-6 lg:right-12 z-10 font-mono text-[10px] text-[#95C11F]/50 tracking-widest text-right hidden lg:block"
       >
         <div>ELV · 467m</div>
         <div>PIEDEMONTE LLANERO</div>
@@ -95,11 +95,11 @@ export default function Hero() {
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-px bg-[#8DC63F]"
+            className="h-px bg-[#95C11F]"
             style={{ opacity: 0.12 + i * 0.04, width: i % 3 === 0 ? 12 : 6 }}
           />
         ))}
-        <span className="text-[#8DC63F]/30 font-mono text-[8px] tracking-widest mt-1" style={{ writingMode: 'vertical-rl' }}>
+        <span className="text-[#95C11F]/30 font-mono text-[8px] tracking-widest mt-1" style={{ writingMode: 'vertical-rl' }}>
           ↑ ELEVACIÓN
         </span>
       </motion.div>
@@ -115,11 +115,11 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex items-center justify-center gap-4 mb-10"
         >
-          <div className="w-10 h-px bg-[#8DC63F]/50" />
-          <span className="font-mono text-[#8DC63F] text-[10px] tracking-[0.38em] uppercase">
+          <div className="w-10 h-px bg-[#95C11F]/50" />
+          <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.38em] uppercase">
             Metodología Keyline · Colombia
           </span>
-          <div className="w-10 h-px bg-[#8DC63F]/50" />
+          <div className="w-10 h-px bg-[#95C11F]/50" />
         </motion.div>
 
         <motion.h1
@@ -129,7 +129,7 @@ export default function Hero() {
           className="font-display text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[0.92] tracking-tight mb-8"
         >
           Diseña el{' '}
-          <em className="text-[#8DC63F] not-italic">Paisaje,</em>
+          <em className="text-[#95C11F] not-italic">Paisaje,</em>
           <br />
           Transforma{' '}
           <span className="relative inline-block">
@@ -138,7 +138,7 @@ export default function Hero() {
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.9, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[#8DC63F]/80 origin-left rounded-full"
+              className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[#95C11F]/80 origin-left rounded-full"
             />
           </span>
         </motion.h1>
@@ -161,13 +161,13 @@ export default function Hero() {
         >
           <a
             href="#proyectos"
-            className="px-8 py-4 bg-[#8DC63F] text-[#0a120a] rounded-full font-semibold text-sm tracking-wide hover:bg-[#9ed44f] transition-all duration-200 hover:scale-105 hover:shadow-[0_0_32px_rgba(141,198,63,0.4)]"
+            className="px-8 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm tracking-wide hover:bg-[#a6d42a] transition-all duration-200 hover:scale-105 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)]"
           >
             Ver Proyectos
           </a>
           <a
             href="#metodologia"
-            className="px-8 py-4 border border-white/20 text-white/80 rounded-full font-medium text-sm tracking-wide hover:border-white/35 hover:bg-white/[0.06] hover:text-white transition-all duration-200"
+            className="px-8 py-4 border border-[#444441] text-white/70 rounded-full font-medium text-sm tracking-wide hover:border-white/30 hover:bg-white/[0.05] hover:text-white transition-all duration-200"
           >
             Explorar Método
           </a>

@@ -9,13 +9,13 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        bg: '#0a120a',
-        accent: '#8DC63F',
+        bg: '#1D1D1B',
+        accent: '#95C11F',
         brand: {
-          lime: '#8DC63F',
+          lime: '#95C11F',
           dark: '#5A7A1E',
-          yellow: '#E5E69B',
-          graphite: '#1A1A1A',
+          yellow: '#E9EA9B',
+          graphite: '#1D1D1B',
           cream: '#F5F5E8',
         },
       },

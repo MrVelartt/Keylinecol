@@ -1,7 +1,8 @@
-﻿'use client'
+'use client'
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
+import Image from 'next/image'
 import KeylineLogo from './KeylineLogo'
 
 const values = [
@@ -36,16 +37,84 @@ const timeline = [
   { year: '2025', event: '+1.400 ha bajo diseño activo en cuatro departamentos' },
 ]
 
+const team = [
+  {
+    name: 'Jhon Prieto',
+    role: 'Fundador · Ing. Agrónomo',
+    photo: '/images/JhonP.png' as string | null,
+    initials: 'JP',
+    bio: 'Ingeniero Agrónomo de la Universidad de los Llanos, hijo de tradición campesina llanera y tolimense. Su tesis sobre manejo del agua de lluvia dio origen a Keyline Colombia en 2020, en Villavicencio. Especialista en diseño hídrico, Línea Clave, agricultura sintrópica y ganadería regenerativa.',
+  },
+  {
+    name: 'J. Camilo Velásquez',
+    role: 'Infraestructura Digital · Ing. Mecánico / Dev',
+    photo: '/images/JCamilo.jpg' as string | null,
+    initials: 'CV',
+    bio: 'Ingeniero Mecánico y desarrollador de software, a cargo de la infraestructura digital de Keyline Colombia. Lidera la investigación tecnológica que sofistica y robustece los procesos del equipo: desde sistemas de gestión y automatización hasta inteligencia artificial aplicada al sector agropecuario.',
+  },
+]
+
+function TeamCard({ member, index }: { member: (typeof team)[0]; index: number }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const inView = useInView(ref, { once: true, margin: '-40px' })
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.85, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
+      className="flex flex-col sm:flex-row gap-5 p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A] hover:border-[#95C11F]/20 hover:bg-[#333331] transition-all duration-500 group"
+    >
+      {/* Foto / Avatar */}
+      <div className="shrink-0">
+        {member.photo ? (
+          <Image
+            src={member.photo}
+            alt={member.name}
+            width={180}
+            height={180}
+            className="w-[180px] h-[180px] rounded-2xl object-cover object-top"
+          />
+        ) : (
+          <div className="w-[180px] h-[180px] rounded-2xl bg-[#1D1D1B] border border-[#95C11F]/15 flex items-center justify-center shrink-0">
+            <span className="font-display text-4xl font-semibold text-[#95C11F]/60 select-none">
+              {member.initials}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Info */}
+      <div className="flex flex-col justify-center gap-3 min-w-0 flex-1">
+        <div>
+          <h3 className="font-display text-[1.625rem] font-medium text-white leading-tight mb-1.5">
+            {member.name}
+          </h3>
+          <p className="font-mono text-[11px] text-[#95C11F] tracking-[0.08em] uppercase">
+            {member.role}
+          </p>
+        </div>
+        <p className="text-[#B4B2A9] text-base leading-[1.8]">
+          {member.bio}
+        </p>
+      </div>
+    </motion.div>
+  )
+}
+
 export default function Nosotros() {
   const ref = useRef<HTMLDivElement>(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
   const tlRef = useRef<HTMLDivElement>(null)
   const tlInView = useInView(tlRef, { once: true, margin: '-60px' })
+  const teamRef = useRef<HTMLDivElement>(null)
+  const teamInView = useInView(teamRef, { once: true, margin: '-60px' })
 
   return (
     <section id="nosotros" className="py-32 lg:py-44 px-6 relative overflow-hidden">
       {/* Bg accent */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#8DC63F]/[0.025] rounded-full blur-[180px] pointer-events-none -translate-x-1/2 -translate-y-1/4" />
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#95C11F]/[0.025] rounded-full blur-[180px] pointer-events-none -translate-x-1/2 -translate-y-1/4" />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -56,8 +125,8 @@ export default function Nosotros() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-7"
           >
-            <div className="w-7 h-px bg-[#8DC63F]/60" />
-            <span className="font-mono text-[#8DC63F] text-[10px] tracking-[0.32em] uppercase">
+            <div className="w-7 h-px bg-[#95C11F]/60" />
+            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
               Sobre Nosotros
             </span>
           </motion.div>
@@ -70,7 +139,7 @@ export default function Nosotros() {
           >
             Leemos la tierra
             <br />
-            <em className="text-[#8DC63F] not-italic">con precisión.</em>
+            <em className="text-[#95C11F] not-italic">con precisión.</em>
           </motion.h2>
         </div>
 
@@ -88,7 +157,7 @@ export default function Nosotros() {
                 <KeylineLogo size={48} />
               </div>
               <div>
-                <div className="font-mono text-[10px] text-[#8DC63F]/50 tracking-widest uppercase mb-2">
+                <div className="font-mono text-[10px] text-[#95C11F]/50 tracking-widest uppercase mb-2">
                   Villavicencio · Meta · Colombia
                 </div>
                 <p className="text-white/70 text-lg leading-relaxed">
@@ -121,7 +190,7 @@ export default function Nosotros() {
                   'Hidrología de Cuencas Aplicada — IDEAM Colombia',
                 ].map((cert) => (
                   <div key={cert} className="flex items-start gap-3 text-sm text-white/40">
-                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-[#8DC63F]/60 shrink-0" />
+                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-[#95C11F]/60 shrink-0" />
                     {cert}
                   </div>
                 ))}
@@ -142,10 +211,10 @@ export default function Nosotros() {
                 initial={{ opacity: 0, y: 24 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.35 + i * 0.09 }}
-                className="group p-6 rounded-2xl border border-white/[0.05] bg-white/[0.015] hover:border-[#8DC63F]/15 hover:bg-[#8DC63F]/[0.03] transition-all duration-400"
+                className="group p-6 rounded-2xl border border-white/[0.07] bg-[#2C2C2A] hover:border-[#95C11F]/20 hover:bg-[#333331] transition-all duration-400"
               >
                 <div className="flex items-start gap-4">
-                  <span className="font-mono text-[11px] text-[#8DC63F]/40 tracking-widest mt-0.5 shrink-0">
+                  <span className="font-mono text-[11px] text-[#95C11F]/40 tracking-widest mt-0.5 shrink-0">
                     {v.code}
                   </span>
                   <div>
@@ -158,6 +227,27 @@ export default function Nosotros() {
           </motion.div>
         </div>
 
+        {/* ── Equipo ── */}
+        <div ref={teamRef} className="mb-28">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            animate={teamInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.7 }}
+            className="flex items-center gap-3 mb-12"
+          >
+            <div className="w-7 h-px bg-[#95C11F]/60" />
+            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
+              Equipo
+            </span>
+          </motion.div>
+
+          <div className="grid gap-6" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))' }}>
+            {team.map((member, i) => (
+              <TeamCard key={member.name} member={member} index={i} />
+            ))}
+          </div>
+        </div>
+
         {/* Timeline */}
         <div ref={tlRef}>
           <motion.div
@@ -166,19 +256,18 @@ export default function Nosotros() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-12"
           >
-            <div className="w-7 h-px bg-[#8DC63F]/60" />
-            <span className="font-mono text-[#8DC63F] text-[10px] tracking-[0.32em] uppercase">
+            <div className="w-7 h-px bg-[#95C11F]/60" />
+            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
               Trayectoria
             </span>
           </motion.div>
 
           <div className="relative">
-            {/* Vertical line */}
             <motion.div
               initial={{ scaleY: 0 }}
               animate={tlInView ? { scaleY: 1 } : {}}
               transition={{ duration: 1.2, ease: 'easeOut' }}
-              className="absolute left-[4.5rem] top-0 bottom-0 w-px bg-gradient-to-b from-[#8DC63F]/30 via-[#8DC63F]/15 to-transparent origin-top hidden md:block"
+              className="absolute left-[4.5rem] top-0 bottom-0 w-px bg-gradient-to-b from-[#95C11F]/30 via-[#95C11F]/15 to-transparent origin-top hidden md:block"
             />
 
             <div className="space-y-6">
@@ -190,17 +279,12 @@ export default function Nosotros() {
                   transition={{ duration: 0.6, delay: i * 0.1 }}
                   className="flex items-center gap-6 md:gap-8 group"
                 >
-                  {/* Year */}
-                  <div className="font-mono text-[13px] text-[#8DC63F] w-14 shrink-0 text-right md:text-right">
+                  <div className="font-mono text-[13px] text-[#95C11F] w-14 shrink-0 text-right">
                     {item.year}
                   </div>
-
-                  {/* Dot */}
                   <div className="relative shrink-0 hidden md:block">
-                    <div className="w-2 h-2 rounded-full bg-[#8DC63F]/40 group-hover:bg-[#8DC63F] transition-colors duration-300" />
+                    <div className="w-2 h-2 rounded-full bg-[#95C11F]/40 group-hover:bg-[#95C11F] transition-colors duration-300" />
                   </div>
-
-                  {/* Event */}
                   <p className="text-white/45 text-sm leading-relaxed group-hover:text-white/65 transition-colors duration-300">
                     {item.event}
                   </p>

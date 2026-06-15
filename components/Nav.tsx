@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -43,7 +43,7 @@ export default function Nav() {
             ? 'backdrop-blur-2xl border-b border-white/[0.05]'
             : 'bg-transparent'
         }`}
-        style={scrolled ? { backgroundColor: 'rgba(7,16,7,0.88)' } : {}}
+        style={scrolled ? { backgroundColor: 'rgba(29,29,27,0.88)' } : {}}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 h-[72px] flex items-center justify-between gap-8">
           {/* Logo real */}
@@ -60,7 +60,7 @@ export default function Nav() {
 
           {/* Center: coordinates (tech accent) */}
           <div className="hidden lg:flex items-center gap-1.5 font-mono text-[10px] text-white/20 tracking-widest select-none">
-            <span className="w-1 h-1 rounded-full bg-[#8DC63F] animate-pulse" />
+            <span className="w-1 h-1 rounded-full bg-[#95C11F] animate-pulse" />
             04°09′N&nbsp;·&nbsp;73°38′O&nbsp;·&nbsp;ELV 467m
           </div>
 
@@ -74,13 +74,13 @@ export default function Nav() {
                   key={link.label}
                   href={link.href}
                   className={`relative px-4 py-2 text-[13px] tracking-wide transition-colors duration-200 rounded-lg ${
-                    isActive ? 'text-[#8DC63F]' : 'text-white/45 hover:text-white/80'
+                    isActive ? 'text-[#95C11F]' : 'text-white/45 hover:text-white/80'
                   }`}
                 >
                   {isActive && (
                     <motion.span
                       layoutId="nav-pill"
-                      className="absolute inset-0 bg-[#8DC63F]/[0.08] border border-[#8DC63F]/20 rounded-lg"
+                      className="absolute inset-0 bg-[#95C11F]/[0.08] border border-[#95C11F]/20 rounded-lg"
                       transition={{ type: 'spring', stiffness: 380, damping: 32 }}
                     />
                   )}
@@ -96,7 +96,7 @@ export default function Nav() {
               href="https://wa.me/573113650567"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-[#8DC63F] text-[#0a120a] rounded-full text-[13px] font-semibold hover:bg-[#9ed44f] transition-all duration-200 hover:scale-105 hover:shadow-[0_0_20px_rgba(141,198,63,0.35)]"
+              className="hidden sm:flex items-center gap-2 px-5 py-2.5 bg-[#95C11F] text-[#1D1D1B] rounded-full text-[13px] font-semibold hover:bg-[#a6d42a] transition-all duration-200 hover:scale-105 hover:shadow-[0_0_20px_rgba(149,193,31,0.35)]"
             >
               <svg width="14" height="14" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
@@ -139,7 +139,7 @@ export default function Nav() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -12 }}
             transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="fixed top-[72px] left-0 right-0 z-40 bg-[#080f08]/95 backdrop-blur-2xl border-b border-white/[0.05]"
+            className="fixed top-[72px] left-0 right-0 z-40 bg-[#141412]/95 backdrop-blur-2xl border-b border-white/[0.05]"
           >
             <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1">
               {links.map((link) => (
@@ -157,7 +157,7 @@ export default function Nav() {
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => setMenuOpen(false)}
-                className="mt-3 flex items-center justify-center gap-2 py-3.5 bg-[#8DC63F] text-[#0a120a] rounded-full font-semibold text-sm"
+                className="mt-3 flex items-center justify-center gap-2 py-3.5 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm"
               >
                 Contactar por WhatsApp
               </a>

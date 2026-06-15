@@ -2,14 +2,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Tokens de marca Keyline Colombia ── */
+:root {
+  --color-keyline-black: #1D1D1B;
+  --color-keyline-green: #95C11F;
+  --color-keyline-pale:  #E9EA9B;
+}
+
 /* ── Base ── */
 html {
   scroll-behavior: smooth;
 }
 
 ::selection {
-  background: #8DC63F;
-  color: #0a120a;
+  background: #95C11F;
+  color: #1D1D1B;
 }
 
 /* ── Scrollbar ── */
@@ -17,14 +24,14 @@ html {
   width: 3px;
 }
 ::-webkit-scrollbar-track {
-  background: #080f08;
+  background: #141412;
 }
 ::-webkit-scrollbar-thumb {
   background: #2a4a0e;
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #8DC63F;
+  background: #95C11F;
 }
 
 /* ── Typography ── */
@@ -40,22 +47,22 @@ html {
 @layer utilities {
   .tech-grid {
     background-image:
-      linear-gradient(rgba(141, 198, 63, 0.028) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(141, 198, 63, 0.028) 1px, transparent 1px);
+      linear-gradient(rgba(149, 193, 31, 0.028) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(149, 193, 31, 0.028) 1px, transparent 1px);
     background-size: 72px 72px;
   }
 
   .dot-grid {
     background-image: radial-gradient(
       circle,
-      rgba(141, 198, 63, 0.045) 1px,
+      rgba(149, 193, 31, 0.045) 1px,
       transparent 1px
     );
     background-size: 36px 36px;
   }
 
   .glow-green {
-    box-shadow: 0 0 32px rgba(141, 198, 63, 0.25);
+    box-shadow: 0 0 32px rgba(149, 193, 31, 0.25);
   }
 
   .text-balance {

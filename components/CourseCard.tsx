@@ -33,8 +33,8 @@ export default function CourseCard() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-7"
           >
-            <div className="w-7 h-px bg-[#8DC63F]/70" />
-            <span className="text-[#8DC63F] text-[10px] tracking-[0.32em] uppercase font-medium">
+            <div className="w-7 h-px bg-[#95C11F]/70" />
+            <span className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium">
               Formación
             </span>
           </motion.div>
@@ -46,7 +46,7 @@ export default function CourseCard() {
             className="font-display text-[clamp(2.8rem,6vw,5rem)] font-semibold leading-tight max-w-3xl"
           >
             El primer paso{' '}
-            <em className="text-[#8DC63F] not-italic">comienza aquí</em>
+            <em className="text-[#95C11F] not-italic">comienza aquí</em>
           </motion.h2>
         </div>
 
@@ -55,7 +55,7 @@ export default function CourseCard() {
           initial={{ opacity: 0, y: 64 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 1, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-          className="rounded-3xl border border-white/[0.06] bg-[#0c190c] overflow-hidden"
+          className="rounded-3xl border border-white/[0.07] bg-[#2C2C2A] overflow-hidden"
         >
           <div className="grid lg:grid-cols-2">
             {/* Left: visual panel */}
@@ -67,23 +67,23 @@ export default function CourseCard() {
                     <path
                       key={i}
                       d={`M -20 ${y} Q ${125 + Math.sin(i * 0.9) * 40} ${y - 28 + i * 3} ${250 + Math.cos(i * 0.7) * 30} ${y + 10 - i * 2} Q ${380 + Math.sin(i * 0.5) * 20} ${y - 15 + i * 4} 520 ${y + 18}`}
-                      stroke="#8DC63F"
+                      stroke="#95C11F"
                       strokeWidth="0.6"
                       strokeDasharray="3 7"
                       opacity={0.8 - i * 0.08}
                     />
                   ))}
-                  <circle cx="185" cy="105" r="5" fill="#8DC63F" opacity="0.9" />
-                  <circle cx="185" cy="105" r="14" stroke="#8DC63F" strokeWidth="0.5" opacity="0.35" />
-                  <circle cx="185" cy="105" r="26" stroke="#8DC63F" strokeWidth="0.3" opacity="0.15" />
+                  <circle cx="185" cy="105" r="5" fill="#95C11F" opacity="0.9" />
+                  <circle cx="185" cy="105" r="14" stroke="#95C11F" strokeWidth="0.5" opacity="0.35" />
+                  <circle cx="185" cy="105" r="26" stroke="#95C11F" strokeWidth="0.3" opacity="0.15" />
                 </svg>
               </div>
 
               <div className="relative z-10">
-                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#8DC63F]/15 text-[#8DC63F] text-xs tracking-wide mb-8">
+                <div className="inline-flex items-center gap-2.5 px-4 py-2 rounded-full bg-[#95C11F]/15 text-[#95C11F] text-xs tracking-wide mb-8">
                   <span className="relative flex h-1.5 w-1.5">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#8DC63F] opacity-60" />
-                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#8DC63F]" />
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#95C11F] opacity-60" />
+                    <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-[#95C11F]" />
                   </span>
                   Inscripciones abiertas
                 </div>
@@ -99,7 +99,7 @@ export default function CourseCard() {
               </div>
 
               {/* Corner accent */}
-              <div className="absolute bottom-0 right-0 w-52 h-52 bg-[#8DC63F]/[0.04] rounded-tl-full pointer-events-none" />
+              <div className="absolute bottom-0 right-0 w-52 h-52 bg-[#95C11F]/[0.04] rounded-tl-full pointer-events-none" />
             </div>
 
             {/* Right: pricing & details */}
@@ -108,7 +108,7 @@ export default function CourseCard() {
               <div className="mb-10">
                 <div className="text-white/35 text-xs tracking-widest uppercase mb-3">Inversión</div>
                 <div className="flex items-baseline gap-2">
-                  <span className="font-display text-[3.5rem] font-bold text-[#8DC63F] leading-none">
+                  <span className="font-display text-[3.5rem] font-bold text-[#95C11F] leading-none">
                     $480.000
                   </span>
                 </div>
@@ -140,10 +140,10 @@ export default function CourseCard() {
                       fill="none"
                       className="shrink-0 mt-0.5"
                     >
-                      <circle cx="8" cy="8" r="7" stroke="#8DC63F" strokeWidth="1" opacity="0.4" />
+                      <circle cx="8" cy="8" r="7" stroke="#95C11F" strokeWidth="1" opacity="0.4" />
                       <path
                         d="M5 8L7 10L11 6"
-                        stroke="#8DC63F"
+                        stroke="#95C11F"
                         strokeWidth="1.3"
                         strokeLinecap="round"
                         strokeLinejoin="round"
@@ -157,7 +157,7 @@ export default function CourseCard() {
               {/* CTA */}
               <a
                 href="#"
-                className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#8DC63F] text-[#0a120a] rounded-full font-semibold text-sm hover:bg-[#a3d45a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(141,198,63,0.4)] hover:scale-[1.02]"
+                className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)] hover:scale-[1.02]"
               >
                 Reservar mi lugar
                 <svg width="15" height="15" viewBox="0 0 15 15" fill="none" aria-hidden="true">
