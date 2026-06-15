@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { motion } from 'framer-motion'
 
@@ -21,8 +21,8 @@ export default function Ticker() {
       >
         {doubled.map((item, i) => (
           <span key={i} className="inline-flex items-center gap-4 px-8 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#8DB76A] shrink-0" />
-            <span className="text-[#8DB76A] text-[10px] tracking-[0.28em] uppercase font-medium shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-[#8DC63F] shrink-0" />
+            <span className="text-[#8DC63F] text-[10px] tracking-[0.28em] uppercase font-medium shrink-0">
               {item.label}
             </span>
             <span className="text-white/35 text-[11px] tracking-[0.15em] uppercase shrink-0">

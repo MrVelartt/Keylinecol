@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
@@ -45,7 +45,7 @@ export default function Nosotros() {
   return (
     <section id="nosotros" className="py-32 lg:py-44 px-6 relative overflow-hidden">
       {/* Bg accent */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#8DB76A]/[0.025] rounded-full blur-[180px] pointer-events-none -translate-x-1/2 -translate-y-1/4" />
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#8DC63F]/[0.025] rounded-full blur-[180px] pointer-events-none -translate-x-1/2 -translate-y-1/4" />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
@@ -56,8 +56,8 @@ export default function Nosotros() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-7"
           >
-            <div className="w-7 h-px bg-[#8DB76A]/60" />
-            <span className="font-mono text-[#8DB76A] text-[10px] tracking-[0.32em] uppercase">
+            <div className="w-7 h-px bg-[#8DC63F]/60" />
+            <span className="font-mono text-[#8DC63F] text-[10px] tracking-[0.32em] uppercase">
               Sobre Nosotros
             </span>
           </motion.div>
@@ -70,7 +70,7 @@ export default function Nosotros() {
           >
             Leemos la tierra
             <br />
-            <em className="text-[#8DB76A] not-italic">con precisión.</em>
+            <em className="text-[#8DC63F] not-italic">con precisión.</em>
           </motion.h2>
         </div>
 
@@ -88,7 +88,7 @@ export default function Nosotros() {
                 <KeylineLogo size={48} />
               </div>
               <div>
-                <div className="font-mono text-[10px] text-[#8DB76A]/50 tracking-widest uppercase mb-2">
+                <div className="font-mono text-[10px] text-[#8DC63F]/50 tracking-widest uppercase mb-2">
                   Villavicencio · Meta · Colombia
                 </div>
                 <p className="text-white/70 text-lg leading-relaxed">
@@ -121,7 +121,7 @@ export default function Nosotros() {
                   'Hidrología de Cuencas Aplicada — IDEAM Colombia',
                 ].map((cert) => (
                   <div key={cert} className="flex items-start gap-3 text-sm text-white/40">
-                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-[#8DB76A]/60 shrink-0" />
+                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-[#8DC63F]/60 shrink-0" />
                     {cert}
                   </div>
                 ))}
@@ -142,10 +142,10 @@ export default function Nosotros() {
                 initial={{ opacity: 0, y: 24 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.35 + i * 0.09 }}
-                className="group p-6 rounded-2xl border border-white/[0.05] bg-white/[0.015] hover:border-[#8DB76A]/15 hover:bg-[#8DB76A]/[0.03] transition-all duration-400"
+                className="group p-6 rounded-2xl border border-white/[0.05] bg-white/[0.015] hover:border-[#8DC63F]/15 hover:bg-[#8DC63F]/[0.03] transition-all duration-400"
               >
                 <div className="flex items-start gap-4">
-                  <span className="font-mono text-[11px] text-[#8DB76A]/40 tracking-widest mt-0.5 shrink-0">
+                  <span className="font-mono text-[11px] text-[#8DC63F]/40 tracking-widest mt-0.5 shrink-0">
                     {v.code}
                   </span>
                   <div>
@@ -166,8 +166,8 @@ export default function Nosotros() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-12"
           >
-            <div className="w-7 h-px bg-[#8DB76A]/60" />
-            <span className="font-mono text-[#8DB76A] text-[10px] tracking-[0.32em] uppercase">
+            <div className="w-7 h-px bg-[#8DC63F]/60" />
+            <span className="font-mono text-[#8DC63F] text-[10px] tracking-[0.32em] uppercase">
               Trayectoria
             </span>
           </motion.div>
@@ -178,7 +178,7 @@ export default function Nosotros() {
               initial={{ scaleY: 0 }}
               animate={tlInView ? { scaleY: 1 } : {}}
               transition={{ duration: 1.2, ease: 'easeOut' }}
-              className="absolute left-[4.5rem] top-0 bottom-0 w-px bg-gradient-to-b from-[#8DB76A]/30 via-[#8DB76A]/15 to-transparent origin-top hidden md:block"
+              className="absolute left-[4.5rem] top-0 bottom-0 w-px bg-gradient-to-b from-[#8DC63F]/30 via-[#8DC63F]/15 to-transparent origin-top hidden md:block"
             />
 
             <div className="space-y-6">
@@ -191,13 +191,13 @@ export default function Nosotros() {
                   className="flex items-center gap-6 md:gap-8 group"
                 >
                   {/* Year */}
-                  <div className="font-mono text-[13px] text-[#8DB76A] w-14 shrink-0 text-right md:text-right">
+                  <div className="font-mono text-[13px] text-[#8DC63F] w-14 shrink-0 text-right md:text-right">
                     {item.year}
                   </div>
 
                   {/* Dot */}
                   <div className="relative shrink-0 hidden md:block">
-                    <div className="w-2 h-2 rounded-full bg-[#8DB76A]/40 group-hover:bg-[#8DB76A] transition-colors duration-300" />
+                    <div className="w-2 h-2 rounded-full bg-[#8DC63F]/40 group-hover:bg-[#8DC63F] transition-colors duration-300" />
                   </div>
 
                   {/* Event */}

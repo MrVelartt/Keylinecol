@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useRef, useEffect, useState } from 'react'
 import { motion, useInView, animate } from 'framer-motion'
@@ -47,7 +47,7 @@ export default function StatsBar() {
               transition={{ duration: 0.7, delay: i * 0.1 }}
               className="text-center"
             >
-              <div className="font-display text-[clamp(2.8rem,5vw,4rem)] font-bold text-[#8DB76A] mb-3 leading-none tabular-nums">
+              <div className="font-display text-[clamp(2.8rem,5vw,4rem)] font-bold text-[#8DC63F] mb-3 leading-none tabular-nums">
                 <CountUp target={stat.value} suffix={stat.suffix} active={inView} />
               </div>
               <div className="text-white/35 text-sm tracking-wide">{stat.label}</div>

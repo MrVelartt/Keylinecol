@@ -18,6 +18,10 @@ export const metadata: Metadata = {
   title: 'Keyline Colombia — Diseño Regenerativo de Paisajes',
   description:
     'Transformamos tu tierra con la metodología Keyline: agua, fertilidad y biodiversidad en armonía. Colombia.',
+  icons: {
+    icon: '/brand/isotipo.png',
+    apple: '/brand/isotipo.png',
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

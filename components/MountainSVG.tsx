@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { motion } from 'framer-motion'
 
@@ -41,9 +41,9 @@ export default function MountainSVG() {
       >
         <defs>
           <radialGradient id="keypointGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#8DB76A" stopOpacity="0.9" />
-            <stop offset="40%" stopColor="#8DB76A" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#8DB76A" stopOpacity="0" />
+            <stop offset="0%" stopColor="#8DC63F" stopOpacity="0.9" />
+            <stop offset="40%" stopColor="#8DC63F" stopOpacity="0.4" />
+            <stop offset="100%" stopColor="#8DC63F" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="fadeBottom" x1="0" y1="0" x2="0" y2="1">
             <stop offset="60%" stopColor="#0a120a" stopOpacity="0" />
@@ -88,7 +88,7 @@ export default function MountainSVG() {
             key={i}
             d={line.d}
             fill="none"
-            stroke="#8DB76A"
+            stroke="#8DC63F"
             strokeWidth="0.75"
             strokeDasharray="4 9"
             strokeLinecap="round"
@@ -114,7 +114,7 @@ export default function MountainSVG() {
             cy="145"
             r="9"
             fill="none"
-            stroke="#8DB76A"
+            stroke="#8DC63F"
             strokeWidth="0.6"
             animate={{ r: [9, 22], opacity: [0.7, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 0.8, ease: 'easeOut' }}
@@ -126,14 +126,14 @@ export default function MountainSVG() {
             cy="145"
             r="9"
             fill="none"
-            stroke="#8DB76A"
+            stroke="#8DC63F"
             strokeWidth="0.4"
             animate={{ r: [9, 32], opacity: [0.4, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 0.8, delay: 0.6, ease: 'easeOut' }}
           />
 
           {/* Core dot */}
-          <circle cx="780" cy="145" r="3.5" fill="#8DB76A" />
+          <circle cx="780" cy="145" r="3.5" fill="#8DC63F" />
           <circle cx="780" cy="145" r="1.8" fill="white" />
         </motion.g>
 
@@ -148,7 +148,7 @@ export default function MountainSVG() {
             y1="145"
             x2="850"
             y2="112"
-            stroke="#8DB76A"
+            stroke="#8DC63F"
             strokeWidth="0.5"
             strokeDasharray="2 5"
             opacity="0.7"
@@ -156,7 +156,7 @@ export default function MountainSVG() {
           <text
             x="857"
             y="109"
-            fill="#8DB76A"
+            fill="#8DC63F"
             fontSize="9"
             fontFamily="monospace"
             letterSpacing="0.12em"

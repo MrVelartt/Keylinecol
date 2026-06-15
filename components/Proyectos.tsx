@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
@@ -130,7 +130,7 @@ const projects: Project[] = [
 ]
 
 const statusConfig = {
-  'Completado':  { color: 'text-[#8DB76A]', bg: 'bg-[#8DB76A]/10', border: 'border-[#8DB76A]/25', dot: 'bg-[#8DB76A]' },
+  'Completado':  { color: 'text-[#8DC63F]', bg: 'bg-[#8DC63F]/10', border: 'border-[#8DC63F]/25', dot: 'bg-[#8DC63F]' },
   'En progreso': { color: 'text-sky-400',   bg: 'bg-sky-400/10',    border: 'border-sky-400/25',   dot: 'bg-sky-400 animate-pulse' },
   'Planificación':{ color: 'text-amber-400', bg: 'bg-amber-400/10',  border: 'border-amber-400/25', dot: 'bg-amber-400' },
 }
@@ -141,7 +141,7 @@ function TerrainSVG({ project }: { project: Project }) {
       <rect width="310" height="165" fill="#080e08" />
       {/* Grid */}
       <pattern id={`g-${project.id}`} width="30" height="30" patternUnits="userSpaceOnUse">
-        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(141,183,106,0.04)" strokeWidth="0.5" />
+        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(141,198,63,0.04)" strokeWidth="0.5" />
       </pattern>
       <rect width="310" height="165" fill={`url(#g-${project.id})`} />
 
@@ -154,7 +154,7 @@ function TerrainSVG({ project }: { project: Project }) {
           key={i}
           d={d}
           fill="none"
-          stroke="#8DB76A"
+          stroke="#8DC63F"
           strokeWidth="0.6"
           strokeDasharray="3 7"
           opacity={0.35 - i * 0.08}
@@ -167,17 +167,17 @@ function TerrainSVG({ project }: { project: Project }) {
         y1={project.keypointY + 8}
         x2="310"
         y2={project.keypointY + 8}
-        stroke="#8DB76A"
+        stroke="#8DC63F"
         strokeWidth="0.4"
         opacity="0.2"
         strokeDasharray="1 4"
       />
 
       {/* Keypoint */}
-      <circle cx={project.keypointX} cy={project.keypointY} r="10" fill="rgba(141,183,106,0.08)" />
-      <circle cx={project.keypointX} cy={project.keypointY} r="3.5" fill="#8DB76A" opacity="0.9" />
+      <circle cx={project.keypointX} cy={project.keypointY} r="10" fill="rgba(141,198,63,0.08)" />
+      <circle cx={project.keypointX} cy={project.keypointY} r="3.5" fill="#8DC63F" opacity="0.9" />
       <circle cx={project.keypointX} cy={project.keypointY} r="1.5" fill="#0a120a" />
-      <circle cx={project.keypointX} cy={project.keypointY} r="0.7" fill="#8DB76A" />
+      <circle cx={project.keypointX} cy={project.keypointY} r="0.7" fill="#8DC63F" />
 
       {/* Bottom fade */}
       <defs>
@@ -189,10 +189,10 @@ function TerrainSVG({ project }: { project: Project }) {
       <rect width="310" height="165" fill={`url(#fade-${project.id})`} />
 
       {/* Data overlays */}
-      <text x="8" y="14" fill="rgba(141,183,106,0.45)" fontSize="7.5" fontFamily="monospace" letterSpacing="0.08em">
+      <text x="8" y="14" fill="rgba(141,198,63,0.45)" fontSize="7.5" fontFamily="monospace" letterSpacing="0.08em">
         {project.elv}
       </text>
-      <text x="8" y="24" fill="rgba(141,183,106,0.25)" fontSize="6.5" fontFamily="monospace" letterSpacing="0.06em">
+      <text x="8" y="24" fill="rgba(141,198,63,0.25)" fontSize="6.5" fontFamily="monospace" letterSpacing="0.06em">
         {project.id}
       </text>
     </svg>
@@ -210,7 +210,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
       initial={{ opacity: 0, y: 56 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.85, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
-      className="group relative flex flex-col border border-white/[0.06] rounded-2xl overflow-hidden bg-[#0b160b]/60 hover:border-[#8DB76A]/20 transition-all duration-500 hover:bg-[#0d1c0d]/80"
+      className="group relative flex flex-col border border-white/[0.06] rounded-2xl overflow-hidden bg-[#0b160b]/60 hover:border-[#8DC63F]/20 transition-all duration-500 hover:bg-[#0d1c0d]/80"
     >
       {/* Terrain visual */}
       <div className="relative h-44 overflow-hidden">
@@ -227,7 +227,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
         {/* ID + coords */}
         <div className="flex items-center justify-between">
           <span className="font-mono text-[10px] text-white/20 tracking-widest">{project.id}</span>
-          <span className="font-mono text-[10px] text-[#8DB76A]/35 tracking-wide">{project.coords}</span>
+          <span className="font-mono text-[10px] text-[#8DC63F]/35 tracking-wide">{project.coords}</span>
         </div>
 
         {/* Name + location */}
@@ -235,7 +235,7 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           <h3 className="font-display text-xl font-semibold leading-snug mb-1">{project.name}</h3>
           <div className="flex items-center gap-1.5 text-[12px] text-white/35">
             <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-              <path d="M5 1C2.79 1 1 2.79 1 5c0 3 4 7 4 7s4-4 4-7c0-2.21-1.79-4-4-4z" stroke="#8DB76A" strokeWidth="0.8" fill="none" opacity="0.6"/>
+              <path d="M5 1C2.79 1 1 2.79 1 5c0 3 4 7 4 7s4-4 4-7c0-2.21-1.79-4-4-4z" stroke="#8DC63F" strokeWidth="0.8" fill="none" opacity="0.6"/>
             </svg>
             {project.location}, {project.dept}
           </div>
@@ -250,13 +250,13 @@ function ProjectCard({ project, index }: { project: Project; index: number }) {
           ].map(({ label, value }) => (
             <div key={label}>
               <div className="font-mono text-[9px] text-white/20 tracking-widest uppercase mb-1">{label}</div>
-              <div className="font-mono text-[13px] text-[#8DB76A] font-medium">{value}</div>
+              <div className="font-mono text-[13px] text-[#8DC63F] font-medium">{value}</div>
             </div>
           ))}
         </div>
 
         {/* Type */}
-        <div className="text-[11px] text-[#8DB76A]/50 tracking-wide uppercase font-medium">{project.type}</div>
+        <div className="text-[11px] text-[#8DC63F]/50 tracking-wide uppercase font-medium">{project.type}</div>
 
         {/* Description — revealed on hover */}
         <p className="text-white/35 text-[13px] leading-relaxed line-clamp-3 group-hover:text-white/50 transition-colors duration-300">
@@ -277,7 +277,7 @@ export default function Proyectos() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: 'radial-gradient(circle, rgba(141,183,106,0.04) 1px, transparent 1px)',
+          backgroundImage: 'radial-gradient(circle, rgba(141,198,63,0.04) 1px, transparent 1px)',
           backgroundSize: '40px 40px',
         }}
       />
@@ -291,8 +291,8 @@ export default function Proyectos() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-7"
           >
-            <div className="w-7 h-px bg-[#8DB76A]/60" />
-            <span className="font-mono text-[#8DB76A] text-[10px] tracking-[0.32em] uppercase">
+            <div className="w-7 h-px bg-[#8DC63F]/60" />
+            <span className="font-mono text-[#8DC63F] text-[10px] tracking-[0.32em] uppercase">
               Proyectos en Campo
             </span>
           </motion.div>
@@ -307,7 +307,7 @@ export default function Proyectos() {
               Tierra transformada
               <br />
               en{' '}
-              <em className="text-[#8DB76A] not-italic">datos reales</em>
+              <em className="text-[#8DC63F] not-italic">datos reales</em>
             </motion.h2>
 
             <motion.div
@@ -346,10 +346,10 @@ export default function Proyectos() {
           className="mt-14 text-center"
         >
           <a
-            href="https://wa.me/573001234567?text=Hola%2C%20quisiera%20iniciar%20un%20proyecto%20Keyline%20en%20mi%20finca"
+            href="https://wa.me/573113650567?text=Hola%2C%20quisiera%20iniciar%20un%20proyecto%20Keyline%20en%20mi%20finca"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 px-7 py-3.5 border border-[#8DB76A]/30 text-[#8DB76A] rounded-full text-sm font-medium hover:bg-[#8DB76A]/10 transition-all duration-200 hover:border-[#8DB76A]/50 tracking-wide"
+            className="inline-flex items-center gap-2.5 px-7 py-3.5 border border-[#8DC63F]/30 text-[#8DC63F] rounded-full text-sm font-medium hover:bg-[#8DC63F]/10 transition-all duration-200 hover:border-[#8DC63F]/50 tracking-wide"
           >
             Iniciar un proyecto
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
