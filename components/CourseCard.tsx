@@ -19,11 +19,11 @@ const details = [
 ]
 
 const galleryImages = [
-  '/courses/ecuador/ec01.jpg',
-  '/courses/ecuador/ec02.jpg',
-  '/courses/ecuador/ec03.jpg',
-  '/courses/ecuador/ec04.jpg',
-  '/courses/ecuador/ec05.jpg',
+  '/courses/ecuador/ce01.jpg',
+  '/courses/ecuador/ce02.jpg',
+  '/courses/ecuador/ce03.jpg',
+  '/courses/ecuador/ce04.jpg',
+  '/courses/ecuador/ce05.jpg',
 ]
 
 function CourseGallery() {
