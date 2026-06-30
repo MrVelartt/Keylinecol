@@ -3,10 +3,13 @@
 import { motion } from 'framer-motion'
 
 const items = [
-  { label: 'PROYECTO ACTIVO', text: 'Finca La Esperanza — Cundinamarca · Diseño Keyline en progreso · 240 ha' },
-  { label: 'PROYECTO ACTIVO', text: 'Finca El Roble — Antioquia · Regeneración de suelos · 180 ha' },
-  { label: 'EN EVALUACIÓN', text: 'Valle del Cauca · Agroforestería Keyline · 380 ha' },
-  { label: 'COMPLETADO', text: 'Finca Santa Clara — Boyacá · Sistema de captación de agua · 92 ha' },
+  { label: 'COMPLETADO', text: 'La Guajira · Drone Keyline + Pastoreo Regenerativo · 3 ha' },
+  { label: 'COMPLETADO', text: 'Mineros S.A. — El Bagre, Antioquia · Agroforestal Sintrópico · 3 ha' },
+  { label: 'COMPLETADO', text: 'Grupo BIOS — Cereté, Córdoba · Piloto Demostrativo · 0,4 ha' },
+  { label: 'COMPLETADO', text: 'Villanueva — Casanare · Ganadería Regenerativa · 456 ha' },
+  { label: 'COMPLETADO', text: 'Magangué — Bolívar · Ganadería Keyline · 1.000 ha' },
+  { label: 'COMPLETADO', text: 'Jericó — Antioquia · Diseño Keyline Cafetero · 0,7 ha' },
+  { label: 'COMPLETADO', text: 'Tranquilandia — Mesetas, Meta · Sistema Agrosilvopastoril · 10 ha' },
 ]
 
 export default function Ticker() {

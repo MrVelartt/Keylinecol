@@ -18,3 +18,10 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Videos (alojar en YouTube o Cloudinary)
+*.mp4
+*.MP4
+*.mov
+*.MOV
+*.webm
