@@ -84,7 +84,7 @@ export default function Footer() {
             Hablemos por WhatsApp
           </a>
           <a
-            href="#cursos"
+            href="/#cursos"
             className="px-8 py-4 border border-[#444441] text-white/70 rounded-full font-medium hover:border-white/30 hover:bg-white/[0.05] hover:text-white transition-all duration-200"
           >
             Ver todos los cursos

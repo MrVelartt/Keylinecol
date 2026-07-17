@@ -1,26 +1,35 @@
 ﻿'use client'
 
 import { useEffect, useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
 
 const links = [
-  { label: 'Metodología', href: '#metodologia' },
-  { label: 'Proyectos', href: '#proyectos' },
-  { label: 'Cursos', href: '#cursos' },
-  { label: 'Nosotros', href: '#nosotros' },
+  { label: 'Metodología', href: '/#metodologia', type: 'anchor' as const },
+  { label: 'Herramientas', href: '/herramientas', type: 'route' as const },
+  { label: 'Analítica', href: '/analitica', type: 'route' as const },
+  { label: 'Proyectos', href: '/#proyectos', type: 'anchor' as const },
+  { label: 'Cursos', href: '/#cursos', type: 'anchor' as const },
+  { label: 'Nosotros', href: '/#nosotros', type: 'anchor' as const },
 ]
 
 export default function Nav() {
-  const [scrolled, setScrolled] = useState(false)
+  const pathname = usePathname()
+  const isHome = pathname === '/'
+  const [scrolled, setScrolled] = useState(!isHome)
   const [active, setActive] = useState('')
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
+    if (!isHome) {
+      setScrolled(true)
+      return
+    }
+    const anchorIds = links.filter((l) => l.type === 'anchor').map((l) => l.href.replace('/#', ''))
     const onScroll = () => {
       setScrolled(window.scrollY > 24)
-      const sections = links.map((l) => l.href.replace('#', ''))
-      for (const id of [...sections].reverse()) {
+      for (const id of [...anchorIds].reverse()) {
         const el = document.getElementById(id)
         if (el && window.scrollY >= el.offsetTop - 140) {
           setActive(id)
@@ -30,7 +39,10 @@ export default function Nav() {
     }
     window.addEventListener('scroll', onScroll, { passive: true })
     return () => window.removeEventListener('scroll', onScroll)
-  }, [])
+  }, [isHome])
+
+  const isLinkActive = (link: (typeof links)[number]) =>
+    link.type === 'route' ? pathname === link.href : isHome && active === link.href.replace('/#', '')
 
   return (
     <>
@@ -47,7 +59,7 @@ export default function Nav() {
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 h-[72px] flex items-center justify-between gap-8">
           {/* Logo real */}
-          <a href="#" className="shrink-0 flex items-center" aria-label="Keyline Colombia">
+          <a href="/" className="shrink-0 flex items-center" aria-label="Keyline Colombia">
             <Image
               src="/brand/logo-dark.png"
               alt="Keyline Colombia"
@@ -67,8 +79,7 @@ export default function Nav() {
           {/* Desktop links */}
           <div className="hidden md:flex items-center gap-1">
             {links.map((link) => {
-              const id = link.href.replace('#', '')
-              const isActive = active === id
+              const isActive = isLinkActive(link)
               return (
                 <a
                   key={link.label}
