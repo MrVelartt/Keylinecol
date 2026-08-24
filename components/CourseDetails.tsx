@@ -55,7 +55,7 @@ export default function CourseDetails() {
           <div className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium mb-4">
             Para quién es
           </div>
-          <p className="text-white/55 text-lg leading-relaxed">
+          <p className="text-white/65 text-xl lg:text-2xl leading-snug">
             Prioridad para <span className="text-white">agrónomos y dueños de tierra</span>, abierto a cualquier
             interesado. Sin requisitos previos de topografía ni SIG — pero sí computador, QGIS no corre en celular.
           </p>
@@ -90,10 +90,10 @@ export default function CourseDetails() {
                     {unit.weeks}
                   </span>
                 </div>
-                <h3 className="font-display text-xl font-semibold text-white mb-3">{unit.title}</h3>
-                <p className="text-white/50 text-sm leading-relaxed mb-6 flex-1">{unit.description}</p>
+                <h3 className="font-display text-2xl lg:text-[1.7rem] font-semibold text-white mb-4">{unit.title}</h3>
+                <p className="text-white/60 text-base leading-relaxed mb-6 flex-1">{unit.description}</p>
                 <div className="flex items-start gap-2.5 pt-5 border-t border-white/[0.06]">
-                  <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
                     <path
                       d="M2 8.5l3.5 3.5L14 3"
                       stroke="#95C11F"
@@ -102,8 +102,8 @@ export default function CourseDetails() {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <span className="text-white/70 text-xs leading-relaxed">
-                    <span className="text-white/35 uppercase tracking-wide">Entregable — </span>
+                  <span className="text-white/80 text-sm leading-relaxed">
+                    <span className="text-white/40 uppercase tracking-wide">Entregable — </span>
                     {unit.deliverable}
                   </span>
                 </div>
