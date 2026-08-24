@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Climático Keyline – Baranoa, Atlántico</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0f1117;
+    --card: #1a1d2e;
+    --card2: #222538;
+    --accent: #4ade80;
+    --accent2: #60a5fa;
+    --accent3: #f59e0b;
+    --accent4: #f87171;
+    --text: #e2e8f0;
+    --muted: #94a3b8;
+    --border: #2d3148;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: 'Segoe UI', system-ui, sans-serif; min-height: 100vh; }
+
+  .header {
+    background: linear-gradient(135deg, #0f3460 0%, #16213e 50%, #0d1117 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 20px 28px 16px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;
+  }
+  .header-left { display: flex; flex-direction: column; gap: 4px; }
+  .header-title { font-size: 1.4rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; }
+  .header-title span.tag {
+    font-size: 0.65rem; background: var(--accent); color: #000; padding: 2px 8px; border-radius: 20px; font-weight: 700; letter-spacing: .5px;
+  }
+  .header-sub { color: var(--muted); font-size: 0.82rem; }
+  .header-meta { display: flex; gap: 20px; flex-wrap: wrap; }
+  .meta-item { text-align: center; }
+  .meta-val { font-size: 1.1rem; font-weight: 700; color: var(--accent2); }
+  .meta-lbl { font-size: 0.68rem; color: var(--muted); }
+
+  .tabs { display: flex; gap: 4px; padding: 16px 28px 0; border-bottom: 1px solid var(--border); }
+  .tab {
+    padding: 9px 18px; border-radius: 8px 8px 0 0; cursor: pointer; font-size: 0.83rem;
+    font-weight: 600; color: var(--muted); border: 1px solid transparent; border-bottom: none;
+    transition: all .2s; user-select: none;
+  }
+  .tab:hover { color: var(--text); background: var(--card2); }
+  .tab.active { color: var(--accent); background: var(--card); border-color: var(--border); }
+
+  .content { padding: 24px 28px; display: none; }
+  .content.active { display: block; }
+
+  .kpi-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .kpi {
+    background: var(--card); border: 1px solid var(--border); border-radius: 12px;
+    padding: 16px 18px; position: relative; overflow: hidden;
+  }
+  .kpi::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--kpi-color, var(--accent));
+  }
+  .kpi-label { font-size: 0.72rem; color: var(--muted); font-weight: 600; letter-spacing: .5px; text-transform: uppercase; }
+  .kpi-value { font-size: 1.7rem; font-weight: 800; color: var(--text); margin: 4px 0 2px; line-height: 1; }
+  .kpi-unit { font-size: 0.72rem; color: var(--muted); }
+  .kpi-sub { font-size: 0.73rem; color: var(--muted); margin-top: 6px; }
+
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+  @media(max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+  .card-title { font-size: 0.85rem; font-weight: 700; color: var(--text); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+  .card-title .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .chart-wrap { position: relative; height: 240px; }
+  .chart-wrap.tall { height: 300px; }
+  .chart-wrap.short { height: 180px; }
+
+  .filter-bar { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; }
+  .filter-bar label { font-size: 0.78rem; color: var(--muted); font-weight: 600; }
+  select {
+    background: var(--card2); color: var(--text); border: 1px solid var(--border);
+    padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; outline: none;
+  }
+  select:focus { border-color: var(--accent2); }
+  .badge {
+    background: var(--card2); border: 1px solid var(--border); padding: 5px 12px;
+    border-radius: 20px; font-size: 0.75rem; color: var(--muted);
+  }
+  .badge strong { color: var(--text); }
+
+  .data-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+  .data-table th { background: var(--card2); color: var(--muted); font-weight: 600; padding: 8px 10px; text-align: left; font-size: 0.7rem; text-transform: uppercase; letter-spacing: .4px; }
+  .data-table td { padding: 7px 10px; border-bottom: 1px solid var(--border); color: var(--text); }
+  .data-table tr:hover td { background: var(--card2); }
+  .data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .deficit { color: var(--accent4); }
+  .surplus { color: var(--accent); }
+
+  .bal-bar { height: 6px; border-radius: 3px; background: var(--border); margin-top: 4px; overflow: hidden; }
+  .bal-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+
+  .insight { background: #1a2235; border: 1px solid #2a3a5c; border-radius: 10px; padding: 14px 16px; margin-top: 14px; font-size: 0.8rem; color: var(--muted); line-height: 1.6; }
+  .insight strong { color: var(--accent2); }
+
+  .zone-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 18px; }
+  .zone-card {
+    background: var(--card2); border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+    border-left: 3px solid var(--zc, #4ade80);
+  }
+  .zone-name { font-size: 0.75rem; font-weight: 700; color: var(--text); }
+  .zone-area { font-size: 0.68rem; color: var(--muted); margin-top: 2px; }
+  .zone-vol { font-size: 1.1rem; font-weight: 700; color: var(--zc, #4ade80); margin-top: 8px; }
+  .zone-vol-lbl { font-size: 0.65rem; color: var(--muted); }
+
+  footer { text-align: center; padding: 16px; font-size: 0.7rem; color: var(--muted); border-top: 1px solid var(--border); margin-top: 10px; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-left">
+    <div class="header-title">
+      🌿 Dashboard Climático — Keyline Baranoa
+      <span class="tag">DISEÑO KEYLINE</span>
+    </div>
+    <div class="header-sub">Baranoa, Atlántico, Colombia · 10.79°N, -74.92°O · 12 m s.n.m. · Finca 28 ha</div>
+  </div>
+  <div class="header-meta">
+    <div class="meta-item"><div class="meta-val">751.9</div><div class="meta-lbl">mm/año Precipitación</div></div>
+    <div class="meta-item"><div class="meta-val">1,637</div><div class="meta-lbl">mm/año ETo (FAO-56)</div></div>
+    <div class="meta-item"><div class="meta-val">88,231</div><div class="meta-lbl">m³/año Escorrentía</div></div>
+    <div class="meta-item"><div class="meta-val">28 ha</div><div class="meta-lbl">Área total finca</div></div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('precipitacion')">🌧 Precipitación</div>
+  <div class="tab" onclick="showTab('eto')">☀️ ETo & Clima</div>
+  <div class="tab" onclick="showTab('balance')">⚖️ Balance Hídrico</div>
+  <div class="tab" onclick="showTab('escorrentia')">💧 Escorrentía Keyline</div>
+</div>
+
+<!-- TAB 1: PRECIPITACIÓN -->
+<div id="tab-precipitacion" class="content active">
+  <div class="kpi-row">
+    <div class="kpi" style="--kpi-color:#60a5fa">
+      <div class="kpi-label">Precipitación Anual Media</div>
+      <div class="kpi-value">751.9</div>
+      <div class="kpi-unit">mm / año</div>
+      <div class="kpi-sub">Serie histórica 1997–2025</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#4ade80">
+      <div class="kpi-label">Mes más lluvioso</div>
+      <div class="kpi-value">Ago</div>
+      <div class="kpi-unit">108.1 mm promedio</div>
+      <div class="kpi-sub">Agosto lidera el régimen bimodal</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#f59e0b">
+      <div class="kpi-label">Máximo Anual Histórico</div>
+      <div class="kpi-value">1,658</div>
+      <div class="kpi-unit">mm (año 2010)</div>
+      <div class="kpi-sub">Fenómeno La Niña</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#f87171">
+      <div class="kpi-label">Mínimo Anual Histórico</div>
+      <div class="kpi-value">149</div>
+      <div class="kpi-unit">mm (año 1997)</div>
+      <div class="kpi-sub">Año más seco registrado</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#a78bfa">
+      <div class="kpi-label">Max. diario histórico</div>
+      <div class="kpi-value">140</div>
+      <div class="kpi-unit">mm en un día (Ago 2008)</div>
+      <div class="kpi-sub">Evento extremo</div>
+    </div>
+  </div>
+
+  <div class="filter-bar">
+    <label>Año para detalle mensual:</label>
+    <select id="yearSelect" onchange="updateYearChart()">
+      <option value="avg">— Promedio histórico —</option>
+    </select>
+    <div class="badge">Estación: <strong>Montebello [29040020]</strong></div>
+    <div class="badge">Periodo: <strong>1997–2025</strong></div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#60a5fa"></span>Precipitación Mensual</div>
+      <div class="chart-wrap"><canvas id="ppMensualChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#4ade80"></span>Tendencia Anual (1997–2025)</div>
+      <div class="chart-wrap"><canvas id="ppAnualChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="card-title"><span class="dot" style="background:#f59e0b"></span>Precipitación total mensual (mm) — Seleccione año arriba</div>
+    <div class="chart-wrap"><canvas id="ppMaxDiaChart"></canvas></div>
+  </div>
+
+  <div class="insight">
+    <strong>Régimen bimodal tropical:</strong> Baranoa presenta dos temporadas lluviosas (May–Jul y Ago–Nov) y una marcada temporada seca (Dic–Mar, &lt;15 mm/mes).
+    La alta variabilidad interanual (149–1658 mm) subraya la necesidad del diseño Keyline para <strong>capturar y retener agua en períodos húmedos</strong> y compensar el déficit evapotranspirativo (&gt;885 mm/año).
+  </div>
+</div>
+
+<!-- TAB 2: ETo & CLIMA -->
+<div id="tab-eto" class="content">
+  <div class="kpi-row">
+    <div class="kpi" style="--kpi-color:#f59e0b">
+      <div class="kpi-label">ETo Anual (FAO-56 PM)</div>
+      <div class="kpi-value">1,637</div>
+      <div class="kpi-unit">mm / año</div>
+      <div class="kpi-sub">Penman-Monteith FAO-56</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#f87171">
+      <div class="kpi-label">Demanda hídrica (28 ha)</div>
+      <div class="kpi-value">458,494</div>
+      <div class="kpi-unit">m³ / año</div>
+      <div class="kpi-sub">Volumen ETo sobre la finca</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#60a5fa">
+      <div class="kpi-label">Temp. media anual</div>
+      <div class="kpi-value">28.0</div>
+      <div class="kpi-unit">°C</div>
+      <div class="kpi-sub">Rango: 22.8–33.4°C</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#4ade80">
+      <div class="kpi-label">Humedad relativa media</div>
+      <div class="kpi-value">80%</div>
+      <div class="kpi-unit">Promedio anual</div>
+      <div class="kpi-sub">Rango: 76–84%</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#a78bfa">
+      <div class="kpi-label">Viento promedio (2m)</div>
+      <div class="kpi-value">2.6</div>
+      <div class="kpi-unit">m/s</div>
+      <div class="kpi-sub">Más fuerte: Feb–Mar (3.5 m/s)</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#f59e0b"></span>ETo Diaria por Mes (mm/día)</div>
+      <div class="chart-wrap"><canvas id="etoChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#60a5fa"></span>Temperatura Máx / Mín (°C)</div>
+      <div class="chart-wrap"><canvas id="tempChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="margin-top:18px">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#4ade80"></span>Humedad Relativa (%)</div>
+      <div class="chart-wrap short"><canvas id="hrChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#a78bfa"></span>Viento a 2 m (m/s)</div>
+      <div class="chart-wrap short"><canvas id="windChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#f87171"></span>Insolación (h/día)</div>
+      <div class="chart-wrap short"><canvas id="sunChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>Altos requerimientos hídricos:</strong> La ETo anual de 1,637 mm casi duplica la precipitación anual promedio (751.9 mm), generando un déficit hídrico estructural de
+    <strong>~885 mm/año</strong>. La demanda pico se da en Feb–Mar (Temp. máx. &gt;33°C, baja humedad, mayor viento), justificando estrategias de captación y almacenamiento según el diseño Keyline.
+  </div>
+</div>
+
+<!-- TAB 3: BALANCE HÍDRICO -->
+<div id="tab-balance" class="content">
+  <div class="kpi-row">
+    <div class="kpi" style="--kpi-color:#f87171">
+      <div class="kpi-label">Déficit hídrico anual</div>
+      <div class="kpi-value">-885</div>
+      <div class="kpi-unit">mm / año</div>
+      <div class="kpi-sub">P(751.9) – ETo(1,637.5)</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#4ade80">
+      <div class="kpi-label">Meses con superávit</div>
+      <div class="kpi-value">0</div>
+      <div class="kpi-unit">meses (P > ETo)</div>
+      <div class="kpi-sub">Déficit todos los meses</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#60a5fa">
+      <div class="kpi-label">Menor déficit mensual</div>
+      <div class="kpi-value">Sep</div>
+      <div class="kpi-unit">−17.5 mm</div>
+      <div class="kpi-sub">Septiembre más cercano al equilibrio</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#f59e0b">
+      <div class="kpi-label">Precip. efectiva anual (28ha)</div>
+      <div class="kpi-value">49,377</div>
+      <div class="kpi-unit">m³ / año</div>
+      <div class="kpi-sub">Agua que cae sobre la finca</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#60a5fa"></span>Precipitación vs ETo Mensual (mm)</div>
+      <div class="chart-wrap tall"><canvas id="balanceChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#f87171"></span>Déficit Mensual (mm) — P menos ETo</div>
+      <div class="chart-wrap tall"><canvas id="deficitChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="card-title"><span class="dot" style="background:#4ade80"></span>Tabla de Balance Hídrico Mensual</div>
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Mes</th>
+          <th class="num">P media (mm)</th>
+          <th class="num">ETo (mm/mes)</th>
+          <th class="num">Déficit (mm)</th>
+          <th class="num">P efectiva finca (m³)</th>
+          <th class="num">ETo sobre finca (m³)</th>
+          <th>Cobertura</th>
+        </tr>
+      </thead>
+      <tbody id="balanceTable"></tbody>
+    </table>
+  </div>
+
+  <div class="insight">
+    <strong>Todos los meses presentan déficit hídrico.</strong> Septiembre y octubre son los meses de menor déficit (~17–18 mm), mientras que enero–marzo tienen los déficits más severos (&gt;140 mm/mes).
+    El diseño Keyline permite capturar los <strong>88,231 m³/año</strong> de escorrentía superficial para compensar parte de este déficit estructural.
+  </div>
+</div>
+
+<!-- TAB 4: ESCORRENTÍA KEYLINE -->
+<div id="tab-escorrentia" class="content">
+  <div class="kpi-row">
+    <div class="kpi" style="--kpi-color:#4ade80">
+      <div class="kpi-label">Escorrentía total anual (CN)</div>
+      <div class="kpi-value">88,231</div>
+      <div class="kpi-unit">m³ / año</div>
+      <div class="kpi-sub">Método Número de Curva (CN=68)</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#60a5fa">
+      <div class="kpi-label">Escorrentía (Racional)</div>
+      <div class="kpi-value">68,698</div>
+      <div class="kpi-unit">m³ / año</div>
+      <div class="kpi-sub">Ce=0.2 – Método Racional</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#f59e0b">
+      <div class="kpi-label">Área de captación total</div>
+      <div class="kpi-value">44.92</div>
+      <div class="kpi-unit">ha (449,200 m²)</div>
+      <div class="kpi-sub">Superficie total del sistema</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#a78bfa">
+      <div class="kpi-label">Caudal pico (Tr=5 años)</div>
+      <div class="kpi-value">10.64</div>
+      <div class="kpi-unit">m³/s</div>
+      <div class="kpi-sub">Sistema total – Método Racional</div>
+    </div>
+    <div class="kpi" style="--kpi-color:#f87171">
+      <div class="kpi-label">CN (Número de Curva)</div>
+      <div class="kpi-value">68</div>
+      <div class="kpi-unit">Condición AMC II</div>
+      <div class="kpi-sub">S potencial = 119.5 mm</div>
+    </div>
+  </div>
+
+  <div class="zone-grid">
+    <div class="zone-card" style="--zc:#4ade80">
+      <div class="zone-name">🌿 Sistema Total</div>
+      <div class="zone-area">44.92 ha · CN=68</div>
+      <div class="zone-vol">88,231 m³/año</div>
+      <div class="zone-vol-lbl">Escorrentía anual (Método CN)</div>
+    </div>
+    <div class="zone-card" style="--zc:#60a5fa">
+      <div class="zone-name">🧭 Zona Norte</div>
+      <div class="zone-area">12.62 ha · CN=68</div>
+      <div class="zone-vol">24,788 m³/año</div>
+      <div class="zone-vol-lbl">Escorrentía anual (Método CN)</div>
+    </div>
+    <div class="zone-card" style="--zc:#f59e0b">
+      <div class="zone-name">🧭 Zona Nororiente</div>
+      <div class="zone-area">10.19 ha · CN=68</div>
+      <div class="zone-vol">~20,074 m³/año</div>
+      <div class="zone-vol-lbl">Escorrentía anual (Método CN)</div>
+    </div>
+    <div class="zone-card" style="--zc:#a78bfa">
+      <div class="zone-name">💧 Canales de Riego</div>
+      <div class="zone-area">4.27 ha · CN=68</div>
+      <div class="zone-vol">8,396 m³/año</div>
+      <div class="zone-vol-lbl">Escorrentía anual (Método CN)</div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#4ade80"></span>Escorrentía Mensual por Zona (m³) — Método CN</div>
+      <div class="chart-wrap tall"><canvas id="escChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title"><span class="dot" style="background:#f59e0b"></span>Escorrentía Capturable vs Demanda ETo (m³)</div>
+      <div class="chart-wrap tall"><canvas id="escVsEtoChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:18px">
+    <div class="card-title"><span class="dot" style="background:#60a5fa"></span>Parámetros hidrológicos del sistema Keyline</div>
+    <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap:10px; margin-top:4px;">
+      <div class="zone-card" style="--zc:#60a5fa">
+        <div class="zone-name">Tiempo de concentración</div>
+        <div class="zone-area">Promedio Kirpich, BOR</div>
+        <div class="zone-vol">0.96 min</div>
+        <div class="zone-vol-lbl">Tc sistema norte (L=50m, S=10%)</div>
+      </div>
+      <div class="zone-card" style="--zc:#4ade80">
+        <div class="zone-name">Intensidad de diseño</div>
+        <div class="zone-area">Tr = 5 años</div>
+        <div class="zone-vol">426.5 mm/h</div>
+        <div class="zone-vol-lbl">Intensidad máxima de diseño</div>
+      </div>
+      <div class="zone-card" style="--zc:#f59e0b">
+        <div class="zone-name">Potencial almacenamiento (S)</div>
+        <div class="zone-area">CN=68, condición AMC II</div>
+        <div class="zone-vol">119.5 mm</div>
+        <div class="zone-vol-lbl">Máxima retención posible</div>
+      </div>
+      <div class="zone-card" style="--zc:#a78bfa">
+        <div class="zone-name">Velocidad media en canales</div>
+        <div class="zone-area">Canales riego (L=200m, S=2.5%)</div>
+        <div class="zone-vol">0.238 m/s</div>
+        <div class="zone-vol-lbl">Tc canales = 4.76 min</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="insight">
+    <strong>Oportunidad Keyline:</strong> La escorrentía anual capturable de <strong>88,231 m³</strong> representa aproximadamente el <strong>19.2%</strong> de la demanda ETo anual (458,494 m³).
+    Agosto y septiembre concentran el mayor volumen (15,631 y 15,035 m³ respectivamente).
+    El diseño Keyline redistribuye este flujo superficial hacia zonas de infiltración profunda, aumentando la disponibilidad de agua en el subsuelo durante los períodos secos.
+  </div>
+</div>
+
+<footer>
+  Datos: IDEAM – Estación Montebello [29040020] | ETo: FAO-56 Penman-Monteith | Escorrentía: Método CN (SCS) y Método Racional
+  <br>Proyecto: Diseño Keyline Baranoa · Atlántico · Colombia
+</footer>
+
+<script>
+const MESES = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const PP_PROM = [3.18, 5.93, 13.46, 59.63, 88.79, 87.48, 84.97, 108.10, 106.07, 97.59, 79.07, 30.41];
+const ETO_MES = [142.6, 142.0, 161.8, 147.9, 138.0, 134.1, 146.3, 144.2, 123.6, 115.9, 112.8, 128.3];
+const ETO_DIA = [4.6, 5.07, 5.22, 4.93, 4.45, 4.47, 4.72, 4.65, 4.12, 3.74, 3.76, 4.14];
+const TMAX = [31.8, 32.6, 33.2, 33.4, 32.6, 32.3, 32.7, 32.7, 32.0, 31.2, 31.4, 31.6];
+const TMIN = [22.8, 23.0, 23.6, 24.3, 24.4, 24.2, 23.8, 23.8, 23.6, 23.5, 23.7, 23.3];
+const HR   = [77, 76, 76, 78, 81, 80, 79, 80, 83, 84, 83, 80];
+const WIND = [3.4, 3.5, 3.3, 2.7, 2.3, 2.4, 2.6, 2.4, 2.0, 1.9, 2.3, 3.0];
+const SUN  = [8.0, 8.2, 7.6, 6.8, 6.2, 6.5, 7.0, 6.8, 5.8, 5.5, 6.2, 7.4];
+const ESC_TOTAL = [1953.3, 1429.6, 449.0, 3692.4, 10253.6, 9916.0, 9273.8, 15631.1, 15035.0, 12621.6, 7825.2, 150.6];
+const ESC_NORTE = [548.8, 401.6, 126.1, 1037.4, 2880.7, 2785.8, 2605.4, 4391.5, 4224.0, 3546.0, 2198.4, 42.2];
+const ESC_CANAL = [185.9, 136.0, 42.7, 351.4, 975.7, 943.6, 882.5, 1487.4, 1430.7, 1201.0, 744.6, 14.3];
+const ESC_NORO  = [448.5, 328.1, 103.0, 847.0, 2352.0, 2274.7, 2126.7, 3587.5, 3449.3, 2897.2, 1796.0, 34.5];
+const PP_AÑOS = [1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const PP_ANN  = [149,470,856,506,437,448,358,446,763,460,1038,1445,726,1658,1312,497,721,568,716,1405,1466,1055,1070,551,624,718,426,533,383];
+const PP_ANUAL_MENSUAL = {
+  1997:[0,0,0,0,79,40,0,0,9,21,0,0], 1998:[0,0,5,0,87,0,141,19,132,68,13,5],
+  1999:[0,0,23,0,129,125,57,145,202,175,0,0], 2000:[18,0,0,24,51,97,82,84,24,116,5,5],
+  2001:[0,0,5,50,61,6,18,31,151,40,34,41], 2002:[0,0,1,37,82,20,0,62,64,141,27,14],
+  2003:[0,8,83,106,0,30,29,4,87,3,0,8], 2004:[0,0,0,0,0,25,254,25,33,31,78,0],
+  2005:[0,0,0,94,38,122,94,114,42,126,113,20], 2006:[23,27,0,27,152,10,35,29,0,34,82,41],
+  2007:[0,0,28,106,15,90,132,211,243,138,15,60], 2008:[0,0,34,126,204,131,181,397,213,113,26,20],
+  2009:[0,0,0,5,30,77,49,250,85,100,120,10], 2010:[0,0,0,126,54,213,328,196,191,188,251,111],
+  2011:[0,77,0,58,121,280,39,228,72,185,171,81], 2012:[5,5,25,103,16,23,67,45,94,79,21,14],
+  2013:[0,0,4,0,77,65,89,25,157,104,195,5], 2014:[0,5,0,20,77,58,0,95,60,200,45,8],
+  2015:[0,24,10,26,13,73,71,161,221,52,59,6], 2016:[0,0,0,69,285,143,150,97,124,238,285,14],
+  2017:[0,18,124,64,278,188,190,202,126,79,150,47], 2018:[37,0,0,145,210,108,46,143,173,99,94,0],
+  2019:[6,0,0,149,75,83,175,149,118,186,89,40], 2020:[0,0,0,44,95,145,39,52,67,19,60,30],
+  2021:[0,2,16,26,79,98,36,52,70,105,118,22], 2022:[0,0,11,115,57,63,70,167,121,63,38,13],
+  2023:[0,0,0,55,55,87,17,68,5,54,84,1], 2024:[0,0,0,35,32,115,65,80,126,51,5,24],
+  2025:[0,0,8,0,34,22,10,4,66,22,36,181]
+};
+
+Chart.defaults.color = '#94a3b8';
+Chart.defaults.borderColor = '#2d3148';
+Chart.defaults.font.family = "'Segoe UI', system-ui, sans-serif";
+Chart.defaults.font.size = 11;
+const GRID = { color: '#2d3148', drawBorder: false };
+
+// Populate year selector
+const sel = document.getElementById('yearSelect');
+PP_AÑOS.forEach(y => { const o = document.createElement('option'); o.value = y; o.textContent = y; sel.appendChild(o); });
+
+// PP Mensual chart
+let ppMensualChart = new Chart(document.getElementById('ppMensualChart'), {
+  type: 'bar',
+  data: { labels: MESES, datasets: [{ label: 'Precipitación (mm)', data: PP_PROM, backgroundColor: PP_PROM.map(v => v>80?'#3b82f6':v>30?'#60a5fa':'#93c5fd'), borderRadius: 5 }] },
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false}, tooltip:{callbacks:{label:c=>`${c.parsed.y.toFixed(1)} mm`}} }, scales:{x:{grid:GRID},y:{grid:GRID}} }
+});
+
+// PP Anual trend
+new Chart(document.getElementById('ppAnualChart'), {
+  type: 'line',
+  data: { labels: PP_AÑOS, datasets: [
+    { label: 'Precipitación anual (mm)', data: PP_ANN, borderColor:'#4ade80', backgroundColor:'rgba(74,222,128,0.08)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor: PP_ANN.map(v=>v>1200?'#f59e0b':v<400?'#f87171':'#4ade80') },
+    { label: 'Promedio histórico', data: PP_AÑOS.map(()=>751.9), borderColor:'#f87171', borderDash:[6,3], pointRadius:0, tension:0 }
+  ]},
+  options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:true,position:'bottom',labels:{boxWidth:12,padding:10,font:{size:10}}}, tooltip:{mode:'index',intersect:false} }, scales:{x:{grid:GRID,ticks:{maxRotation:45,font:{size:9}}},y:{grid:GRID,title:{display:true,text:'mm/año',font:{size:10}}}} }
+});
+
+// PP Max dia (detail by year)
+let ppMaxDiaChart = new Chart(document.getElementById('ppMaxDiaChart'), {
+  type:'bar', data:{labels:MESES,datasets:[]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y} mm`}}},scales:{x:{grid:GRID},y:{grid:GRID}}}
+});
+
+function updateYearChart() {
+  const year = sel.value;
+  const data = year==='avg' ? PP_PROM : PP_ANUAL_MENSUAL[parseInt(year)];
+  const colors = data.map(v=>v>150?'#f59e0b':v>80?'#3b82f6':v>0?'#60a5fa':'#2d3148');
+  ppMensualChart.data.datasets[0].data = data;
+  ppMensualChart.data.datasets[0].backgroundColor = colors;
+  ppMensualChart.update();
+  ppMaxDiaChart.data.datasets = [{ label: year==='avg'?'Promedio histórico':year, data, backgroundColor:colors, borderRadius:5 }];
+  ppMaxDiaChart.update();
+}
+updateYearChart();
+
+// ETo chart
+new Chart(document.getElementById('etoChart'), {
+  type:'bar',
+  data:{ labels:MESES, datasets:[
+    { label:'ETo diaria (mm/día)', data:ETO_DIA, backgroundColor:ETO_DIA.map(v=>v>5?'#f59e0b':v>4.5?'#fbbf24':'#fde68a'), borderRadius:5, yAxisID:'y' },
+    { label:'ETo mensual (mm/mes)', data:ETO_MES, type:'line', borderColor:'#f87171', backgroundColor:'transparent', pointRadius:4, tension:0.3, yAxisID:'y2' }
+  ]},
+  options:{ responsive:true,maintainAspectRatio:false, plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,padding:10,font:{size:10}}},tooltip:{mode:'index',intersect:false}}, scales:{x:{grid:GRID},y:{grid:GRID,title:{display:true,text:'mm/día',font:{size:10}},position:'left'},y2:{grid:{display:false},title:{display:true,text:'mm/mes',font:{size:10}},position:'right'}} }
+});
+
+// Temp
+new Chart(document.getElementById('tempChart'), {
+  type:'line',
+  data:{labels:MESES,datasets:[
+    {label:'Tmax (°C)',data:TMAX,borderColor:'#f87171',backgroundColor:'rgba(248,113,113,0.1)',fill:true,tension:0.3,pointRadius:3},
+    {label:'Tmin (°C)',data:TMIN,borderColor:'#60a5fa',backgroundColor:'rgba(96,165,250,0.1)',fill:true,tension:0.3,pointRadius:3}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,padding:10,font:{size:10}}},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:GRID},y:{grid:GRID,min:20,max:36,title:{display:true,text:'°C',font:{size:10}}}}}
+});
+
+// HR
+new Chart(document.getElementById('hrChart'), {
+  type:'line', data:{labels:MESES,datasets:[{label:'HR (%)',data:HR,borderColor:'#4ade80',backgroundColor:'rgba(74,222,128,0.1)',fill:true,tension:0.3,pointRadius:3}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:GRID},y:{grid:GRID,min:70,max:90}}}
+});
+// Wind
+new Chart(document.getElementById('windChart'), {
+  type:'bar', data:{labels:MESES,datasets:[{label:'Viento (m/s)',data:WIND,backgroundColor:'#a78bfa',borderRadius:4}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:GRID},y:{grid:GRID,min:0,max:4.5}}}
+});
+// Sun
+new Chart(document.getElementById('sunChart'), {
+  type:'bar', data:{labels:MESES,datasets:[{label:'Insolación (h/día)',data:SUN,backgroundColor:'#fde68a',borderRadius:4}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:GRID},y:{grid:GRID,min:4,max:10}}}
+});
+
+// Balance
+const BALANCE = PP_PROM.map((p,i)=>p-ETO_MES[i]);
+new Chart(document.getElementById('balanceChart'), {
+  type:'bar',
+  data:{labels:MESES,datasets:[
+    {label:'Precipitación (mm)',data:PP_PROM,backgroundColor:'rgba(96,165,250,0.7)',borderRadius:4,yAxisID:'y'},
+    {label:'ETo mensual (mm)',data:ETO_MES,type:'line',borderColor:'#f87171',backgroundColor:'transparent',pointRadius:4,tension:0.3,yAxisID:'y'}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,padding:10,font:{size:10}}},tooltip:{mode:'index',intersect:false}},scales:{x:{grid:GRID},y:{grid:GRID,title:{display:true,text:'mm/mes',font:{size:10}}}}}
+});
+new Chart(document.getElementById('deficitChart'), {
+  type:'bar',
+  data:{labels:MESES,datasets:[{label:'Balance P - ETo (mm)',data:BALANCE,backgroundColor:BALANCE.map(v=>v>=0?'#4ade80':'#f87171'),borderRadius:4}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.parsed.y.toFixed(1)} mm`}}},scales:{x:{grid:GRID},y:{grid:GRID,title:{display:true,text:'mm/mes',font:{size:10}}}}}
+});
+
+// Balance table
+const AREA_FINCA = 280000;
+const tbody = document.getElementById('balanceTable');
+MESES.forEach((m,i)=>{
+  const bal = PP_PROM[i]-ETO_MES[i];
+  const pEf = PP_PROM[i]*AREA_FINCA/1000;
+  const etoVol = ETO_MES[i]*AREA_FINCA/1000;
+  const pct = Math.min(100, PP_PROM[i]/ETO_MES[i]*100);
+  tbody.innerHTML += `<tr>
+    <td><strong>${m}</strong></td>
+    <td class="num">${PP_PROM[i].toFixed(1)}</td>
+    <td class="num">${ETO_MES[i].toFixed(1)}</td>
+    <td class="num ${bal>=0?'surplus':'deficit'}">${bal.toFixed(1)}</td>
+    <td class="num">${pEf.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</td>
+    <td class="num">${etoVol.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')}</td>
+    <td><div class="bal-bar"><div class="bal-fill" style="width:${pct.toFixed(0)}%;background:${pct>80?'#4ade80':pct>50?'#f59e0b':'#f87171'}"></div></div>
+    <div style="font-size:0.65rem;color:#64748b;margin-top:2px">${pct.toFixed(0)}% cubierto</div></td>
+  </tr>`;
+});
+
+// Escorrentía
+new Chart(document.getElementById('escChart'), {
+  type:'bar',
+  data:{labels:MESES,datasets:[
+    {label:'Sistema Total',data:ESC_TOTAL,backgroundColor:'rgba(74,222,128,0.7)',stack:'a',borderRadius:3},
+    {label:'Zona Norte',data:ESC_NORTE,backgroundColor:'rgba(96,165,250,0.7)',stack:'b',borderRadius:3},
+    {label:'Zona Nororiente',data:ESC_NORO,backgroundColor:'rgba(245,158,11,0.7)',stack:'c',borderRadius:3},
+    {label:'Canales Riego',data:ESC_CANAL,backgroundColor:'rgba(167,139,250,0.7)',stack:'d',borderRadius:3}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,padding:8,font:{size:10}}},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(0)} m³`}}},scales:{x:{grid:GRID},y:{grid:GRID,title:{display:true,text:'m³',font:{size:10}}}}}
+});
+
+const ETO_M3 = ETO_MES.map(e=>e*AREA_FINCA/1000);
+new Chart(document.getElementById('escVsEtoChart'), {
+  type:'bar',
+  data:{labels:MESES,datasets:[
+    {label:'Escorrentía capturable (m³)',data:ESC_TOTAL,backgroundColor:'rgba(74,222,128,0.7)',borderRadius:4},
+    {label:'Demanda ETo finca (m³)',data:ETO_M3,type:'line',borderColor:'#f87171',backgroundColor:'transparent',pointRadius:4,tension:0.3}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,padding:8,font:{size:10}}},tooltip:{mode:'index',intersect:false,callbacks:{label:c=>`${c.dataset.label}: ${c.parsed.y.toFixed(0)} m³`}}},scales:{x:{grid:GRID},y:{grid:GRID,title:{display:true,text:'m³',font:{size:10}}}}}
+});
+
+function showTab(id) {
+  const tabs = ['precipitacion','eto','balance','escorrentia'];
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active', tabs[i]===id));
+  document.querySelectorAll('.content').forEach(c=>{ c.style.display='none'; c.classList.remove('active'); });
+  const el = document.getElementById(`tab-${id}`);
+  el.style.display='block'; el.classList.add('active');
+  setTimeout(()=>window.dispatchEvent(new Event('resize')),50);
+}
+</script>
+</body>
+</html>

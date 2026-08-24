@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KEYLINE SOIL INTELLIGENCE | Finca Alma Luz</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#261c12;--bg2:#3D3028;--bg3:#4a3830;
+  --border:#6B3F2A;--text:#D4B896;--dim:#8A7968;
+  --green:#7A8C3E;--gdark:#5a6a28;--gmuted:#2a2c14;
+  --red:#C1533A;--yellow:#C8862A;--blue:#3A8FA1;--orange:#9C5C2E;
+  --card-shadow:0 2px 14px rgba(0,0,0,0.55);
+}
+[data-theme="light"]{
+  --bg:#FAF0E4;--bg2:#FFF8F0;--bg3:#F5EBE0;
+  --border:#D4B896;--text:#3D3028;--dim:#7A6855;
+  --gmuted:#F0D8C0;--card-shadow:0 2px 12px rgba(0,0,0,0.08);
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);height:100vh;overflow:hidden;font-size:13px;line-height:1.4}
+.app{display:grid;grid-template-columns:220px 1fr 290px;grid-template-rows:54px 1fr;height:100vh}
+
+/* HEADER */
+.hdr{grid-column:1/-1;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 14px;gap:12px;z-index:200}
+.logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:14px;color:var(--green);white-space:nowrap;letter-spacing:-.3px}
+.logo-box{width:30px;height:30px;background:linear-gradient(135deg,#C1533A,#9C3020);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0}
+.srch{flex:1;max-width:360px;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:6px 11px;color:var(--text);font-size:12px;outline:none}
+.srch::placeholder{color:var(--dim)}
+.hdr-right{display:flex;align-items:center;gap:6px;margin-left:auto}
+.ibtn{background:var(--bg3);border:1px solid var(--border);border-radius:7px;width:32px;height:32px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--dim);transition:.15s}
+.ibtn:hover{color:var(--green);border-color:var(--green)}
+.farm-chip{background:var(--gmuted);border:1px solid var(--gdark);border-radius:20px;padding:4px 10px;font-size:11px;font-weight:600;color:var(--green)}
+
+/* SIDEBAR */
+.sb{background:var(--bg2);border-right:1px solid var(--border);overflow-y:auto;padding:10px 6px}
+.sb-lbl{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--dim);padding:10px 10px 4px}
+.ni{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:7px;cursor:pointer;color:var(--dim);transition:.15s;font-size:12px;font-weight:500;user-select:none}
+.ni:hover{background:var(--bg3);color:var(--text)}
+.ni.active{background:var(--gmuted);color:var(--green);font-weight:600}
+.ni .ic{font-size:15px;width:18px;text-align:center;flex-shrink:0}
+.ni .nb{margin-left:auto;background:var(--red);color:#fff;font-size:9px;font-weight:800;padding:1px 5px;border-radius:8px}
+.sdiv{height:1px;background:var(--border);margin:7px 4px}
+
+/* MAIN */
+.main{overflow-y:auto;background:var(--bg);padding:14px}
+.panel{display:none}.panel.active{display:block;animation:fadeIn .25s ease}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* RIGHT */
+.rp{background:var(--bg2);border-left:1px solid var(--border);overflow-y:auto;padding:10px}
+.rp-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.gauge-wrap{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.g-box{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:8px 6px;text-align:center}
+.g-lbl{font-size:9px;font-weight:700;text-transform:uppercase;color:var(--dim);margin-bottom:2px;letter-spacing:.04em;line-height:1.2}
+.g-val{font-size:17px;font-weight:800;margin-top:-14px;position:relative;z-index:1}
+.g-max{font-size:9px;color:var(--dim)}
+canvas.g-canvas{display:block;margin:0 auto}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:14px;margin-bottom:12px;box-shadow:var(--card-shadow)}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.card-title{font-size:13px;font-weight:700;display:flex;align-items:center;gap:6px}
+.section-hdr{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--green);margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid var(--border)}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin-bottom:14px}
+.kpi{background:var(--bg2);border:1px solid var(--border);border-radius:11px;padding:12px;position:relative;overflow:hidden;box-shadow:var(--card-shadow)}
+.kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.kpi.r::before{background:var(--red)}.kpi.y::before{background:var(--yellow)}.kpi.g::before{background:var(--green)}.kpi.b::before{background:var(--blue)}
+.kpi-lbl{font-size:10px;color:var(--dim);font-weight:600;margin-bottom:3px}
+.kpi-val{font-size:22px;font-weight:800;line-height:1}
+.kpi-unit{font-size:10px;color:var(--dim);margin-left:2px}
+.kpi-st{font-size:10px;font-weight:700;margin-top:4px}
+.cr{color:var(--red)}.cy{color:var(--yellow)}.cg{color:var(--green)}.cb{color:var(--blue)}
+
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse;font-size:12px}
+.tbl th{background:var(--bg3);padding:9px 11px;text-align:left;font-weight:700;font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--dim);border-bottom:1px solid var(--border);white-space:nowrap}
+.tbl td{padding:9px 11px;border-bottom:1px solid var(--border);vertical-align:middle}
+.tbl tr:hover td{background:var(--bg3)}
+.pill{display:inline-flex;align-items:center;gap:3px;padding:2px 7px;border-radius:20px;font-size:10px;font-weight:700;white-space:nowrap}
+.p-def{background:rgba(193,83,58,.15);color:#E07A60}.p-baj{background:rgba(156,92,46,.15);color:#C8862A}
+.p-ok{background:rgba(122,140,62,.15);color:#9AB84E}.p-alt{background:rgba(200,134,42,.15);color:#D4A050}
+.p-exc{background:rgba(193,83,58,.15);color:#E07A60}.p-crit{background:rgba(193,83,58,.25);color:#E8A090}
+
+/* ALERTS */
+.alert{padding:9px 12px;border-radius:8px;font-size:12px;font-weight:500;margin-bottom:9px;display:flex;align-items:flex-start;gap:7px;line-height:1.45}
+.a-red{background:rgba(193,83,58,.1);border:1px solid rgba(193,83,58,.25);color:#E8A090}
+.a-yel{background:rgba(200,134,42,.1);border:1px solid rgba(200,134,42,.25);color:#D4B060}
+.a-grn{background:rgba(122,140,62,.1);border:1px solid rgba(122,140,62,.25);color:#B0C870}
+
+/* SIMULATOR */
+.sim-layout{display:grid;grid-template-columns:300px 1fr;gap:14px}
+.sl-grp{margin-bottom:11px}
+.sl-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:4px}
+.sl-lbl{font-size:12px;font-weight:500}
+.sl-val{font-size:12px;font-weight:800;color:var(--green)}
+input[type=range]{width:100%;height:5px;border-radius:3px;outline:none;-webkit-appearance:none;background:var(--bg3);border:1px solid var(--border);cursor:pointer}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;background:var(--green);cursor:pointer;box-shadow:0 0 6px rgba(122,140,62,.5)}
+.impact-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.imp-card{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px;text-align:center}
+.imp-lbl{font-size:9px;color:var(--dim);text-transform:uppercase;font-weight:700;margin-bottom:4px;letter-spacing:.04em}
+.imp-old{font-size:11px;color:var(--dim);text-decoration:line-through}
+.imp-new{font-size:18px;font-weight:800;color:var(--green)}
+.imp-delta{font-size:10px;color:var(--green)}
+
+/* CHAT */
+.chat-box{display:flex;flex-direction:column;height:480px;border:1px solid var(--border);border-radius:11px;overflow:hidden}
+.chat-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--bg)}
+.msg{max-width:82%;padding:10px 13px;border-radius:11px;font-size:12px;line-height:1.5}
+.msg.ai{background:var(--bg2);border:1px solid var(--border);align-self:flex-start;border-top-left-radius:3px}
+.msg.ai .ai-hdr{font-size:10px;font-weight:700;color:var(--green);margin-bottom:4px;display:flex;align-items:center;gap:4px}
+.msg.user{background:var(--gmuted);border:1px solid var(--gdark);align-self:flex-end;border-top-right-radius:3px;color:var(--green)}
+.chat-foot{padding:10px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--bg2)}
+.chat-in{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:7px;padding:8px 11px;color:var(--text);font-size:12px;outline:none}
+.chat-in::placeholder{color:var(--dim)}
+.quick-btns{display:flex;flex-wrap:wrap;gap:5px;padding:8px 14px;border-top:1px solid var(--border);background:var(--bg2)}
+.qb{background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:4px 10px;font-size:10px;font-weight:600;color:var(--dim);cursor:pointer;transition:.15s}
+.qb:hover{border-color:var(--green);color:var(--green)}
+
+/* BTNS */
+.btn{background:var(--green);border:none;border-radius:7px;padding:7px 14px;color:#fff;font-weight:700;cursor:pointer;font-size:12px;transition:.15s;display:inline-flex;align-items:center;gap:5px}
+.btn:hover{background:var(--gdark);transform:translateY(-1px)}
+.btn-o{background:transparent;border:1px solid var(--border);border-radius:7px;padding:7px 14px;color:var(--dim);font-weight:600;cursor:pointer;font-size:12px;transition:.15s}
+.btn-o:hover{border-color:var(--green);color:var(--green)}
+.btns-row{display:flex;gap:8px;flex-wrap:wrap}
+
+/* TABS */
+.tabs{display:flex;gap:4px;margin-bottom:14px;background:var(--bg2);border-radius:9px;padding:4px;border:1px solid var(--border)}
+.tab{padding:6px 13px;border-radius:6px;cursor:pointer;font-size:11px;font-weight:600;color:var(--dim);background:transparent;border:none;transition:.15s;white-space:nowrap}
+.tab.active{background:var(--green);color:#fff}
+.tab:hover:not(.active){color:var(--text);background:var(--bg3)}
+
+/* RECOVERY */
+.rec-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px}
+.rec-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:11px;text-align:center}
+.rec-yr{font-size:10px;color:var(--green);font-weight:800;text-transform:uppercase;margin-bottom:3px}
+.rec-val{font-size:22px;font-weight:800;margin-bottom:2px}
+.rec-lbl{font-size:10px;color:var(--dim)}
+
+/* TIMELINE */
+.tl{position:relative;padding-left:22px}
+.tl::before{content:'';position:absolute;left:7px;top:8px;bottom:8px;width:2px;background:var(--border)}
+.tl-item{position:relative;margin-bottom:18px}
+.tl-dot{position:absolute;left:-19px;top:4px;width:11px;height:11px;border-radius:50%;background:var(--green);border:2px solid var(--bg)}
+.tl-yr{font-size:10px;color:var(--green);font-weight:800;margin-bottom:3px}
+.tl-txt{font-size:12px;color:var(--text);line-height:1.5}
+
+/* GRID HELPERS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.panel-hdr{margin-bottom:14px}
+.panel-ttl{font-size:19px;font-weight:800;margin-bottom:2px}
+.panel-sub{font-size:12px;color:var(--dim)}
+
+/* PROGRESS BAR */
+.pbar{height:7px;border-radius:4px;background:var(--bg3);overflow:hidden;margin-top:3px}
+.pfill{height:100%;border-radius:4px;transition:width .5s ease}
+
+/* MAP */
+#soil-map,#kl-map{height:380px;border-radius:9px;border:1px solid var(--border)}
+.leaflet-container{background:#2a1a0a}
+.leaflet-layer{filter:brightness(0.8) saturate(0.7) sepia(0.2)}
+
+/* ECON */
+.econ-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
+.econ-card{background:var(--bg3);border:1px solid var(--border);border-radius:9px;padding:12px}
+.econ-lbl{font-size:10px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-bottom:4px}
+.econ-val{font-size:20px;font-weight:800;color:var(--green)}
+.econ-sub{font-size:10px;color:var(--dim);margin-top:2px}
+
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+@media(max-width:1100px){.rp{display:none}.app{grid-template-columns:220px 1fr}}
+@media(max-width:700px){.sb{display:none}.app{grid-template-columns:1fr}.kpi-grid{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header class="hdr">
+  <div class="logo">
+    <div class="logo-box">🌱</div>
+    KEYLINE <span style="color:var(--dim);font-weight:400;margin:0 2px">/</span> SOIL INTELLIGENCE
+  </div>
+  <input class="srch" type="text" placeholder="🔍  Buscar parámetro, finca, muestreo...">
+  <div class="hdr-right">
+    <div class="farm-chip">🌾 Finca Alma Luz</div>
+    <button class="ibtn" onclick="toggleTheme()" title="Tema">🌙</button>
+    <button class="ibtn" title="Notificaciones">🔔</button>
+    <button class="ibtn" onclick="window.print()" title="Exportar">📥</button>
+    <button class="ibtn" title="Ayuda">❓</button>
+  </div>
+</header>
+
+<!-- SIDEBAR -->
+<nav class="sb">
+  <div class="sb-lbl">Proyecto</div>
+  <div class="ni active" onclick="nav('dashboard')"><span class="ic">🏠</span>Dashboard</div>
+  <div class="ni" onclick="nav('parametros')"><span class="ic">🧪</span>Parámetros<span class="nb">!</span></div>
+  <div class="ni" onclick="nav('interpretacion')"><span class="ic">🎯</span>Interpretación</div>
+  <div class="ni" onclick="nav('simulador')"><span class="ic">⚡</span>Simulador</div>
+  <div class="sdiv"></div>
+  <div class="sb-lbl">GIS & Keyline</div>
+  <div class="ni" onclick="nav('mapa')"><span class="ic">🗺️</span>Mapa GIS</div>
+  <div class="ni" onclick="nav('keyline')"><span class="ic">🌿</span>Módulo Keyline</div>
+  <div class="sdiv"></div>
+  <div class="sb-lbl">Inteligencia</div>
+  <div class="ni" onclick="nav('asistente')"><span class="ic">🤖</span>Asistente IA</div>
+  <div class="ni" onclick="nav('recuperacion')"><span class="ic">📈</span>Plan Recuperación</div>
+  <div class="ni" onclick="nav('economia')"><span class="ic">💰</span>Análisis Económico</div>
+  <div class="ni" onclick="nav('reportes')"><span class="ic">📋</span>Reportes</div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main" id="main">
+
+<!-- ═══ DASHBOARD ═══ -->
+<div class="panel active" id="panel-dashboard">
+  <div class="panel-hdr">
+    <div class="panel-ttl">Dashboard General</div>
+    <div class="panel-sub">Análisis No. 449 · Finca Alma Luz · Baranoa, Atlántico · 30 Jun 2026</div>
+  </div>
+
+  <div class="alert a-red">⛔ <span><strong>ALERTA CRÍTICA:</strong> pH 4.3 — suelo extremadamente ácido. Saturación de Al 29.99% (tóxico). Fósforo disponible 3.10 ppm (8% del mínimo óptimo). El encalamiento es la acción más urgente antes de cualquier fertilización.</span></div>
+
+  <div class="kpi-grid">
+    <div class="kpi r"><div class="kpi-lbl">pH del Suelo</div><div class="kpi-val">4.3<span class="kpi-unit"></span></div><div class="kpi-st cr">⛔ CRÍTICO</div></div>
+    <div class="kpi r"><div class="kpi-lbl">Materia Orgánica</div><div class="kpi-val">2.64<span class="kpi-unit">%</span></div><div class="kpi-st cr">⚠ BAJO</div></div>
+    <div class="kpi r"><div class="kpi-lbl">Fósforo (Bray II)</div><div class="kpi-val">3.10<span class="kpi-unit">ppm</span></div><div class="kpi-st cr">⛔ CRÍTICO</div></div>
+    <div class="kpi g"><div class="kpi-lbl">CIC</div><div class="kpi-val">19.0<span class="kpi-unit">meq</span></div><div class="kpi-st cg">✅ NORMAL</div></div>
+    <div class="kpi r"><div class="kpi-lbl">Sat. Aluminio</div><div class="kpi-val">30.0<span class="kpi-unit">%</span></div><div class="kpi-st cr">⛔ TÓXICO</div></div>
+    <div class="kpi y"><div class="kpi-lbl">Carbono Org.</div><div class="kpi-val">1.53<span class="kpi-unit">%</span></div><div class="kpi-st cy">⚠ BAJO</div></div>
+    <div class="kpi r"><div class="kpi-lbl">Boro</div><div class="kpi-val">0.09<span class="kpi-unit">ppm</span></div><div class="kpi-st cr">⛔ CRÍTICO</div></div>
+    <div class="kpi b"><div class="kpi-lbl">Índice Fertil.</div><div class="kpi-val">22<span class="kpi-unit">/100</span></div><div class="kpi-st cb">DSS Score</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">🕸 Perfil vs. Óptimo</div><span style="font-size:10px;color:var(--dim)">Actual vs Referencia</span></div>
+      <canvas id="radarChart" style="max-height:260px"></canvas>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">📊 Estado por Parámetro</div></div>
+      <canvas id="barChart" style="max-height:260px"></canvas>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📋 Resumen de Prioridades de Acción</div></div>
+    <div class="alert a-red">⛔ <strong>INMEDIATO:</strong> Aplicar 2.5-3.0 ton/ha Cal Calcítica (CaCO₃) + 5-8 ton/ha Humus de Lombriz. 60-90 días antes de siembra.</div>
+    <div class="alert a-red">⛔ <strong>SIEMBRA:</strong> MAP 12-61-0 (150-200 kg/ha) + Borax 5 kg/ha + ZnSO₄ 15 kg/ha + CuSO₄ 4 kg/ha.</div>
+    <div class="alert a-yel">⚠ <strong>POST-SIEMBRA:</strong> Urea 80-100 kg/ha (fraccionada 30 y 60 días). Lixiviado de lombriz 30 L/ha/mes.</div>
+    <div class="alert a-grn">✅ <strong>CONTINUO:</strong> Micorrizas + Azospirillum al momento de siembra. Roca fosfórica + humus a mediano plazo.</div>
+  </div>
+</div>
+
+<!-- ═══ PARÁMETROS ═══ -->
+<div class="panel" id="panel-parametros">
+  <div class="panel-hdr">
+    <div class="panel-ttl">🧪 Parámetros del Laboratorio</div>
+    <div class="panel-sub">Análisis No. 449 · Laboratorio Terrallanos, Villavicencio, Meta</div>
+  </div>
+  <div class="btns-row" style="margin-bottom:12px">
+    <button class="btn">⬇ Exportar CSV</button>
+    <button class="btn-o">✏️ Editar Valores</button>
+    <button class="btn-o">🖨 Imprimir</button>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this,'t-general')">📋 General</button>
+    <button class="tab" onclick="switchTab(this,'t-quimico')">⚗️ Químicos</button>
+    <button class="tab" onclick="switchTab(this,'t-menores')">🔬 Menores</button>
+    <button class="tab" onclick="switchTab(this,'t-saturaciones')">📐 Saturaciones</button>
+    <button class="tab" onclick="switchTab(this,'t-relaciones')">⚖️ Relaciones</button>
+  </div>
+
+  <div id="t-general" class="card">
+    <div class="section-hdr">Datos Generales del Muestreo</div>
+    <table class="tbl">
+      <tr><th>Campo</th><th>Valor</th></tr>
+      <tr><td>Laboratorio</td><td>Terrallanos · NIT 17350824-5 · Villavicencio, Meta</td></tr>
+      <tr><td>No. de Laboratorio</td><td><strong>449</strong></td></tr>
+      <tr><td>Solicitante</td><td>Jhon Prieto</td></tr>
+      <tr><td>Propietario</td><td>Angélica Serrano</td></tr>
+      <tr><td>Finca</td><td>Alma Luz</td></tr>
+      <tr><td>Municipio / Depto.</td><td>Baranoa, Atlántico, Colombia</td></tr>
+      <tr><td>Textura</td><td><strong>Franco Arcillo Arenoso (FArA)</strong></td></tr>
+      <tr><td>Profundidad</td><td>0-20 cm (capa arable)</td></tr>
+      <tr><td>Muestra No.</td><td>1 de 1</td></tr>
+    </table>
+  </div>
+
+  <div id="t-quimico" class="card" style="display:none">
+    <div class="section-hdr">Parámetros Químicos Principales</div>
+    <table class="tbl">
+      <tr><th>Parámetro</th><th>Valor</th><th>Unidad</th><th>Rango Adecuado</th><th>Estado</th></tr>
+      <tr><td>pH (1:1 agua)</td><td><strong>4.3</strong></td><td>—</td><td>5.5 – 6.5</td><td><span class="pill p-crit">⛔ CRÍTICO</span></td></tr>
+      <tr><td>Carbono Orgánico C</td><td>1.53</td><td>%</td><td>3.00 – 6.00</td><td><span class="pill p-baj">⚠ BAJO</span></td></tr>
+      <tr><td>Materia Orgánica M.O.</td><td>~2.64 (calc.)</td><td>%</td><td>5.00 – 10.0</td><td><span class="pill p-baj">⚠ BAJO</span></td></tr>
+      <tr><td>Relación C/N</td><td>11.52</td><td>—</td><td>10.0 – 15.0</td><td><span class="pill p-ok">✅ NORMAL</span></td></tr>
+      <tr><td>Nitrógeno Total N.T.</td><td>0.08</td><td>%</td><td>0.10 – 0.20</td><td><span class="pill p-baj">⚠ BAJO</span></td></tr>
+      <tr><td>Fósforo P (Bray II)</td><td><strong>3.10</strong></td><td>ppm</td><td>15.0 – 40.0</td><td><span class="pill p-crit">⛔ CRÍTICO</span></td></tr>
+      <tr><td>CIC</td><td>19.0</td><td>meq/100g</td><td>10.0 – 25.0</td><td><span class="pill p-ok">✅ NORMAL</span></td></tr>
+      <tr><td>Bases Totales BT</td><td>10.27</td><td>meq/100g</td><td>15.0 – 25.0</td><td><span class="pill p-baj">⚠ BAJO</span></td></tr>
+      <tr><td>Calcio Ca</td><td>5.80</td><td>meq/100g</td><td>3.00 – 10.0</td><td><span class="pill p-ok">✅ NORMAL</span></td></tr>
+      <tr><td>Magnesio Mg</td><td>3.80</td><td>meq/100g</td><td>1.50 – 3.00</td><td><span class="pill p-alt">↑ ALTO</span></td></tr>
+      <tr><td>Potasio K</td><td>0.33</td><td>meq/100g</td><td>0.20 – 0.40</td><td><span class="pill p-ok">✅ NORMAL</span></td></tr>
+      <tr><td>Sodio Na</td><td>0.34</td><td>meq/100g</td><td>0.10 – 1.00</td><td><span class="pill p-ok">✅ NORMAL</span></td></tr>
+      <tr><td>Aluminio Al (est.)</td><td>~5.70</td><td>meq/100g</td><td>&lt; 1.00</td><td><span class="pill p-crit">⛔ TÓXICO</span></td></tr>
+      <tr><td>Azufre S</td><td>10.69</td><td>ppm</td><td>10.0 – 20.0</td><td><span class="pill p-ok">✅ NORMAL ↓</span></td></tr>
+    </table>
+  </div>
+
+  <div id="t-menores" class="card" style="display:none">
+    <div class="section-hdr">Elementos Menores (Micronutrientes)</div>
+    <table class="tbl">
+      <tr><th>Elemento</th><th>Símbolo</th><th>Valor (ppm)</th><th>Rango Adecuado</th><th>Estado</th><th>Prioridad</th></tr>
+      <tr><td>Cobre</td><td>Cu</td><td>0.60</td><td>1.00 – 3.00</td><td><span class="pill p-baj">⚠ BAJO</span></td><td>🔴 Alta</td></tr>
+      <tr><td>Hierro</td><td>Fe</td><td>60.0</td><td>20.0 – 100</td><td><span class="pill p-ok">✅ NORMAL</span></td><td>🟢 Baja</td></tr>
+      <tr><td>Manganeso</td><td>Mn</td><td>11.25</td><td>10.0 – 20.0</td><td><span class="pill p-ok">✅ NORMAL</span></td><td>🟢 Baja</td></tr>
+      <tr><td>Zinc</td><td>Zn</td><td>1.40</td><td>2.00 – 4.00</td><td><span class="pill p-baj">⚠ BAJO</span></td><td>🔴 Alta</td></tr>
+      <tr><td>Boro</td><td>B</td><td><strong>0.09</strong></td><td>0.30 – 0.60</td><td><span class="pill p-crit">⛔ CRÍTICO</span></td><td>🔴 Urgente</td></tr>
+      <tr><td>Azufre</td><td>S</td><td>10.69</td><td>10.0 – 20.0</td><td><span class="pill p-ok">✅ NORMAL ↓</span></td><td>🟡 Media</td></tr>
+    </table>
+    <div class="alert a-yel" style="margin-top:10px">⚠ <strong>Nota:</strong> Con pH 4.3, aunque Mn y Fe están en rango normal actualmente, el pH muy bajo puede elevar el Mn a niveles fitotóxicos. Monitorear tras encalamiento.</div>
+  </div>
+
+  <div id="t-saturaciones" class="card" style="display:none">
+    <div class="section-hdr">Porcentaje de Saturaciones en el Complejo de Cambio</div>
+    <table class="tbl">
+      <tr><th>Saturación</th><th>Valor (%)</th><th>Rango Adecuado (%)</th><th>Estado</th></tr>
+      <tr><td>Saturación Calcio (SCa)</td><td>30.53</td><td>50.0 – 60.0</td><td><span class="pill p-baj">⚠ BAJO</span></td></tr>
+      <tr><td>Saturación Magnesio (SMg)</td><td>20.00</td><td>10.0 – 20.0</td><td><span class="pill p-alt">↑ LÍMITE SUP.</span></td></tr>
+      <tr><td>Saturación Potasio (SK)</td><td>1.74</td><td>2.00 – 3.00</td><td><span class="pill p-baj">⚠ BAJO</span></td></tr>
+      <tr><td>Saturación Sodio (SNa)</td><td>1.79</td><td>5.00 – 15.0</td><td><span class="pill p-baj">⚠ BAJO</span></td></tr>
+      <tr><td>Saturación Aluminio (STAl)</td><td><strong>29.99</strong></td><td>&lt; 15.0</td><td><span class="pill p-crit">⛔ TÓXICO</span></td></tr>
+      <tr><td>Saturación de Bases (STB)</td><td>54.05</td><td>35.0 – 50.0</td><td><span class="pill p-alt">↑ ALTO</span></td></tr>
+    </table>
+    <div class="alert a-red" style="margin-top:10px">⛔ La saturación de Al de 29.99% supera el umbral crítico del 20-25%. El Al³⁺ inhibe activamente el crecimiento radicular y bloquea la absorción de P, Ca y Mg. La baja SCa (30.53% vs 50-60% óptimo) confirma que el Al ocupa los sitios de intercambio que deberían tener Ca.</div>
+  </div>
+
+  <div id="t-relaciones" class="card" style="display:none">
+    <div class="section-hdr">Relaciones Catiónicas</div>
+    <table class="tbl">
+      <tr><th>Relación</th><th>Valor</th><th>Rango Adecuado</th><th>Estado</th><th>Interpretación</th></tr>
+      <tr><td>Ca / Mg</td><td>1.53</td><td>3.0 – 5.0</td><td><span class="pill p-baj">⚠ BAJO</span></td><td>Exceso relativo de Mg → antagonismo con Ca y K</td></tr>
+      <tr><td>Ca / K</td><td>17.58</td><td>10.0 – 20.0</td><td><span class="pill p-ok">✅ NORMAL</span></td><td>Relación aceptable</td></tr>
+      <tr><td>C / N</td><td>11.52</td><td>10.0 – 15.0</td><td><span class="pill p-ok">✅ NORMAL</span></td><td>Mineralización activa y saludable</td></tr>
+      <tr><td>(Ca+Mg) / K</td><td>29.09</td><td>20.0 – 40.0</td><td><span class="pill p-ok">✅ NORMAL</span></td><td>Balance catiónico aceptable</td></tr>
+      <tr><td>Mg / K (est.)</td><td>11.52</td><td>3.0 – 8.0</td><td><span class="pill p-alt">↑ ALTO</span></td><td>Exceso de Mg puede deprimir absorción de K</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ═══ INTERPRETACIÓN ═══ -->
+<div class="panel" id="panel-interpretacion">
+  <div class="panel-hdr">
+    <div class="panel-ttl">🎯 Interpretación Agronómica</div>
+    <div class="panel-sub">Diagnóstico detallado de cada parámetro — Finca Alma Luz</div>
+  </div>
+
+  <div class="alert a-red">⛔ <strong>Factor limitante principal:</strong> El pH de 4.3 es la causa raíz de casi todos los demás problemas. Sin corregir el pH primero, ningún otro insumo tendrá eficiencia adecuada.</div>
+
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">🔴 pH 4.3 — Extremadamente Ácido</div><span class="pill p-crit">CRÍTICO</span></div>
+    <p style="font-size:12px;line-height:1.6;color:var(--dim)">El pH de 4.3 se ubica por debajo del umbral de 4.5, el valor más crítico para suelos tropicales. A este pH ocurren simultáneamente: (1) solubilización masiva de Al³⁺ hasta niveles tóxicos, (2) precipitación del P por Fe y Al — haciéndolo inaccesible para las plantas, (3) inhibición de bacterias nitrificantes y fijadoras de N libre, (4) reducción de la CIC efectiva. La causa probable es lixiviación histórica de bases sin reposición de calcio, típica en Baranoa con la alternancia de sequías y lluvias intensas. <strong>Acción urgente: encalamiento con Cal Calcítica 2.5-3.0 ton/ha.</strong> Meta pH: 5.5-6.0.</p>
+    <div style="margin-top:10px">
+      <div style="font-size:10px;color:var(--dim);margin-bottom:3px;font-weight:600">Progreso hacia pH objetivo 5.8</div>
+      <div class="pbar"><div class="pfill" style="width:12%;background:var(--red)"></div></div>
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--dim);margin-top:2px"><span>Actual: 4.3</span><span>Óptimo: 5.8</span></div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">🔴 Aluminio Tóxico</div><span class="pill p-crit">CRÍTICO</span></div>
+      <p style="font-size:12px;line-height:1.6;color:var(--dim)">STAl = 29.99% y Al estimado de ~5.70 meq/100g. El Al³⁺ inhibe la elongación radicular, bloquea la absorción de P y compite con Ca y Mg. Niveles &gt;20% causan daño demostrable en la mayoría de los cultivos. La precipitación con cal como Al(OH)₃ es la única solución efectiva.</p>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">🔴 Fósforo Crítico</div><span class="pill p-crit">3.10 ppm</span></div>
+      <p style="font-size:12px;line-height:1.6;color:var(--dim)">Solo el 8% del límite inferior óptimo (15 ppm). La doble causa: pH ácido que inmoviliza P con Fe y Al, y baja MO que reduce el pool orgánico de P. Sin encalamiento previo, el P aplicado se inmovilizará rápidamente. Con pH corregido, aplicar MAP 150-200 kg/ha + micorrizas AMF.</p>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">⚠️ Materia Orgánica Baja</div><span class="pill p-baj">2.64%</span></div>
+      <p style="font-size:12px;line-height:1.6;color:var(--dim)">C% 1.53 → MO ~2.64% (factor Van Bemmelen 1.724). Rango ideal tropical: 5-10%. La C/N de 11.52 es normal, indicando descomposición activa. El bajo nivel de MO reduce la CIC efectiva, la retención de agua y la actividad biológica. <strong>La lombricultura es el recurso estratégico</strong>: aplicar 5-8 ton/ha de humus de lombriz para recuperación acelerada.</p>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-title">⚠️ Relación Ca/Mg Desequilibrada</div><span class="pill p-baj">1.53</span></div>
+      <p style="font-size:12px;line-height:1.6;color:var(--dim)">Ca/Mg = 1.53 (ideal: 3-5). El Mg está alto en valor absoluto (3.80 meq/100g, sobre el rango óptimo), lo que genera antagonismo con Ca y K. Por esto se recomienda Cal Calcítica (solo CaCO₃) en lugar de dolomítica, para subir Ca sin agregar más Mg.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">🔬 Micronutrientes — Deficiencias Vinculadas al pH</div></div>
+    <div class="g3">
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px">
+        <div style="font-weight:700;color:var(--red);margin-bottom:5px">Boro ⛔ 0.09 ppm</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.5">Crítico. Solo 30% del límite inferior. El B es inmóvil en la planta: aplicar en cada ciclo. Borax 5 kg/ha + foliar 0.15%. Causa deficiencia de flores y frutos.</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px">
+        <div style="font-weight:700;color:var(--orange);margin-bottom:5px">Zinc ⚠ 1.40 ppm</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.5">Bajo (rango 2-4 ppm). ZnSO₄·7H₂O: 15-20 kg/ha edáfico + foliar 0.3% cada 15 días. Afecta síntesis de clorofila y metabolismo de N.</div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px">
+        <div style="font-weight:700;color:var(--orange);margin-bottom:5px">Cobre ⚠ 0.60 ppm</div>
+        <div style="font-size:11px;color:var(--dim);line-height:1.5">Bajo (rango 1-3 ppm). CuSO₄·5H₂O: 4-5 kg/ha. Mezcla Bordelesa (Cu + cal) para protección fúngica simultánea. Esencial para fotosíntesis.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SIMULADOR ═══ -->
+<div class="panel" id="panel-simulador">
+  <div class="panel-hdr">
+    <div class="panel-ttl">⚡ Simulador de Prácticas Regenerativas</div>
+    <div class="panel-sub">Ajuste los parámetros y observe el impacto estimado en los índices del suelo</div>
+  </div>
+
+  <div class="sim-layout">
+    <div>
+      <div class="card">
+        <div class="section-hdr">🎛 Variables de Intervención</div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">pH objetivo</span><span class="sl-val" id="v-ph">4.3</span></div>
+          <input type="range" min="4.3" max="7.0" step="0.1" value="4.3" oninput="simUpdate('ph',this.value)">
+        </div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">Materia Orgánica (%)</span><span class="sl-val" id="v-mo">2.64</span></div>
+          <input type="range" min="2.64" max="10" step="0.1" value="2.64" oninput="simUpdate('mo',this.value)">
+        </div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">Fósforo P (ppm)</span><span class="sl-val" id="v-p">3.1</span></div>
+          <input type="range" min="3.1" max="50" step="0.5" value="3.1" oninput="simUpdate('p',this.value)">
+        </div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">Humus de Lombriz (ton/ha)</span><span class="sl-val" id="v-hl">0</span></div>
+          <input type="range" min="0" max="10" step="0.5" value="0" oninput="simUpdate('hl',this.value)">
+        </div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">Cobertura Vegetal (%)</span><span class="sl-val" id="v-cob">25</span></div>
+          <input type="range" min="5" max="100" step="5" value="25" oninput="simUpdate('cob',this.value)">
+        </div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">Biochar (ton/ha)</span><span class="sl-val" id="v-bc">0</span></div>
+          <input type="range" min="0" max="5" step="0.25" value="0" oninput="simUpdate('bc',this.value)">
+        </div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">Rotación de Potreros (N°)</span><span class="sl-val" id="v-rot">1</span></div>
+          <input type="range" min="1" max="8" step="1" value="1" oninput="simUpdate('rot',this.value)">
+        </div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">Árboles en sistema (%)</span><span class="sl-val" id="v-arb">5</span></div>
+          <input type="range" min="0" max="40" step="5" value="5" oninput="simUpdate('arb',this.value)">
+        </div>
+        <div class="sl-grp">
+          <div class="sl-hdr"><span class="sl-lbl">Subsolado Keyline</span><span class="sl-val" id="v-kl">No</span></div>
+          <input type="range" min="0" max="1" step="1" value="0" oninput="simUpdate('kl',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card">
+        <div class="section-hdr">📈 Proyección de Índices</div>
+        <canvas id="simChart" style="max-height:260px"></canvas>
+      </div>
+      <div class="impact-grid" id="impactGrid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAPA GIS ═══ -->
+<div class="panel" id="panel-mapa">
+  <div class="panel-hdr">
+    <div class="panel-ttl">🗺️ Mapa GIS Interactivo</div>
+    <div class="panel-sub">Finca Alma Luz · Baranoa, Atlántico (10.797°N, 74.925°O)</div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab(this,'m-suelo')">🧪 Suelo</button>
+    <button class="tab" onclick="switchTab(this,'m-cober')">🌿 Cobertura</button>
+    <button class="tab" onclick="switchTab(this,'m-agua')">💧 Hidrología</button>
+  </div>
+  <div id="m-suelo"><div id="soil-map"></div></div>
+  <div id="m-cober" style="display:none">
+    <div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:48px;margin-bottom:12px">🛰️</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px">Capa NDVI / Cobertura</div>
+      <div style="font-size:12px;color:var(--dim)">Requiere importar raster GeoTIFF o conectar servicio WMS. Formatos soportados: GeoTIFF, GeoPackage, Shapefile, WMS/WMTS.</div>
+      <button class="btn" style="margin-top:12px">📂 Importar Raster</button>
+    </div>
+  </div>
+  <div id="m-agua" style="display:none">
+    <div class="card" style="text-align:center;padding:40px">
+      <div style="font-size:48px;margin-bottom:12px">💧</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:6px">Módulo Hidrológico</div>
+      <div style="font-size:12px;color:var(--dim)">Requiere DEM para generar dirección de flujo, acumulación, cuencas y zonas de infiltración.</div>
+      <button class="btn" style="margin-top:12px">📂 Importar DEM</button>
+    </div>
+  </div>
+  <div class="g3" style="margin-top:12px">
+    <div class="card" style="padding:10px">
+      <div class="section-hdr">Leyenda pH</div>
+      <div style="display:flex;flex-direction:column;gap:4px;font-size:11px">
+        <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#dc2626;border-radius:3px;display:inline-block"></span> &lt; 4.5 — Muy ácido</div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#ea580c;border-radius:3px;display:inline-block"></span> 4.5–5.5 — Ácido</div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#ca8a04;border-radius:3px;display:inline-block"></span> 5.5–6.0 — L. ácido</div>
+        <div style="display:flex;align-items:center;gap:6px"><span style="width:14px;height:14px;background:#7A8C3E;border-radius:3px;display:inline-block"></span> 6.0–7.0 — Óptimo</div>
+      </div>
+    </div>
+    <div class="card" style="padding:10px">
+      <div class="section-hdr">Capas disponibles</div>
+      <div style="font-size:11px;display:flex;flex-direction:column;gap:5px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked> Predio / Lotes</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> Curvas de nivel</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> Escorrentía</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> Interpolación pH</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> Heatmap P</label>
+      </div>
+    </div>
+    <div class="card" style="padding:10px">
+      <div class="section-hdr">Importar datos</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <button class="btn-o" style="font-size:11px;text-align:left">📥 GeoJSON / GeoPackage</button>
+        <button class="btn-o" style="font-size:11px;text-align:left">📥 Shapefile (.zip)</button>
+        <button class="btn-o" style="font-size:11px;text-align:left">📥 Raster (.tif)</button>
+        <button class="btn-o" style="font-size:11px;text-align:left">📥 CSV con coordenadas</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ KEYLINE ═══ -->
+<div class="panel" id="panel-keyline">
+  <div class="panel-hdr">
+    <div class="panel-ttl">🌿 Módulo Keyline Design</div>
+    <div class="panel-sub">Análisis topográfico e hidrológico para Finca Alma Luz (28 ha · Baranoa, Atlántico)</div>
+  </div>
+  <div class="g2" style="margin-bottom:12px">
+    <div class="card" style="padding:10px">
+      <div class="section-hdr">Elementos Keyline</div>
+      <div style="font-size:11px;display:flex;flex-direction:column;gap:5px">
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked> 🔵 Keypoint</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox" checked> 🟢 Keylines</label>
+        <label style="display:flex;align-items:center;gap=6px;cursor:pointer"><input type="checkbox"> 🔶 Reservorios</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 🟤 Canales</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 🟣 Crestas</label>
+        <label style="display:flex;align-items:center;gap:6px;cursor:pointer"><input type="checkbox"> 🔴 Divisorias</label>
+      </div>
+    </div>
+    <div class="card" style="padding:10px">
+      <div class="section-hdr">Parámetros DEM</div>
+      <div style="display:flex;flex-direction:column;gap:5px">
+        <button class="btn" style="font-size:11px">📂 Importar DEM (.tif)</button>
+        <button class="btn-o" style="font-size:11px">⚙️ Generar Keylines automático</button>
+        <button class="btn-o" style="font-size:11px">💧 Calcular Cuencas</button>
+        <button class="btn-o" style="font-size:11px">📐 Diseñar Reservorios</button>
+        <button class="btn-o" style="font-size:11px">🌊 Simular Escorrentía</button>
+      </div>
+    </div>
+  </div>
+  <div id="kl-map"></div>
+  <div class="g3" style="margin-top:12px">
+    <div class="card" style="padding:11px;text-align:center"><div style="font-size:11px;color:var(--dim);margin-bottom:3px">Superficie total</div><div style="font-size:20px;font-weight:800;color:var(--green)">28 ha</div></div>
+    <div class="card" style="padding:11px;text-align:center"><div style="font-size:11px;color:var(--dim);margin-bottom:3px">Keylines estimadas</div><div style="font-size:20px;font-weight:800;color:var(--blue)">6 líneas</div></div>
+    <div class="card" style="padding:11px;text-align:center"><div style="font-size:11px;color:var(--dim);margin-bottom:3px">Capacidad reservorio</div><div style="font-size:20px;font-weight:800;color:var(--yellow)">~4,200 m³</div></div>
+  </div>
+</div>
+
+<!-- ═══ ASISTENTE IA ═══ -->
+<div class="panel" id="panel-asistente">
+  <div class="panel-hdr">
+    <div class="panel-ttl">🤖 Asistente Agronómico IA</div>
+    <div class="panel-sub">Motor de reglas agronómicas basado en datos del Análisis No. 449</div>
+  </div>
+  <div class="chat-box">
+    <div class="chat-msgs" id="chatMsgs">
+      <div class="msg ai">
+        <div class="ai-hdr">🌱 KEYLINE AI · Especialista en Suelos</div>
+        <div>Hola Jhon, he analizado el Análisis No. 449 de la Finca Alma Luz.<br><br>
+        <strong>Diagnóstico inicial:</strong><br>
+        ⛔ El pH de <strong>4.3</strong> es el problema raíz de este suelo — extremadamente ácido.<br>
+        ⛔ El Aluminio tóxico ocupa el <strong>30%</strong> de los sitios de intercambio, bloqueando raíces y nutrientes.<br>
+        ⛔ El Fósforo disponible es <strong>crítico: 3.10 ppm</strong> (solo 8% del mínimo óptimo).<br>
+        ⚠ La Materia Orgánica al <strong>2.64%</strong> está muy por debajo del ideal (5-10%).<br><br>
+        La buena noticia: la <strong>lombricultura en la finca</strong> es su mayor ventaja. El humus de lombriz puede acelerar dramáticamente la recuperación.<br><br>
+        ¿Sobre qué le gustaría profundizar?</div>
+      </div>
+    </div>
+    <div class="quick-btns">
+      <button class="qb" onclick="askAI('pH y encalamiento')">🧪 pH y encalamiento</button>
+      <button class="qb" onclick="askAI('materia orgánica')">🍂 Materia orgánica</button>
+      <button class="qb" onclick="askAI('fósforo deficiencia')">🌾 Fósforo crítico</button>
+      <button class="qb" onclick="askAI('lombricompost aplicación')">🪱 Lombricompost</button>
+      <button class="qb" onclick="askAI('keyline agua')">💧 Keyline & agua</button>
+      <button class="qb" onclick="askAI('plan fertilización')">📋 Plan fertilización</button>
+      <button class="qb" onclick="askAI('micronutrientes boro zinc')">🔬 Micronutrientes</button>
+      <button class="qb" onclick="askAI('recuperación tiempo')">📈 Tiempo recuperación</button>
+    </div>
+    <div class="chat-foot">
+      <input class="chat-in" id="chatIn" type="text" placeholder="Pregunte sobre su suelo, fertilización, keyline, lombricultura..." onkeydown="if(event.key==='Enter')sendChat()">
+      <button class="btn" onclick="sendChat()">Enviar ➤</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ RECUPERACIÓN ═══ -->
+<div class="panel" id="panel-recuperacion">
+  <div class="panel-hdr">
+    <div class="panel-ttl">📈 Plan de Recuperación del Suelo</div>
+    <div class="panel-sub">Proyección a 1, 3, 5 y 10 años — Finca Alma Luz</div>
+  </div>
+
+  <div class="rec-grid">
+    <div class="rec-card"><div class="rec-yr">Año 1</div><div class="rec-val">45<span style="font-size:13px">/100</span></div><div class="rec-lbl">Índice de Fertilidad</div></div>
+    <div class="rec-card"><div class="rec-yr">Año 3</div><div class="rec-val">62<span style="font-size:13px">/100</span></div><div class="rec-lbl">Índice de Fertilidad</div></div>
+    <div class="rec-card"><div class="rec-yr">Año 5</div><div class="rec-val">74<span style="font-size:13px">/100</span></div><div class="rec-lbl">Índice de Fertilidad</div></div>
+    <div class="rec-card"><div class="rec-yr">Año 10</div><div class="rec-val">88<span style="font-size:13px">/100</span></div><div class="rec-lbl">Índice de Fertilidad</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📊 Proyección de Indicadores Clave</div></div>
+    <canvas id="recChart" style="max-height:280px"></canvas>
+  </div>
+
+  <div class="card">
+    <div class="card-hdr"><div class="card-title">📅 Cronograma de Intervenciones</div></div>
+    <div class="tl">
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-yr">MES 1-3 — Corrección Base</div><div class="tl-txt">✅ Cal Calcítica 2.5 ton/ha + Humus de Lombriz 5 ton/ha incorporados al suelo.<br>✅ Yeso Agrícola 300 kg/ha para movilizar Al y aportar Ca+S.<br>✅ Primera medición de pH de control a los 45 días.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-yr">MES 3-4 — Siembra / Establecimiento</div><div class="tl-txt">✅ MAP 12-61-0 (150 kg/ha) + Borax 5 kg/ha + ZnSO₄ 15 kg/ha + CuSO₄ 4 kg/ha.<br>✅ Inoculante micorrícico + Azospirillum + Trichoderma al momento de la siembra.<br>✅ Primera aplicación de lixiviado de lombriz (30 L conc./ha diluido 1:10).</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-yr">MES 4-12 — Nutrición y Bioestimulación</div><div class="tl-txt">✅ Urea 80 kg/ha fraccionada (mes 4 y mes 6).<br>✅ Lixiviado de lombriz mensual + foliares de Zn, Cu, B quincenal.<br>✅ Establecimiento de sistema silvopastoril (mínimo 10% cobertura arbórea).<br>✅ Implementar rotación de potreros (mínimo 4 potreros).</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-yr">AÑO 2-3 — Consolidación y Keyline</div><div class="tl-txt">✅ Segundo análisis de suelo completo. Ajuste del plan de fertilización.<br>✅ Implementar diseño Keyline: zanjas, canales y reservorios según topografía.<br>✅ Subsolado Keyline para romper hardpan y distribuir humus en profundidad.<br>✅ Incremento de árboles y biomasa. Meta MO: 4.0%.</div></div>
+      <div class="tl-item"><div class="tl-dot"></div><div class="tl-yr">AÑO 5-10 — Sistema Maduro Regenerativo</div><div class="tl-txt">✅ pH estabilizado 5.8-6.2. MO &gt; 5%. P disponible &gt; 15 ppm.<br>✅ Sistema silvopastoril establecido. Lombricompost autosuficiente in situ.<br>✅ Reservorios operativos. Infiltración &gt;80% de precipitación.<br>✅ Potencial certificación de carbono y bonos de carbono.</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ ECONOMÍA ═══ -->
+<div class="panel" id="panel-economia">
+  <div class="panel-hdr">
+    <div class="panel-ttl">💰 Análisis Económico</div>
+    <div class="panel-sub">Costos de recuperación, ROI y potencial de ingresos — Finca Alma Luz (28 ha)</div>
+  </div>
+
+  <div class="alert a-grn">✅ La inversión en recuperación del suelo tiene un ROI estimado del <strong>340%</strong> en 5 años, considerando incremento de productividad + captura de carbono.</div>
+
+  <div class="econ-grid">
+    <div class="econ-card"><div class="econ-lbl">Costo total Año 1</div><div class="econ-val">$18.4M COP</div><div class="econ-sub">~$4,600 USD · 28 ha</div></div>
+    <div class="econ-card"><div class="econ-lbl">Costo por hectárea</div><div class="econ-val">$657K COP</div><div class="econ-sub">~$164 USD / ha / año</div></div>
+    <div class="econ-card"><div class="econ-lbl">Incremento productividad</div><div class="econ-val">+180%</div><div class="econ-sub">Estimado a 5 años vs. línea base</div></div>
+    <div class="econ-card"><div class="econ-lbl">ROI a 5 años</div><div class="econ-val">340%</div><div class="econ-sub">Retorno sobre inversión acumulada</div></div>
+    <div class="econ-card"><div class="econ-lbl">Período de recuperación</div><div class="econ-val">2.8 años</div><div class="econ-sub">Payback estimado</div></div>
+    <div class="econ-card"><div class="econ-lbl">Carbono secuestrado</div><div class="econ-val">~3.2 tCO₂/ha/año</div><div class="econ-sub">Con prácticas regenerativas plenas</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="section-hdr">Desglose de Costos Año 1 (28 ha)</div>
+      <table class="tbl">
+        <tr><th>Insumo</th><th>Dosis/ha</th><th>$/ha COP</th><th>Total (28 ha)</th></tr>
+        <tr><td>Cal Calcítica</td><td>2.5 ton</td><td>$90,000</td><td>$2,520,000</td></tr>
+        <tr><td>Humus de Lombriz*</td><td>5 ton</td><td>$0 (propio)</td><td>$0</td></tr>
+        <tr><td>MAP 12-61-0</td><td>150 kg</td><td>$250,000</td><td>$7,000,000</td></tr>
+        <tr><td>Urea 46-0-0</td><td>80 kg</td><td>$85,000</td><td>$2,380,000</td></tr>
+        <tr><td>ZnSO₄ + CuSO₄ + Borax</td><td>mix</td><td>$60,000</td><td>$1,680,000</td></tr>
+        <tr><td>Yeso Agrícola</td><td>300 kg</td><td>$45,000</td><td>$1,260,000</td></tr>
+        <tr><td>Bioinsumos (mic, azos, trich)</td><td>—</td><td>$40,000</td><td>$1,120,000</td></tr>
+        <tr><td>Lixiviado lombriz*</td><td>mensual</td><td>$0 (propio)</td><td>$0</td></tr>
+        <tr><td>Mano de obra</td><td>—</td><td>$85,000</td><td>$2,380,000</td></tr>
+        <tr><td><strong>TOTAL</strong></td><td></td><td><strong>$655,000</strong></td><td><strong>$18,340,000</strong></td></tr>
+      </table>
+      <div style="font-size:10px;color:var(--green);margin-top:6px">* La lombricultura propia elimina ~$4-6M COP en compra de enmiendas orgánicas</div>
+    </div>
+    <div class="card">
+      <div class="section-hdr">Potencial Bonos de Carbono</div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px">
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px">
+          <div style="font-weight:700;color:var(--green);margin-bottom:4px">Carbono capturado (5 años)</div>
+          <div style="font-size:22px;font-weight:800">~448 tCO₂eq</div>
+          <div style="color:var(--dim);margin-top:2px">3.2 tCO₂/ha/año × 28 ha × 5 años</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px">
+          <div style="font-weight:700;color:var(--blue);margin-bottom:4px">Ingreso potencial carbono</div>
+          <div style="font-size:22px;font-weight:800">$44,800 USD</div>
+          <div style="color:var(--dim);margin-top:2px">A $100 USD/tCO₂ (mercado voluntario VCS/Gold Standard)</div>
+        </div>
+        <div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:11px">
+          <div style="font-weight:700;color:var(--yellow);margin-bottom:4px">Valor total del proyecto (5 años)</div>
+          <div style="font-size:22px;font-weight:800">~$68M COP</div>
+          <div style="color:var(--dim);margin-top:2px">Producción + carbono + servicios ecosistémicos</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ REPORTES ═══ -->
+<div class="panel" id="panel-reportes">
+  <div class="panel-hdr">
+    <div class="panel-ttl">📋 Generación de Reportes</div>
+    <div class="panel-sub">Exportar análisis, recomendaciones y plan de manejo</div>
+  </div>
+  <div class="g3">
+    <div class="card" style="text-align:center;padding:20px">
+      <div style="font-size:40px;margin-bottom:10px">📄</div>
+      <div style="font-weight:700;margin-bottom:5px">Informe Ejecutivo PDF</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:12px">Resumen ejecutivo con KPIs, diagnóstico y prioridades. 4-6 páginas.</div>
+      <button class="btn" onclick="window.print()">⬇ Generar PDF</button>
+    </div>
+    <div class="card" style="text-align:center;padding:20px">
+      <div style="font-size:40px;margin-bottom:10px">📊</div>
+      <div style="font-weight:700;margin-bottom:5px">Informe Técnico Completo</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:12px">Interpretación completa de todos los parámetros, plan de fertilización y cronograma.</div>
+      <button class="btn">⬇ Descargar DOCX</button>
+    </div>
+    <div class="card" style="text-align:center;padding:20px">
+      <div style="font-size:40px;margin-bottom:10px">📈</div>
+      <div style="font-weight:700;margin-bottom:5px">Hoja de Datos Excel</div>
+      <div style="font-size:11px;color:var(--dim);margin-bottom:12px">Todos los parámetros, rangos, estados, índices calculados y proyecciones.</div>
+      <button class="btn">⬇ Descargar XLSX</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-hdr">Contenido incluido en los reportes</div>
+    <div class="g3" style="font-size:12px">
+      <div><div style="font-weight:700;color:var(--green);margin-bottom:6px">Análisis</div>
+        <div style="display:flex;flex-direction:column;gap:3px;color:var(--dim)">
+          <span>✅ Datos del laboratorio</span><span>✅ Interpretación por parámetro</span>
+          <span>✅ Diagnóstico integral</span><span>✅ Alertas críticas</span>
+        </div>
+      </div>
+      <div><div style="font-weight:700;color:var(--green);margin-bottom:6px">Recomendaciones</div>
+        <div style="display:flex;flex-direction:column;gap:3px;color:var(--dim)">
+          <span>✅ Plan de fertilización</span><span>✅ Enmiendas y correctivos</span>
+          <span>✅ Bioinsumos</span><span>✅ Prácticas regenerativas</span>
+        </div>
+      </div>
+      <div><div style="font-weight:700;color:var(--green);margin-bottom:6px">Planeación</div>
+        <div style="display:flex;flex-direction:column;gap:3px;color:var(--dim)">
+          <span>✅ Cronograma 1-10 años</span><span>✅ Diseño Keyline</span>
+          <span>✅ Análisis económico</span><span>✅ Bonos de carbono</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- RIGHT PANEL — INDICES -->
+<aside class="rp">
+  <div class="rp-title">⚡ Índices del Suelo <span style="font-size:9px;background:rgba(122,140,62,.15);color:var(--green);padding:2px 6px;border-radius:8px;font-weight:800">LIVE</span></div>
+  <div class="gauge-wrap" id="gaugeWrap">
+    <!-- Gauges rendered by JS -->
+  </div>
+  <div style="margin-top:10px;padding:9px;background:var(--bg3);border:1px solid var(--border);border-radius:8px">
+    <div style="font-size:10px;font-weight:700;color:var(--dim);margin-bottom:6px;text-transform:uppercase">Score general</div>
+    <div style="font-size:28px;font-weight:800;color:var(--red)" id="overallScore">28</div>
+    <div style="font-size:10px;color:var(--dim)">/100 · Estado Crítico</div>
+    <div class="pbar" style="margin-top:6px"><div class="pfill" id="overallBar" style="width:28%;background:var(--red)"></div></div>
+    <div style="font-size:10px;color:var(--dim);margin-top:4px">Meta a 5 años: 78/100</div>
+  </div>
+  <div style="margin-top:8px;padding:9px;background:var(--bg3);border:1px solid var(--border);border-radius:8px">
+    <div style="font-size:10px;font-weight:700;color:var(--dim);margin-bottom:6px;text-transform:uppercase">Leyenda colores</div>
+    <div style="font-size:10px;display:flex;flex-direction:column;gap:3px">
+      <div><span style="color:var(--green)">■</span> 70-100 Óptimo</div>
+      <div><span style="color:var(--yellow)">■</span> 40-69 Moderado</div>
+      <div><span style="color:var(--red)">■</span> 0-39 Crítico</div>
+    </div>
+  </div>
+</aside>
+
+</div><!-- end .app -->
+
+<script>
+// ═══ DATA ═══
+const SOIL = {
+  ph:4.3,mo:2.64,c:1.53,cn:11.52,nt:0.08,p:3.10,
+  cic:19.0,bt:10.27,ca:5.80,mg:3.80,k:0.33,na:0.34,al:5.70,
+  cu:0.60,fe:60.0,mn:11.25,zn:1.40,b:0.09,s:10.69,
+  sCa:30.53,sMg:20.0,sK:1.74,sNa:1.79,sTAl:29.99,stb:54.05,
+  caMg:1.53,caK:17.58,caMgK:29.09
+};
+
+const SIM = {ph:4.3,mo:2.64,p:3.1,hl:0,cob:25,bc:0,rot:1,arb:5,kl:0};
+
+// ═══ NAVIGATION ═══
+function nav(id) {
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  const panel = document.getElementById('panel-'+id);
+  if(panel) panel.classList.add('active');
+  const items = document.querySelectorAll('.ni');
+  items.forEach(n=>{if(n.getAttribute('onclick')&&n.getAttribute('onclick').includes("'"+id+"'"))n.classList.add('active')});
+  if(id==='mapa') setTimeout(initSoilMap,100);
+  if(id==='keyline') setTimeout(initKlMap,100);
+  if(id==='simulador') setTimeout(initSimCharts,100);
+  if(id==='recuperacion') setTimeout(initRecChart,100);
+}
+
+function switchTab(btn,target) {
+  const parent = btn.closest('.tabs');
+  parent.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  const panels = parent.nextElementSibling;
+  // find siblings
+  let el = parent.nextElementSibling;
+  while(el && (el.classList.contains('card')||el.id)) {
+    el.style.display = 'none';
+    el = el.nextElementSibling;
+  }
+  const target_el = document.getElementById(target);
+  if(target_el) target_el.style.display='';
+}
+
+// ═══ THEME ═══
+function toggleTheme(){
+  const h=document.documentElement;
+  const t=h.getAttribute('data-theme');
+  h.setAttribute('data-theme',t==='dark'?'light':'dark');
+  document.querySelector('.ibtn[title="Tema"]').textContent = t==='dark'?'☀️':'🌙';
+}
+
+// ═══ GAUGE CHARTS ═══
+const INDICES_DEF = [
+  {key:'fertilidad',label:'Fertilidad',val:22},
+  {key:'salud',label:'Salud Suelo',val:28},
+  {key:'biologico',label:'Biológico',val:30},
+  {key:'hidro',label:'Hidrológico',val:52},
+  {key:'carbono',label:'Carbono',val:26},
+  {key:'compacta',label:'Compactac.',val:42},
+  {key:'erosion',label:'Anti-Erosión',val:42},
+  {key:'retencion',label:'Ret. Agua',val:54},
+  {key:'nutri',label:'Disp. Nutric.',val:18},
+  {key:'regen',label:'Reg. Agric.',val:28},
+];
+
+let gaugeCharts={};
+let currentIndices={...INDICES_DEF.reduce((a,d)=>{a[d.key]=d.val;return a},{})};
+
+function gaugeColor(v){return v>=70?'#7A8C3E':v>=40?'#C8862A':'#C1533A'}
+
+function initGauges(){
+  const wrap=document.getElementById('gaugeWrap');
+  wrap.innerHTML='';
+  INDICES_DEF.forEach(d=>{
+    const box=document.createElement('div');
+    box.className='g-box';
+    box.innerHTML=`<div class="g-lbl">${d.label}</div><canvas class="g-canvas" id="gc-${d.key}" width="90" height="50"></canvas><div class="g-val" id="gv-${d.key}" style="color:${gaugeColor(d.val)}">${d.val}</div><div class="g-max">/100</div>`;
+    wrap.appendChild(box);
+    const ctx=document.getElementById('gc-'+d.key).getContext('2d');
+    const color=gaugeColor(d.val);
+    gaugeCharts[d.key]=new Chart(ctx,{
+      type:'doughnut',
+      data:{datasets:[{data:[d.val,100-d.val],backgroundColor:[color,'#4a2a18'],borderWidth:0,circumference:180,rotation:270}]},
+      options:{plugins:{legend:{display:false},tooltip:{enabled:false}},cutout:'72%',responsive:false,animation:{duration:800}}
+    });
+  });
+}
+
+function updateGauges(){
+  INDICES_DEF.forEach(d=>{
+    const v=currentIndices[d.key]||d.val;
+    const color=gaugeColor(v);
+    const chart=gaugeCharts[d.key];
+    if(chart){chart.data.datasets[0].data=[v,100-v];chart.data.datasets[0].backgroundColor=[color,'#4a2a18'];chart.update('none');}
+    const el=document.getElementById('gv-'+d.key);
+    if(el){el.textContent=Math.round(v);el.style.color=color;}
+  });
+  const overall=Math.round(Object.values(currentIndices).reduce((a,b)=>a+b,0)/Object.keys(currentIndices).length);
+  const sc=document.getElementById('overallScore');
+  const bar=document.getElementById('overallBar');
+  if(sc){sc.textContent=overall;sc.style.color=gaugeColor(overall);}
+  if(bar){bar.style.width=overall+'%';bar.style.background=gaugeColor(overall);}
+}
+
+// ═══ RADAR CHART ═══
+function initRadar(){
+  const ctx=document.getElementById('radarChart');
+  if(!ctx)return;
+  new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['pH','Mat. Org.','Fósforo','Calcio','Potasio','CIC','Nitrógeno','Biología'],
+      datasets:[
+        {label:'Actual',data:[12,26,8,58,82,76,40,30],backgroundColor:'rgba(193,83,58,0.15)',borderColor:'#C1533A',pointBackgroundColor:'#C1533A',borderWidth:2,pointRadius:3},
+        {label:'Óptimo',data:[100,100,100,100,100,100,100,100],backgroundColor:'rgba(122,140,62,0.08)',borderColor:'#7A8C3E',borderWidth:1.5,pointRadius:2,borderDash:[4,4]}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      scales:{r:{beginAtZero:true,max:100,grid:{color:'rgba(200,150,100,0.06)'},ticks:{color:'#5A4A38',font:{size:9},stepSize:25},pointLabels:{color:'#9A8A78',font:{size:10}}}},
+      plugins:{legend:{position:'bottom',labels:{color:'#9A8A78',font:{size:10},boxWidth:10,padding:10}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.raw}%`}}}
+    }
+  });
+}
+
+// ═══ BAR CHART ═══
+function initBar(){
+  const ctx=document.getElementById('barChart');
+  if(!ctx)return;
+  new Chart(ctx,{
+    type:'bar',
+    data:{
+      labels:['pH','M.O.','P','Ca','Mg','K','CIC','N','Zn','B','Cu'],
+      datasets:[
+        {label:'Actual (%)',data:[12,26,8,58,100,82,76,40,35,15,20],backgroundColor:'rgba(193,83,58,0.75)',borderRadius:4},
+        {label:'Óptimo (100%)',data:[100,100,100,100,100,100,100,100,100,100,100],backgroundColor:'rgba(122,140,62,0.12)',borderRadius:4,borderWidth:1,borderColor:'rgba(122,140,62,0.3)'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      plugins:{legend:{position:'bottom',labels:{color:'#9A8A78',font:{size:10},boxWidth:10,padding:8}}},
+      scales:{x:{ticks:{color:'#9A8A78',font:{size:10}},grid:{color:'rgba(200,150,100,0.04)'}},y:{beginAtZero:true,max:110,ticks:{color:'#9A8A78',font:{size:10}},grid:{color:'rgba(200,150,100,0.04)'}}}
+    }
+  });
+}
+
+// ═══ SIMULATOR ═══
+let simChart=null;
+
+function simUpdate(key,val){
+  SIM[key]=parseFloat(val);
+  document.getElementById('v-'+key).textContent = key==='kl'?(val==='1'?'Sí':'No'):val;
+  recalcIndices();
+  updateGauges();
+  updateSimChart();
+  updateImpact();
+}
+
+function recalcIndices(){
+  const ph=SIM.ph,mo=SIM.mo,p=SIM.p,hl=SIM.hl,cob=SIM.cob,bc=SIM.bc,rot=SIM.rot,arb=SIM.arb,kl=SIM.kl;
+  const phF=Math.min(1,(ph-3.5)/3.0);
+  const moF=Math.min(1,mo/8.0);
+  const pF=Math.min(1,p/30);
+  const hlF=Math.min(1,hl/8);
+  const cobF=Math.min(1,cob/80);
+  const bcF=Math.min(1,bc/4);
+  const rotF=Math.min(1,(rot-1)/6);
+  const arbF=Math.min(1,arb/30);
+  const klF=kl?0.12:0;
+  currentIndices.fertilidad=Math.min(99,Math.round(22+(phF*35)+(pF*20)+(moF*10)+(hlF*8)));
+  currentIndices.salud=Math.min(99,Math.round(28+(phF*30)+(moF*20)+(hlF*10)+(bcF*5)));
+  currentIndices.biologico=Math.min(99,Math.round(30+(moF*28)+(hlF*18)+(cobF*10)+(arbF*5)));
+  currentIndices.hidro=Math.min(99,Math.round(52+(moF*15)+(cobF*12)+(klF*100*0.15)+(arbF*8)));
+  currentIndices.carbono=Math.min(99,Math.round(26+(moF*40)+(hlF*12)+(bcF*15)+(arbF*8)));
+  currentIndices.compacta=Math.min(99,Math.round(42+(klF*100*0.2)+(moF*15)+(cobF*10)+(rotF*10)));
+  currentIndices.erosion=Math.min(99,Math.round(42+(cobF*25)+(moF*12)+(arbF*15)+(klF*100*0.1)));
+  currentIndices.retencion=Math.min(99,Math.round(54+(moF*20)+(bcF*10)+(klF*100*0.1)+(arbF*6)));
+  currentIndices.nutri=Math.min(99,Math.round(18+(phF*30)+(pF*25)+(hlF*15)+(moF*10)));
+  currentIndices.regen=Math.min(99,Math.round(Object.values(currentIndices).slice(0,9).reduce((a,b)=>a+b,0)/9-2));
+}
+
+function initSimCharts(){
+  const ctx=document.getElementById('simChart');
+  if(!ctx||simChart)return;
+  simChart=new Chart(ctx,{
+    type:'radar',
+    data:{
+      labels:['Fertilidad','Salud','Biológico','Hidrológico','Carbono','Compac.','Erosión','Ret.Agua','Disp.Nutric.'],
+      datasets:[
+        {label:'Estado actual',data:Object.values(currentIndices).slice(0,9),backgroundColor:'rgba(193,83,58,0.12)',borderColor:'#C1533A',borderWidth:2,pointRadius:2,pointBackgroundColor:'#C1533A'},
+        {label:'Simulación',data:Object.values(currentIndices).slice(0,9),backgroundColor:'rgba(122,140,62,0.12)',borderColor:'#7A8C3E',borderWidth:2,pointRadius:2,pointBackgroundColor:'#7A8C3E'}
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      scales:{r:{beginAtZero:true,max:100,grid:{color:'rgba(200,150,100,0.05)'},ticks:{color:'#5A4A38',font:{size:8},stepSize:25},pointLabels:{color:'#9A8A78',font:{size:9}}}},
+      plugins:{legend:{position:'bottom',labels:{color:'#9A8A78',font:{size:10},boxWidth:8,padding:8}},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.raw}`}}}
+    }
+  });
+  updateImpact();
+}
+
+function updateSimChart(){
+  if(!simChart)return;
+  simChart.data.datasets[1].data=Object.values(currentIndices).slice(0,9);
+  simChart.update('none');
+}
+
+function updateImpact(){
+  const base={fertilidad:22,salud:28,biologico:30,hidro:52,carbono:26,nutri:18};
+  const now=currentIndices;
+  const grid=document.getElementById('impactGrid');
+  if(!grid)return;
+  const items=[
+    {lbl:'Fertilidad',base:base.fertilidad,now:now.fertilidad,unit:''},
+    {lbl:'Salud Suelo',base:base.salud,now:now.salud,unit:''},
+    {lbl:'Biológico',base:base.biologico,now:now.biologico,unit:''},
+    {lbl:'Hidrológico',base:base.hidro,now:now.hidro,unit:''},
+    {lbl:'Carbono',base:base.carbono,now:now.carbono,unit:''},
+    {lbl:'Disp. Nutr.',base:base.nutri,now:now.nutri,unit:''},
+  ];
+  grid.innerHTML=items.map(i=>{
+    const delta=i.now-i.base;
+    return `<div class="imp-card"><div class="imp-lbl">${i.lbl}</div><div class="imp-old">${i.base}</div><div class="imp-new">${Math.round(i.now)}</div><div class="imp-delta">${delta>0?'+':''}${Math.round(delta)} pts</div></div>`;
+  }).join('');
+}
+
+// ═══ RECOVERY CHART ═══
+let recChart=null;
+function initRecChart(){
+  const ctx=document.getElementById('recChart');
+  if(!ctx||recChart)return;
+  recChart=new Chart(ctx,{
+    type:'line',
+    data:{
+      labels:['Hoy','1 año','2 años','3 años','5 años','7 años','10 años'],
+      datasets:[
+        {label:'Fertilidad',data:[22,45,56,62,74,81,88],borderColor:'#7A8C3E',backgroundColor:'rgba(122,140,62,0.10)',tension:.4,fill:true,pointRadius:3,borderWidth:2},
+        {label:'Salud Suelo',data:[28,48,60,68,78,83,90],borderColor:'#3A8FA1',backgroundColor:'rgba(58,143,161,0.07)',tension:.4,fill:false,pointRadius:3,borderWidth:2},
+        {label:'Carbono',data:[26,36,48,58,70,76,82],borderColor:'#C8862A',backgroundColor:'rgba(200,134,42,0.07)',tension:.4,fill:false,pointRadius:3,borderWidth:2},
+        {label:'Disp. Nutricional',data:[18,38,52,62,76,82,88],borderColor:'#C1533A',backgroundColor:'rgba(193,83,58,0.07)',tension:.4,fill:false,pointRadius:3,borderWidth:2},
+      ]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:true,
+      scales:{
+        x:{ticks:{color:'#9A8A78',font:{size:10}},grid:{color:'rgba(200,150,100,0.04)'}},
+        y:{beginAtZero:true,max:100,ticks:{color:'#9A8A78',font:{size:10}},grid:{color:'rgba(200,150,100,0.04)'}}
+      },
+      plugins:{legend:{position:'bottom',labels:{color:'#9A8A78',font:{size:10},boxWidth:10,padding:10}}}
+    }
+  });
+}
+
+// ═══ MAPS ═══
+let soilMap=null,klMap=null;
+
+function initSoilMap(){
+  if(soilMap)return;
+  soilMap=L.map('soil-map').setView([10.7967,-74.9250],14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(soilMap);
+  const farmBounds=[[10.790,-74.932],[10.804,-74.918]];
+  L.rectangle(farmBounds,{color:'#7A8C3E',weight:2,fillColor:'#7A8C3E',fillOpacity:0.08}).addTo(soilMap);
+  L.marker([10.7967,-74.925],{title:'Punto de muestreo 449'})
+    .bindPopup('<strong>Muestra 449</strong><br>pH: 4.3 — Crítico<br>MO: 2.64%<br>P: 3.10 ppm<br>Finca Alma Luz')
+    .addTo(soilMap).openPopup();
+  L.circle([10.7967,-74.925],{radius:80,color:'#C1533A',fillColor:'#C1533A',fillOpacity:0.15}).addTo(soilMap);
+  soilMap.fitBounds(farmBounds);
+}
+
+function initKlMap(){
+  if(klMap)return;
+  klMap=L.map('kl-map').setView([10.7967,-74.9250],15);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',{attribution:'© OpenStreetMap'}).addTo(klMap);
+  const farmBounds=[[10.790,-74.932],[10.804,-74.918]];
+  L.rectangle(farmBounds,{color:'#7A8C3E',weight:2,fillColor:'#7A8C3E',fillOpacity:0.05}).addTo(klMap);
+  // Simulated keylines (slightly angled across the farm)
+  const keylines=[
+    [[10.792,-74.930],[10.797,-74.920]],
+    [[10.793,-74.930],[10.798,-74.920]],
+    [[10.794,-74.930],[10.799,-74.920]],
+    [[10.795,-74.930],[10.800,-74.920]],
+    [[10.796,-74.930],[10.801,-74.919]],
+    [[10.797,-74.930],[10.802,-74.918]],
+  ];
+  keylines.forEach((kl,i)=>L.polyline(kl,{color:'#7A8C3E',weight:2.5,dashArray:i===2?null:'6,4',opacity:.8}).addTo(klMap).bindTooltip(`Keyline ${i+1}`));
+  // Simulated keypoint
+  L.circleMarker([10.795,-74.925],{radius:8,color:'#3A8FA1',fillColor:'#3A8FA1',fillOpacity:0.8}).addTo(klMap).bindTooltip('Keypoint principal');
+  // Simulated reservoir
+  L.circle([10.792,-74.928],{radius:40,color:'#3A8FA1',fillColor:'#3A8FA1',fillOpacity:0.3}).addTo(klMap).bindTooltip('Reservorio (estimado 4,200 m³)');
+  // Main ridge
+  L.polyline([[10.804,-74.932],[10.804,-74.918]],{color:'#9C5C2E',weight:3,dashArray:'8,4'}).addTo(klMap).bindTooltip('Cresta principal');
+  klMap.fitBounds(farmBounds);
+}
+
+// ═══ AI CHAT ═══
+const AI_KB = {
+  'ph':()=>`<strong>pH 4.3 — Diagnóstico:</strong><br>El pH de 4.3 es extremadamente ácido y es el <strong>problema raíz</strong> de la mayoría de los déficits. Genera: solubilización masiva de Al³⁺ tóxico (STAl 29.99%), bloqueo del Fósforo por precipitación con Fe y Al, inhibición de bacterias fijadoras de N, y reducción de la CIC efectiva.<br><br><strong>Acción inmediata:</strong> Cal Calcítica (CaCO₃) 2.5-3.0 ton/ha, incorporada al suelo 60-90 días antes de la siembra. Meta: pH 5.5-6.0. Evitar cal dolomítica porque el Mg ya está alto.`,
+  'calcio':()=>`<strong>Cal Calcítica — Encalamiento:</strong><br>Usar SOLO Cal Calcítica (CaCO₃), no dolomítica. El Mg (3.80 meq/100g) ya supera el rango óptimo (1.5-3.0). La cal dolomítica agregaría más Mg, empeorando la relación Ca/Mg que ya está baja (1.53 vs ideal 3-5).<br><br>Con 2.5 ton/ha de CaCO₃ se espera subir el pH de 4.3 a 5.5-6.0, precipitar el Al tóxico como Al(OH)₃, y aumentar la saturación de Ca del 30.53% actual al 50-60% óptimo.`,
+  'materia':()=>`<strong>Materia Orgánica — Diagnóstico:</strong><br>C% = 1.53 → MO estimada ~2.64% (muy por debajo del ideal 5-10% para suelos tropicales de la Costa Caribe).<br><br>La relación C/N de 11.52 es saludable (indicando mineralización activa), pero el bajo nivel de MO limita severamente: la CIC efectiva, la retención de agua, la actividad microbiana y la disponibilidad de micronutrientes.<br><br><strong>Solución principal:</strong> 5-8 ton/ha de Humus de Lombriz de la finca propia. El humus ya humificado no genera bloqueo de N y aporta ácidos húmicos que quelan micronutrientes.`,
+  'fósforo':()=>`<strong>Fósforo Crítico — 3.10 ppm:</strong><br>Solo el 8% del límite inferior óptimo (15 ppm). Es la deficiencia más limitante para producción de biomasa, después del pH.<br><br><strong>Causa doble:</strong><br>① El pH ácido (4.3) inmoviliza el P por precipitación con Fe³⁺ y Al³⁺ — el P aplicado se "fija" en horas.<br>② La baja MO reduce el pool orgánico de P.<br><br><strong>Solución:</strong> PRIMERO corregir pH (sin esto, el P aplicado se perderá). Luego MAP 12-61-0 (150-200 kg/ha) al momento de siembra. Adicionalmente: inoculante de Micorrizas AMF — aumentan la absorción de P hasta 10× sin costo adicional de fertilizante.`,
+  'lombri':()=>`<strong>Lombricompost — El Activo Estratégico de la Finca:</strong><br><br><strong>Humus sólido (5-8 ton/ha):</strong><br>• MO estabilizada y humificada — no bloquea N<br>• N orgánico 1.5-2.5%, P 0.5-1.5%, K 0.5-1.0%<br>• Ácidos húmicos y fúlvicos: mejoran CIC, quelan micronutrientes, amortiguan pH<br>• Enzimas (fosfatasas, ureasa): movilizan el P bloqueado<br>• Flora microbiana diversa: solubilizadores de P, fijadores de N libre<br><br><strong>Lixiviado (30-50 L conc./ha/mes diluido 1:10):</strong><br>• Auxinas, citoquininas y giberelinas → estimulan raíces<br>• Inoculante microbiano vivo<br>• Mezclar con ZnSO₄ (2g/L), CuSO₄ (1g/L) y Borax (0.5g/L) para aplicación integrada<br><br>La lombricultura propia ahorra ~$4-6M COP/año en compra de enmiendas orgánicas.`,
+  'keyline':()=>`<strong>Keyline Design — Aplicación en Finca Alma Luz:</strong><br><br>El Diseño Keyline distribuye el agua de lluvia desde las partes bajas (valles) hacia las partes altas (ridges), recargando el suelo uniformemente en lugar de concentrarse en flujos erosivos.<br><br><strong>Elementos para la finca (28 ha):</strong><br>• <strong>Keypoint:</strong> punto donde el valle cambia de cóncavo a convexo — desde aquí se traza todo.<br>• <strong>Keylines:</strong> 6 líneas de subsolado levemente inclinadas hacia las crestas (no paralelas a curvas de nivel).<br>• <strong>Reservorio:</strong> ~4,200 m³ en el punto más bajo — almacena agua para riego ganadero.<br>• <strong>Canales de conducción:</strong> conectan el reservorio con las zonas más altas.<br><br>El subsolado Keyline (con cincel paratill) incorpora humus de lombriz en profundidad y mejora la infiltración hasta 6× comparado con suelo sin tratar.`,
+  'fertilización':()=>`<strong>Plan de Fertilización Integrado — Finca Alma Luz:</strong><br><br><strong>FASE 1 (60-90 días antes de siembra):</strong><br>• Cal Calcítica: 2.5-3.0 ton/ha<br>• Humus de Lombriz: 5-8 ton/ha<br>• Yeso Agrícola: 300 kg/ha<br><br><strong>FASE 2 (Momento de siembra):</strong><br>• MAP 12-61-0: 150-200 kg/ha<br>• Borax: 5 kg/ha (Boro crítico 0.09 ppm)<br>• ZnSO₄·7H₂O: 15-20 kg/ha<br>• CuSO₄·5H₂O: 4-5 kg/ha<br>• Micorrizas + Azospirillum + Trichoderma<br><br><strong>FASE 3 (Post-siembra):</strong><br>• Urea: 80-100 kg/ha fraccionada (mes 1 y mes 2)<br>• Lixiviado lombriz: 30 L/ha mensual<br>• Foliares: ZnSO₄ 0.3% + Borax 0.15% cada 15 días`,
+  'micronutrientes':()=>`<strong>Micronutrientes — Tres Deficiencias Críticas:</strong><br><br>🔴 <strong>Boro (B): 0.09 ppm</strong> (ideal 0.30-0.60) — La más crítica. Inmóvil en la planta, debe aplicarse en cada ciclo. Borax 5 kg/ha al suelo + foliar 0.1-0.15% cada 2 semanas. Afecta floración y fructificación.<br><br>🟠 <strong>Zinc (Zn): 1.40 ppm</strong> (ideal 2-4) — ZnSO₄·7H₂O 15-20 kg/ha edáfico + foliar 0.3% c/15 días. Esencial para síntesis de clorofila y metabolismo del N.<br><br>🟠 <strong>Cobre (Cu): 0.60 ppm</strong> (ideal 1-3) — CuSO₄·5H₂O 4-5 kg/ha. Mezcla Bordelesa (Cu + cal hidratada) para protección fúngica simultánea.<br><br><strong>Nota:</strong> Fe (60 ppm) y Mn (11.25 ppm) están en rango. El Mn puede volverse tóxico si el pH sube rápido — monitorear tras encalamiento.`,
+  'recuperación':()=>`<strong>Tiempo de Recuperación Estimado:</strong><br><br>📅 <strong>Mes 1-3:</strong> pH comienza a subir. Al tóxico precipita. Las raíces empiezan a crecer normalmente.<br><br>📅 <strong>Mes 4-6:</strong> P disponible mejora dramáticamente con pH 5.5+. Actividad microbiana se dispara. MO empieza a subir.<br><br>📅 <strong>Año 1:</strong> Índice de Fertilidad: 22→45. pH objetivo 5.5. P disponible >10 ppm. Producción +40%.<br><br>📅 <strong>Año 3:</strong> pH estabilizado 5.8. MO 4.0%. Sistema biológico activo. Producción +100%.<br><br>📅 <strong>Año 5:</strong> MO 5%+. Al tóxico &lt;5%. P >20 ppm. Índice Regenerativo: 74/100.<br><br>📅 <strong>Año 10:</strong> Sistema maduro. Autosuficiencia en fertilidad. Bonos de carbono activos. Índice: 88/100.<br><br><strong>Clave del éxito:</strong> La lombricultura propia acelera este proceso 2-3× comparado con un suelo similar sin ella.`
+};
+
+function getAIResponse(q){
+  const lq=q.toLowerCase();
+  if(lq.includes('ph')||lq.includes('acid')||lq.includes('encal'))return AI_KB['ph']();
+  if(lq.includes('calcio')||lq.includes('cal '))return AI_KB['calcio']();
+  if(lq.includes('materia')||lq.includes('orgánica')||lq.includes('organica')||lq.includes('humus'))return AI_KB['materia']();
+  if(lq.includes('fósforo')||lq.includes('fosforo')||lq.includes('phosph'))return AI_KB['fósforo']();
+  if(lq.includes('lombri')||lq.includes('lixiv')||lq.includes('vermi'))return AI_KB['lombri']();
+  if(lq.includes('keyline')||lq.includes('agua')||lq.includes('hidro')||lq.includes('reserv'))return AI_KB['keyline']();
+  if(lq.includes('fertil')||lq.includes('plan')||lq.includes('urea')||lq.includes('map'))return AI_KB['fertilización']();
+  if(lq.includes('boro')||lq.includes('zinc')||lq.includes('cobre')||lq.includes('micro'))return AI_KB['micronutrientes']();
+  if(lq.includes('recup')||lq.includes('tiempo')||lq.includes('plazo')||lq.includes('año'))return AI_KB['recuperación']();
+  return `He analizado su consulta sobre "<em>${q}</em>" en el contexto del Análisis 449.<br><br>Los temas que puedo explicar en detalle para la Finca Alma Luz son: <strong>pH y encalamiento</strong>, <strong>materia orgánica</strong>, <strong>fósforo</strong>, <strong>lombricompost</strong>, <strong>keyline</strong>, <strong>plan de fertilización</strong>, <strong>micronutrientes</strong> (B, Zn, Cu) y <strong>proyección de recuperación</strong>.<br><br>Intente preguntar por cualquiera de estos temas.`;
+}
+
+function sendChat(){
+  const inp=document.getElementById('chatIn');
+  const q=inp.value.trim();
+  if(!q)return;
+  addMsg(q,'user');
+  inp.value='';
+  setTimeout(()=>{addMsg(getAIResponse(q),'ai');},600);
+}
+
+function askAI(q){addMsg(q,'user');setTimeout(()=>addMsg(getAIResponse(q),'ai'),600);}
+
+function addMsg(text,type){
+  const msgs=document.getElementById('chatMsgs');
+  const div=document.createElement('div');
+  div.className='msg '+type;
+  if(type==='ai')div.innerHTML=`<div class="ai-hdr">🌱 KEYLINE AI · Especialista en Suelos</div><div>${text}</div>`;
+  else div.textContent=text;
+  msgs.appendChild(div);
+  msgs.scrollTop=msgs.scrollHeight;
+}
+
+// ═══ INIT ═══
+window.addEventListener('DOMContentLoaded',()=>{
+  initGauges();
+  updateGauges();
+  setTimeout(()=>{initRadar();initBar();},200);
+});
+</script>
+</body>
+</html>
