@@ -6,6 +6,7 @@ import ClientPaths from '@/components/ClientPaths'
 import Proyectos from '@/components/Proyectos'
 import LandscapeBreak from '@/components/LandscapeBreak'
 import CourseCard from '@/components/CourseCard'
+import CourseDetails from '@/components/CourseDetails'
 import StatsBar from '@/components/StatsBar'
 import Clients from '@/components/Clients'
 import Nosotros from '@/components/Nosotros'
@@ -26,6 +27,7 @@ export default function Home() {
         sub="Principio Keyline · Diseño regenerativo de paisajes"
       />
       <CourseCard />
+      <CourseDetails />
       <StatsBar />
       <LandscapeBreak
         image="/assets/atardecer_sol.jpg"

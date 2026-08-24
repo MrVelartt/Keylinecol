@@ -4,18 +4,18 @@ import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 
 const includes = [
-  'Acceso de por vida a todas las clases',
-  '3 sesiones de prácticas de campo en Colombia',
-  'Software de análisis topográfico (licencia)',
-  'Certificado oficial Keyline Colombia',
-  'Comunidad privada de practitioners',
+  '32 h en vivo (miércoles y sábados) + 28 h autónomas con PDF y videos',
+  'Grabaciones de todas las sesiones',
+  'Software QGIS — libre y gratuito',
+  'Diseñas el plano keyline de tu propio predio',
+  'Certificado oficial Keyline Colombia (60 horas)',
 ]
 
 const details = [
-  { label: 'Duración', value: '8 semanas' },
-  { label: 'Modalidad', value: 'Online + Campo' },
-  { label: 'Nivel', value: 'Principiante' },
-  { label: 'Próxima fecha', value: 'Agosto 2026' },
+  { label: 'Duración', value: '8 semanas · 60 h' },
+  { label: 'Modalidad', value: '100% virtual en vivo' },
+  { label: 'Requisitos', value: 'Ninguno · sí computador' },
+  { label: 'Inicia', value: '16 sep 2026' },
 ]
 
 const galleryImages = [
@@ -63,7 +63,7 @@ function CourseGallery() {
       <div className="relative flex-1 overflow-hidden rounded-xl">
         <img
           src={main}
-          alt="Curso Keyline Ecuador"
+          alt="Diseño Keyline en campo"
           className="w-full h-full object-cover"
           onError={() => handleError(0)}
         />
@@ -77,7 +77,7 @@ function CourseGallery() {
             <div key={i} className="relative overflow-hidden rounded-lg">
               <img
                 src={src}
-                alt={`Curso Ecuador ${i + 2}`}
+                alt={`Diseño Keyline en campo ${i + 2}`}
                 className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                 onError={() => handleError(i + 1)}
               />
@@ -116,8 +116,8 @@ export default function CourseCard() {
             transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
             className="font-display text-[clamp(2.8rem,6vw,5rem)] font-semibold leading-tight max-w-3xl"
           >
-            El primer paso{' '}
-            <em className="text-[#95C11F] not-italic">comienza aquí</em>
+            Del terreno al plano,{' '}
+            <em className="text-[#95C11F] not-italic">del plano al campo</em>
           </motion.h2>
         </div>
 
@@ -150,10 +150,10 @@ export default function CourseCard() {
               {/* Course label bottom */}
               <div className="absolute bottom-6 left-6 z-10">
                 <div className="font-mono text-[10px] text-[#95C11F]/60 tracking-widest uppercase mb-1">
-                  Curso intensivo · Ecuador
+                  Curso virtual en vivo
                 </div>
                 <h3 className="font-display text-[clamp(1.6rem,3vw,2.4rem)] font-semibold leading-tight text-white drop-shadow-lg">
-                  Fundamentos del<br />Diseño Keyline
+                  Diseño Keyline<br />del terreno al plano
                 </h3>
               </div>
             </div>
@@ -165,11 +165,11 @@ export default function CourseCard() {
                 <div className="text-white/35 text-xs tracking-widest uppercase mb-3">Inversión</div>
                 <div className="flex items-baseline gap-2">
                   <span className="font-display text-[3.5rem] font-bold text-[#95C11F] leading-none">
-                    $480.000
+                    $550.000
                   </span>
                 </div>
                 <div className="text-white/30 text-sm mt-1.5">
-                  COP &nbsp;·&nbsp; o 2 pagos de $260.000
+                  COP &nbsp;·&nbsp; cupos limitados (mín. 20 · máx. 50)
                 </div>
               </div>
 
@@ -200,7 +200,7 @@ export default function CourseCard() {
 
               {/* CTA */}
               <a
-                href="https://wa.me/573113650567?text=Hola%2C%20quiero%20inscribirme%20al%20curso%20de%20Dise%C3%B1o%20Keyline"
+                href="https://wa.me/573113650567?text=Hola%2C%20quiero%20inscribirme%20al%20curso%20de%20Dise%C3%B1o%20Keyline%20que%20inicia%20el%2016%20de%20septiembre"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)] hover:scale-[1.02]"
