@@ -15,7 +15,7 @@ const details = [
   { label: 'Duración', value: '8 semanas · 60 h' },
   { label: 'Modalidad', value: '100% virtual en vivo' },
   { label: 'Requisitos', value: 'Ninguno · sí computador' },
-  { label: 'Inicia', value: '16 sep 2026' },
+  { label: 'Inicia', value: '23 sep 2026' },
 ]
 
 const galleryImages = [
@@ -169,7 +169,7 @@ export default function CourseCard() {
                   </span>
                 </div>
                 <div className="text-white/30 text-sm mt-1.5">
-                  COP &nbsp;·&nbsp; cupos limitados (mín. 20 · máx. 50)
+                  COP &nbsp;·&nbsp; cupos limitados · máx. 50 personas
                 </div>
               </div>
 
@@ -200,7 +200,7 @@ export default function CourseCard() {
 
               {/* CTA */}
               <a
-                href="https://wa.me/573113650567?text=Hola%2C%20quiero%20inscribirme%20al%20curso%20de%20Dise%C3%B1o%20Keyline%20que%20inicia%20el%2016%20de%20septiembre"
+                href="https://wa.me/573113650567?text=Hola%2C%20quiero%20inscribirme%20al%20curso%20de%20Dise%C3%B1o%20Keyline%20que%20inicia%20el%2023%20de%20septiembre"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)] hover:scale-[1.02]"

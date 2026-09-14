@@ -161,7 +161,7 @@ export default function CourseDetails() {
           <div className="rounded-2xl border border-white/[0.07] p-8">
             <div className="text-white/30 text-[10px] tracking-[0.28em] uppercase mb-3">Fechas</div>
             <p className="text-white/60 text-sm leading-relaxed">
-              Inicia miércoles 16 de septiembre, cierra sábado 7 de noviembre de 2026.
+              Inicia miércoles 23 de septiembre, cierra sábado 14 de noviembre de 2026.
             </p>
           </div>
           <div className="rounded-2xl border border-white/[0.07] p-8">

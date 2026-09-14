@@ -3,17 +3,26 @@
 import { useId, useMemo, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
+import { climateData, DEFAULT_RUNOFF_CN } from '@/lib/climateData'
+import { scsCnAnnualRunoffM3, scsCnMonthlyRunoffMm } from '@/lib/hydrology'
 
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
-// ── Distribución mensual de referencia (patrón bimodal tropical, Caribe) ──
+// ── Distribución mensual de referencia (serie real Baranoa, patrón bimodal Caribe) ──
 // Se reescala proporcionalmente a los totales anuales que ingrese el usuario.
-const PP_SHAPE = [3.18, 5.93, 13.46, 59.63, 88.79, 87.48, 84.97, 108.1, 106.07, 97.59, 79.07, 30.41]
-const ETO_SHAPE = [142.6, 142.0, 161.8, 147.9, 138.0, 134.1, 146.3, 144.2, 123.6, 115.9, 112.8, 128.3]
+// Misma serie que /analitica (lib/climateData.ts), para que ambas páginas
+// coincidan cuando se usan los valores de referencia por defecto.
+const PP_SHAPE = climateData.baranoa.monthlyPrecipAvg
+const ETO_SHAPE = climateData.baranoa.monthlyEtoAvg
 const PP_SHAPE_SUM = PP_SHAPE.reduce((a, b) => a + b, 0)
 const ETO_SHAPE_SUM = ETO_SHAPE.reduce((a, b) => a + b, 0)
 
-const DEFAULTS = { areaHa: 28, precipAnual: 751.9, etoAnual: 1637, cn: 68 }
+const DEFAULTS = {
+  areaHa: climateData.baranoa.areaHa,
+  precipAnual: climateData.baranoa.kpis.precipMmYear,
+  etoAnual: climateData.baranoa.kpis.etoMmYear,
+  cn: DEFAULT_RUNOFF_CN,
+}
 
 const BLUE = '#38bdf8'
 const GREEN = '#95C11F'
@@ -106,16 +115,15 @@ export default function CalculadoraClima() {
   }
 
   const monthly = useMemo(() => {
-    const s = 25400 / cn - 254 // retención potencial S (mm), método SCS-CN
+    const monthlyP = PP_SHAPE.map((shape) => (shape / PP_SHAPE_SUM) * precipAnual)
+    const monthlyQ = scsCnMonthlyRunoffMm(monthlyP, cn)
     return MESES.map((mes, i) => {
-      const p = (PP_SHAPE[i] / PP_SHAPE_SUM) * precipAnual
       const eto = (ETO_SHAPE[i] / ETO_SHAPE_SUM) * etoAnual
-      const q = p > 0.2 * s ? Math.pow(p - 0.2 * s, 2) / (p + 0.8 * s) : 0
       return {
         mes,
-        p: Math.round(p * 10) / 10,
+        p: Math.round(monthlyP[i] * 10) / 10,
         eto: Math.round(eto * 10) / 10,
-        escorrentia: Math.round(q * areaHa * 10),
+        escorrentia: Math.round(monthlyQ[i] * areaHa * 10),
       }
     })
   }, [precipAnual, etoAnual, cn, areaHa])
@@ -123,7 +131,12 @@ export default function CalculadoraClima() {
   const deficitAnual = precipAnual - etoAnual
   const precipEfectivaM3 = precipAnual * areaHa * 10
   const demandaEtoM3 = etoAnual * areaHa * 10
-  const escorrentiaTotalM3 = monthly.reduce((sum, m) => sum + m.escorrentia, 0)
+  // Escorrentía total calculada sobre los mm sin redondear (no sumando las
+  // barras del gráfico, ya redondeadas mes a mes) — misma cifra exacta que /analitica.
+  const escorrentiaTotalM3 = useMemo(() => {
+    const monthlyP = PP_SHAPE.map((shape) => (shape / PP_SHAPE_SUM) * precipAnual)
+    return scsCnAnnualRunoffM3(monthlyP, areaHa, cn)
+  }, [precipAnual, cn, areaHa])
   const coberturaPct = demandaEtoM3 > 0 ? (escorrentiaTotalM3 / demandaEtoM3) * 100 : 0
 
   const recommendations = useMemo(() => {

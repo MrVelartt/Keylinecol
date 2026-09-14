@@ -5,6 +5,7 @@ import Pillars from '@/components/Pillars'
 import ClientPaths from '@/components/ClientPaths'
 import Proyectos from '@/components/Proyectos'
 import LandscapeBreak from '@/components/LandscapeBreak'
+import Masterclass from '@/components/Masterclass'
 import CourseCard from '@/components/CourseCard'
 import CourseDetails from '@/components/CourseDetails'
 import StatsBar from '@/components/StatsBar'
@@ -26,6 +27,7 @@ export default function Home() {
         quote="El agua no se pierde — se diseña."
         sub="Principio Keyline · Diseño regenerativo de paisajes"
       />
+      <Masterclass />
       <CourseCard />
       <CourseDetails />
       <StatsBar />

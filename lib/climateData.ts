@@ -5,6 +5,13 @@
 // La estructura (Record<projectId, ProjectClimate>) ya está lista para sumar
 // más proyectos sin tocar el componente que la consume.
 
+import { scsCnAnnualRunoffM3 } from './hydrology'
+
+// CN de referencia usado para la escorrentía reportada en /analitica — debe
+// coincidir con el CN por defecto de la calculadora en /herramientas para que
+// ambas páginas muestren la misma cifra ante los mismos insumos.
+export const DEFAULT_RUNOFF_CN = 68
+
 export interface AnnualRecord {
   year: number
   precipMm: number
@@ -24,7 +31,9 @@ export interface ProjectClimate {
     etoMmYear: number
     runoffM3Year: number
   }
+  etoSource: string
   monthlyPrecipAvg: number[] // 12 valores, Ene → Dic, mm promedio histórico
+  monthlyEtoAvg: number[] // 12 valores, Ene → Dic, mm ETo de referencia (FAO-56 PM)
   monthlyMaxDailyAvg: number[] // 12 valores, Ene → Dic, mm máximo diario promedio
   annualSeries: AnnualRecord[] // 1997–2025
   wettestMonth: { label: string; mm: number }
@@ -67,22 +76,37 @@ const baranoaAnnualSeries: AnnualRecord[] = [
   { year: 2025, precipMm: 590 },
 ]
 
+const baranoaAreaHa = 28
+const baranoaMonthlyPrecipAvg = [2, 5, 13, 59, 88, 86, 84, 108, 106, 97, 78, 25.9]
+
+// ETo de referencia mensual (mm) — método FAO-56 Penman-Monteith (Allen et al.,
+// 1998) calculado sobre climatología satelital NASA POWER (fuentes SYN1DEG /
+// MERRA2, 2001–2020) en 10.79°N, -74.92°O, elevación 12 m. Es una estimación
+// satelital, no la estación en sitio — calibrar cuando exista serie IDEAM local
+// con temperatura, humedad, viento y brillo solar de Baranoa.
+const baranoaMonthlyEtoAvg = [157.9, 159.0, 179.4, 159.5, 142.3, 139.0, 147.3, 145.4, 133.2, 126.1, 118.9, 139.2]
+const baranoaEtoSource = 'NASA POWER (2001–2020) · FAO-56 Penman-Monteith'
+
 export const climateData: Record<string, ProjectClimate> = {
   baranoa: {
     id: 'baranoa',
     name: 'Keyline Baranoa',
     location: 'Baranoa, Atlántico, Colombia',
-    coords: '10.79°N, -74.92°O',
+    coords: '10°47′N · 74°55′O',
     elevation: '12 m s.n.m.',
-    areaHa: 28,
+    areaHa: baranoaAreaHa,
     station: 'Montebello [29040020]',
     period: '1997–2025',
     kpis: {
       precipMmYear: 751.9,
-      etoMmYear: 1637,
-      runoffM3Year: 88231,
+      etoMmYear: Math.round(baranoaMonthlyEtoAvg.reduce((a, b) => a + b, 0) * 10) / 10,
+      // Método CN (SCS) sobre precipitación mensual — mismo método y CN que
+      // la calculadora de /herramientas, ver lib/hydrology.ts.
+      runoffM3Year: scsCnAnnualRunoffM3(baranoaMonthlyPrecipAvg, baranoaAreaHa, DEFAULT_RUNOFF_CN),
     },
-    monthlyPrecipAvg: [2, 5, 13, 59, 88, 86, 84, 108, 106, 97, 78, 25.9],
+    etoSource: baranoaEtoSource,
+    monthlyPrecipAvg: baranoaMonthlyPrecipAvg,
+    monthlyEtoAvg: baranoaMonthlyEtoAvg,
     monthlyMaxDailyAvg: [2, 4, 9, 36, 60, 58, 55, 108, 106, 90, 62, 24],
     annualSeries: baranoaAnnualSeries,
     wettestMonth: { label: 'Ago', mm: 108.1 },
