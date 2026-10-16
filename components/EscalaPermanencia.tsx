@@ -8,14 +8,9 @@ import {
   assessPermanence,
   type PermanenceStatus,
 } from '@/lib/permanenceScale'
+import { toneClass, toneColor, type Tone } from '@/lib/tones'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
-type Tone = 'good' | 'warn' | 'bad'
-
-const toneClass: Record<Tone, string> = {
-  good: 'text-[#95C11F] bg-[#95C11F]/10 border-[#95C11F]/25',
-  warn: 'text-amber-400 bg-amber-400/10 border-amber-400/25',
-  bad: 'text-red-400 bg-red-400/10 border-red-400/25',
-}
 
 const STATUS_TONE: Record<PermanenceStatus, Tone> = {
   resuelto: 'good',
@@ -30,8 +25,8 @@ const DEFAULT_STATUSES: Record<string, PermanenceStatus> = Object.fromEntries(
 )
 
 const inputClass =
-  'w-full px-3.5 py-2.5 rounded-lg bg-[#1D1D1B] border border-white/[0.08] text-white placeholder-white/20 text-[13px] ' +
-  'focus:outline-none focus:border-[#95C11F]/50 focus:ring-2 focus:ring-[#95C11F]/20 transition-all'
+  'w-full px-3.5 py-2.5 rounded-lg bg-surface border border-subtle text-primary placeholder:text-mono text-[13px] ' +
+  'focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/20 transition-all'
 
 function StatusToggle({
   value,
@@ -56,7 +51,7 @@ function StatusToggle({
             aria-checked={active}
             onClick={() => onChange(status)}
             className={`px-3 py-1.5 rounded-full border text-[11px] font-medium tracking-wide transition-all ${
-              active ? toneClass[tone] : 'text-white/30 bg-transparent border-white/[0.08] hover:border-white/20 hover:text-white/50'
+              active ? toneClass[tone] : 'text-mono bg-transparent border-subtle hover:border-strong hover:text-secondary'
             }`}
           >
             {STATUS_LABEL[status]}
@@ -89,7 +84,7 @@ export default function EscalaPermanencia() {
   const { readinessPct, bottleneck, atRiskFactors } = assessment
 
   const readinessTone: Tone = readinessPct >= 80 ? 'good' : readinessPct >= 40 ? 'warn' : 'bad'
-  const readinessColor = readinessTone === 'good' ? '#95C11F' : readinessTone === 'warn' ? '#fbbf24' : '#f87171'
+  const readinessColor = toneColor[readinessTone]
 
   const waMessage = encodeURIComponent(
     `Hola, quiero un diagnóstico real de mi finca con la Escala de Permanencia.\n` +
@@ -103,38 +98,25 @@ export default function EscalaPermanencia() {
 
       <div className="max-w-7xl mx-auto relative">
         <div ref={ref} className="mb-16 max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
-              Herramientas Técnicas · 05
-            </span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 36 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-[clamp(2.8rem,6vw,4.8rem)] font-semibold leading-tight mb-6"
-          >
-            Ordena tu <em className="text-[#95C11F] not-italic">finca</em>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-white/45 leading-relaxed"
-          >
-            La Escala de Permanencia de P.A. Yeomans ordena las decisiones de diseño
-            de lo más fijo (clima, topografía) a lo más flexible (economía, estética).
-            Marca el estado real de cada factor en tu finca y descubre cuál necesitas
-            resolver primero antes de fijar los siguientes.
-          </motion.p>
+          <SectionHeader
+            inView={inView}
+            className=""
+            eyebrow="Herramientas Técnicas"
+            number="05"
+            title={
+              <>
+                Ordena tu <Accent>finca</Accent>
+              </>
+            }
+            subtitle={
+              <>
+                La Escala de Permanencia de P.A. Yeomans ordena las decisiones de diseño
+                de lo más fijo (clima, topografía) a lo más flexible (economía, estética).
+                Marca el estado real de cada factor en tu finca y descubre cuál necesitas
+                resolver primero antes de fijar los siguientes.
+              </>
+            }
+          />
         </div>
 
         <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
@@ -147,10 +129,10 @@ export default function EscalaPermanencia() {
               className="flex items-center justify-between gap-4 flex-wrap"
             >
               <div className="flex items-center gap-3">
-                <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">01</span>
+                <span className="font-mono text-[11px] text-brand/50 tracking-widest">01</span>
                 <h3 className="font-display text-xl font-semibold">Los 10 factores, en orden</h3>
               </div>
-              <button onClick={resetAll} className="text-white/30 text-xs hover:text-[#95C11F] transition-colors">
+              <button onClick={resetAll} className="text-mono text-xs hover:text-brand transition-colors">
                 Reiniciar diagnóstico
               </button>
             </motion.div>
@@ -166,27 +148,27 @@ export default function EscalaPermanencia() {
                   initial={{ opacity: 0, y: 32 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.7, delay: 0.12 + idx * 0.05, ease: [0.22, 1, 0.36, 1] }}
-                  className={`relative p-6 lg:p-7 rounded-2xl border bg-[#2C2C2A] transition-colors duration-300 ${
+                  className={`relative p-6 lg:p-7 rounded-2xl border bg-surface-raised transition-colors duration-300 ${
                     isBottleneck
-                      ? 'border-[#95C11F]/40'
+                      ? 'border-brand/40'
                       : isAtRisk
-                      ? 'border-amber-400/30'
-                      : 'border-white/[0.07]'
+                      ? 'border-signal-demand/30'
+                      : 'border-subtle'
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4 mb-3 flex-wrap">
                     <div className="flex items-center gap-3">
-                      <span className="font-mono text-[11px] text-white/25 tracking-widest w-6 shrink-0">
+                      <span className="font-mono text-[11px] text-mono tracking-widest w-6 shrink-0">
                         {String(factor.order).padStart(2, '0')}
                       </span>
                       <h4 className="font-display text-lg font-semibold">{factor.title}</h4>
                       {isBottleneck && (
-                        <span className="px-2.5 py-0.5 rounded-full border border-[#95C11F]/35 bg-[#95C11F]/10 text-[#95C11F] text-[10px] font-medium tracking-wide">
+                        <span className="px-2.5 py-0.5 rounded-full border border-brand/35 bg-brand/10 text-brand text-[10px] font-medium tracking-wide">
                           Prioridad
                         </span>
                       )}
                       {isAtRisk && !isBottleneck && (
-                        <span className="px-2.5 py-0.5 rounded-full border border-amber-400/30 bg-amber-400/10 text-amber-400 text-[10px] font-medium tracking-wide">
+                        <span className="px-2.5 py-0.5 rounded-full border border-signal-demand/30 bg-signal-demand/10 text-signal-demand text-[10px] font-medium tracking-wide">
                           Decidido antes de tiempo
                         </span>
                       )}
@@ -198,14 +180,14 @@ export default function EscalaPermanencia() {
                     />
                   </div>
 
-                  <p className="text-white/55 text-sm leading-relaxed mb-2">{factor.question}</p>
-                  <p className="text-white/30 text-[12px] leading-relaxed mb-4">{factor.why}</p>
+                  <p className="text-secondary text-sm leading-relaxed mb-2">{factor.question}</p>
+                  <p className="text-mono text-[12px] leading-relaxed mb-4">{factor.why}</p>
 
                   <div className="flex flex-wrap gap-1.5 mb-4">
                     {factor.examples.map((ex) => (
                       <span
                         key={ex}
-                        className="px-2.5 py-1 rounded-full bg-[#1D1D1B]/60 border border-white/[0.06] text-white/35 text-[11px]"
+                        className="px-2.5 py-1 rounded-full bg-surface/60 border border-subtle text-mono text-[11px]"
                       >
                         {ex}
                       </span>
@@ -229,9 +211,9 @@ export default function EscalaPermanencia() {
             initial={{ opacity: 0, y: 40 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-[#95C11F]/20 bg-[#2C2C2A]"
+            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-brand/20 bg-surface-raised"
           >
-            <div className="font-mono text-[10px] text-[#95C11F]/50 tracking-widest uppercase mb-6">
+            <div className="font-mono text-[10px] text-brand/50 tracking-widest uppercase mb-6">
               Diagnóstico en vivo
             </div>
 
@@ -239,9 +221,9 @@ export default function EscalaPermanencia() {
               <span className="font-display text-5xl font-semibold" style={{ color: readinessColor }}>
                 {readinessPct}
               </span>
-              <span className="text-white/30 text-sm mb-1.5">% resuelto</span>
+              <span className="text-mono text-sm mb-1.5">% resuelto</span>
             </div>
-            <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden mb-6">
+            <div className="h-2 rounded-full bg-veil-strong overflow-hidden mb-6">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{ width: `${readinessPct}%`, background: readinessColor }}
@@ -249,7 +231,7 @@ export default function EscalaPermanencia() {
             </div>
 
             <div className="mb-6">
-              <div className="font-mono text-[9px] text-white/30 tracking-widest uppercase mb-2.5">
+              <div className="font-mono text-[9px] text-mono tracking-widest uppercase mb-2.5">
                 Prioridad según la escala
               </div>
               {bottleneck ? (
@@ -257,7 +239,7 @@ export default function EscalaPermanencia() {
                   <div className="font-semibold mb-1.5">
                     {String(bottleneck.order).padStart(2, '0')} · {bottleneck.title}
                   </div>
-                  <p className="text-white/55 text-[12px]">{bottleneck.why}</p>
+                  <p className="text-secondary text-[12px]">{bottleneck.why}</p>
                 </div>
               ) : (
                 <div className={`p-4 rounded-xl border text-[13px] leading-relaxed ${toneClass.good}`}>
@@ -268,20 +250,20 @@ export default function EscalaPermanencia() {
             </div>
 
             {atRiskFactors.length > 0 && (
-              <div className="mb-6 p-4 rounded-xl bg-[#1D1D1B]/60 border border-amber-400/20 space-y-1.5">
-                <div className="font-mono text-[9px] text-amber-400/70 tracking-widest uppercase mb-1">
+              <div className="mb-6 p-4 rounded-xl bg-surface/60 border border-signal-demand/20 space-y-1.5">
+                <div className="font-mono text-[9px] text-signal-demand/70 tracking-widest uppercase mb-1">
                   Posibles decisiones prematuras
                 </div>
-                <p className="text-white/40 text-[12px] leading-relaxed">
+                <p className="text-mono text-[12px] leading-relaxed">
                   Estos factores se marcaron como resueltos antes de resolver{' '}
-                  <span className="text-white/60">{bottleneck?.title}</span> — vale la pena
+                  <span className="text-secondary">{bottleneck?.title}</span> — vale la pena
                   revisarlos cuando ese factor cambie:
                 </p>
                 <div className="flex flex-wrap gap-1.5 pt-1">
                   {atRiskFactors.map((f) => (
                     <span
                       key={f.id}
-                      className="px-2.5 py-1 rounded-full bg-amber-400/10 border border-amber-400/25 text-amber-400 text-[11px]"
+                      className="px-2.5 py-1 rounded-full bg-signal-demand/10 border border-signal-demand/25 text-signal-demand text-[11px]"
                     >
                       {f.shortLabel}
                     </span>
@@ -294,12 +276,12 @@ export default function EscalaPermanencia() {
               href={`https://wa.me/573113650567?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)] hover:scale-[1.02]"
+              className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-brand text-surface rounded-full font-semibold text-sm hover:bg-brand-hover transition-all duration-200 hover:shadow-glow-lg hover:scale-[1.02]"
             >
               Solicitar diagnóstico Keyline real
             </a>
 
-            <p className="mt-5 text-white/25 text-[11px] leading-relaxed text-center">
+            <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Autoevaluación orientativa — no reemplaza una visita técnica ni un diseño Keyline en campo.
             </p>
           </motion.div>

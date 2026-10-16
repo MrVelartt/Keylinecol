@@ -2,6 +2,7 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 const paths = [
   {
@@ -43,30 +44,20 @@ export default function ClientPaths() {
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section className="py-32 lg:py-44 px-6 bg-[#1D1D1B]">
+    <section className="py-32 lg:py-44 px-6 bg-surface">
       <div className="max-w-7xl mx-auto">
         <div ref={ref} className="mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/70" />
-            <span className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium">
-              ¿Cuál es tu camino?
-            </span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 36 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-[clamp(2.8rem,6vw,5rem)] font-semibold leading-tight max-w-3xl"
-          >
-            Dos caminos,{' '}
-            <em className="text-[#95C11F] not-italic">un mismo destino</em>
-          </motion.h2>
+          <SectionHeader
+            inView={inView}
+            className=""
+            eyebrow="¿Cuál es tu camino?"
+            title={
+              <>
+                Dos caminos,{' '}
+                <Accent>un mismo destino</Accent>
+              </>
+            }
+          />
         </div>
 
         <div className="grid md:grid-cols-2 gap-5 lg:gap-6">
@@ -78,22 +69,22 @@ export default function ClientPaths() {
               transition={{ duration: 0.95, delay: 0.2 + i * 0.12, ease: [0.22, 1, 0.36, 1] }}
               className={`relative p-10 lg:p-14 rounded-3xl border transition-all duration-500 overflow-hidden ${
                 path.primary
-                  ? 'bg-[#95C11F]/[0.06] border-[#95C11F]/20 hover:bg-[#95C11F]/[0.1]'
-                  : 'bg-white/[0.015] border-white/[0.06] hover:border-white/10 hover:bg-white/[0.03]'
+                  ? 'bg-brand/[0.06] border-brand/20 hover:bg-brand/[0.1]'
+                  : 'bg-veil border-subtle hover:border-strong hover:bg-veil'
               }`}
             >
               {/* Badge */}
               <div
                 className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-[10px] tracking-[0.18em] uppercase mb-8 ${
                   path.primary
-                    ? 'bg-[#95C11F]/20 text-[#95C11F]'
-                    : 'bg-white/[0.06] text-white/40'
+                    ? 'bg-brand/20 text-brand'
+                    : 'bg-veil-strong text-mono'
                 }`}
               >
                 {path.badge}
               </div>
 
-              <div className="text-[#95C11F] text-[10px] tracking-[0.28em] uppercase mb-3 font-medium">
+              <div className="text-brand text-[10px] tracking-[0.28em] uppercase mb-3 font-medium">
                 {path.type}
               </div>
 
@@ -101,12 +92,12 @@ export default function ClientPaths() {
                 {path.headline}
               </h3>
 
-              <p className="text-white/45 leading-relaxed mb-8 text-[0.95rem]">{path.description}</p>
+              <p className="text-secondary leading-relaxed mb-8 text-[0.95rem]">{path.description}</p>
 
               <ul className="space-y-3 mb-10">
                 {path.features.map((feat) => (
-                  <li key={feat} className="flex items-start gap-3 text-sm text-white/60">
-                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-[#95C11F] shrink-0" />
+                  <li key={feat} className="flex items-start gap-3 text-sm text-secondary">
+                    <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-brand shrink-0" />
                     {feat}
                   </li>
                 ))}
@@ -118,8 +109,8 @@ export default function ClientPaths() {
                 rel={path.href.startsWith('http') ? 'noopener noreferrer' : undefined}
                 className={`inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-105 ${
                   path.primary
-                    ? 'bg-[#95C11F] text-[#1D1D1B] hover:bg-[#a6d42a] hover:shadow-[0_0_24px_rgba(149,193,31,0.35)]'
-                    : 'border border-white/15 text-white/80 hover:border-white/30 hover:bg-white/[0.05]'
+                    ? 'bg-brand text-surface hover:bg-brand-hover hover:shadow-glow'
+                    : 'border border-strong text-primary hover:border-emphasis hover:bg-veil'
                 }`}
               >
                 {path.cta}
@@ -136,7 +127,7 @@ export default function ClientPaths() {
 
               {/* Decorative corner glow for primary */}
               {path.primary && (
-                <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full bg-[#95C11F]/[0.07] blur-2xl pointer-events-none" />
+                <div className="absolute -bottom-10 -right-10 w-48 h-48 rounded-full bg-brand/[0.07] blur-2xl pointer-events-none" />
               )}
             </motion.div>
           ))}

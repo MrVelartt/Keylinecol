@@ -3,6 +3,8 @@
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import MountainSVG from './MountainSVG'
+import { palette, alpha } from '@/lib/theme'
+import { Accent } from '@/components/ui/SectionHeader'
 
 const VIDEO_SRC = '/video/hero.mp4'
 const VIDEO_WEBM = '/video/hero.webm'
@@ -21,7 +23,7 @@ export default function Hero() {
       className="relative h-screen min-h-[700px] overflow-hidden flex items-center justify-center"
     >
       {/* Base bg */}
-      <div className="absolute inset-0 bg-[#1D1D1B]" />
+      <div className="absolute inset-0 bg-surface" />
 
       {/* Video background */}
       <video
@@ -49,18 +51,18 @@ export default function Hero() {
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(149,193,31,0.018) 1px, transparent 1px), linear-gradient(90deg, rgba(149,193,31,0.018) 1px, transparent 1px)',
+            `linear-gradient(${alpha(palette.brand.DEFAULT, 0.018)} 1px, transparent 1px), linear-gradient(90deg, ${alpha(palette.brand.DEFAULT, 0.018)} 1px, transparent 1px)`,
           backgroundSize: '80px 80px',
         }}
       />
 
       {/* Radial ambient glow */}
       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-        <div className="w-[600px] h-[600px] rounded-full bg-[#95C11F]/[0.06] blur-[140px]" />
+        <div className="w-[600px] h-[600px] rounded-full bg-brand/[0.06] blur-[140px]" />
       </div>
 
       {/* Vignette top/bottom */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#1D1D1B]/70 via-transparent to-[#1D1D1B] pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-surface/70 via-transparent to-surface pointer-events-none" />
 
       {/* ── Technical corner overlays ── */}
 
@@ -68,22 +70,22 @@ export default function Hero() {
         initial={{ opacity: 0, x: -12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, delay: 2.2 }}
-        className="absolute top-24 left-6 lg:left-12 z-10 font-mono text-[10px] text-[#95C11F]/50 tracking-widest hidden lg:block"
+        className="absolute top-24 left-6 lg:left-12 z-10 font-mono text-[10px] text-brand/50 tracking-widest hidden lg:block"
       >
         <div>LAT · 04°09′N</div>
         <div>LON · 73°38′O</div>
-        <div className="mt-1.5 text-white/20">VILLAVICENCIO · META · COL</div>
+        <div className="mt-1.5 text-mono">VILLAVICENCIO · META · COL</div>
       </motion.div>
 
       <motion.div
         initial={{ opacity: 0, x: 12 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1, delay: 2.4 }}
-        className="absolute top-24 right-6 lg:right-12 z-10 font-mono text-[10px] text-[#95C11F]/50 tracking-widest text-right hidden lg:block"
+        className="absolute top-24 right-6 lg:right-12 z-10 font-mono text-[10px] text-brand/50 tracking-widest text-right hidden lg:block"
       >
         <div>ELV · 467m</div>
         <div>PIEDEMONTE LLANERO</div>
-        <div className="mt-1.5 text-white/20">SISTEMA KEYLINE ACTIVO</div>
+        <div className="mt-1.5 text-mono">SISTEMA KEYLINE ACTIVO</div>
       </motion.div>
 
       <motion.div
@@ -95,11 +97,11 @@ export default function Hero() {
         {[...Array(6)].map((_, i) => (
           <div
             key={i}
-            className="h-px bg-[#95C11F]"
+            className="h-px bg-brand"
             style={{ opacity: 0.12 + i * 0.04, width: i % 3 === 0 ? 12 : 6 }}
           />
         ))}
-        <span className="text-[#95C11F]/30 font-mono text-[8px] tracking-widest mt-1" style={{ writingMode: 'vertical-rl' }}>
+        <span className="text-brand/30 font-mono text-[8px] tracking-widest mt-1" style={{ writingMode: 'vertical-rl' }}>
           ↑ ELEVACIÓN
         </span>
       </motion.div>
@@ -115,11 +117,11 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.2 }}
           className="flex items-center justify-center gap-4 mb-10"
         >
-          <div className="w-10 h-px bg-[#95C11F]/50" />
-          <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.38em] uppercase">
+          <div className="w-10 h-px bg-brand/50" />
+          <span className="font-mono text-brand text-[10px] tracking-[0.38em] uppercase">
             Metodología Keyline · Colombia
           </span>
-          <div className="w-10 h-px bg-[#95C11F]/50" />
+          <div className="w-10 h-px bg-brand/50" />
         </motion.div>
 
         <motion.h1
@@ -129,7 +131,7 @@ export default function Hero() {
           className="font-display text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[0.92] tracking-tight mb-8"
         >
           Diseña el{' '}
-          <em className="text-[#95C11F] not-italic">Paisaje,</em>
+          <Accent>Paisaje,</Accent>
           <br />
           Transforma{' '}
           <span className="relative inline-block">
@@ -138,7 +140,7 @@ export default function Hero() {
               initial={{ scaleX: 0 }}
               animate={{ scaleX: 1 }}
               transition={{ duration: 0.9, delay: 1.3, ease: [0.22, 1, 0.36, 1] }}
-              className="absolute -bottom-1 left-0 right-0 h-[2px] bg-[#95C11F]/80 origin-left rounded-full"
+              className="absolute -bottom-1 left-0 right-0 h-[2px] bg-brand/80 origin-left rounded-full"
             />
           </span>
         </motion.h1>
@@ -147,7 +149,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.9, delay: 0.65 }}
-          className="text-white/50 text-lg sm:text-xl max-w-xl mx-auto leading-relaxed mb-12"
+          className="text-secondary text-lg sm:text-xl max-w-xl mx-auto leading-relaxed mb-12"
         >
           Regeneramos fincas y paisajes colombianos a través del diseño Keyline:
           agua, suelo y biodiversidad en perfecta armonía.
@@ -161,13 +163,13 @@ export default function Hero() {
         >
           <a
             href="#proyectos"
-            className="px-8 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm tracking-wide hover:bg-[#a6d42a] transition-all duration-200 hover:scale-105 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)]"
+            className="px-8 py-4 bg-brand text-surface rounded-full font-semibold text-sm tracking-wide hover:bg-brand-hover transition-all duration-200 hover:scale-105 hover:shadow-glow-lg"
           >
             Ver Proyectos
           </a>
           <a
             href="#metodologia"
-            className="px-8 py-4 border border-[#444441] text-white/70 rounded-full font-medium text-sm tracking-wide hover:border-white/30 hover:bg-white/[0.05] hover:text-white transition-all duration-200"
+            className="px-8 py-4 border border-strong text-secondary rounded-full font-medium text-sm tracking-wide hover:border-emphasis hover:bg-veil hover:text-primary transition-all duration-200"
           >
             Explorar Método
           </a>
@@ -184,9 +186,9 @@ export default function Hero() {
         <motion.div
           animate={{ y: [0, 10, 0] }}
           transition={{ duration: 1.9, repeat: Infinity, ease: 'easeInOut' }}
-          className="w-px h-12 bg-gradient-to-b from-white/30 to-transparent"
+          className="w-px h-12 bg-gradient-to-b from-line-emphasis to-transparent"
         />
-        <span className="font-mono text-white/25 text-[9px] tracking-[0.4em] uppercase">Scroll</span>
+        <span className="font-mono text-mono text-[9px] tracking-[0.4em] uppercase">Scroll</span>
       </motion.div>
     </section>
   )

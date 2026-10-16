@@ -16,7 +16,7 @@ export default function Ticker() {
   const doubled = [...items, ...items]
 
   return (
-    <div className="border-y border-white/[0.06] bg-[#0c180c] overflow-hidden py-4">
+    <div className="border-y border-subtle bg-landscape-band overflow-hidden py-4">
       <motion.div
         className="flex whitespace-nowrap"
         animate={{ x: ['0%', '-50%'] }}
@@ -24,11 +24,11 @@ export default function Ticker() {
       >
         {doubled.map((item, i) => (
           <span key={i} className="inline-flex items-center gap-4 px-8 shrink-0">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#95C11F] shrink-0" />
-            <span className="text-[#95C11F] text-[10px] tracking-[0.28em] uppercase font-medium shrink-0">
+            <span className="w-1.5 h-1.5 rounded-full bg-brand shrink-0" />
+            <span className="text-brand text-[10px] tracking-[0.28em] uppercase font-medium shrink-0">
               {item.label}
             </span>
-            <span className="text-white/35 text-[11px] tracking-[0.15em] uppercase shrink-0">
+            <span className="text-mono text-[11px] tracking-[0.15em] uppercase shrink-0">
               {item.text}
             </span>
           </span>

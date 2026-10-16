@@ -2,6 +2,8 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { palette } from '@/lib/theme'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 const pillars = [
   {
@@ -13,14 +15,14 @@ const pillars = [
       <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
         <path
           d="M4 22 L9 14 L15 19 L22 8 L31 17"
-          stroke="#95C11F"
+          stroke={palette.brand.DEFAULT}
           strokeWidth="1.4"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
-        <circle cx="22" cy="8" r="2.5" fill="#95C11F" opacity="0.5" />
-        <path d="M4 29 L32 29" stroke="#95C11F" strokeWidth="0.5" strokeDasharray="2 5" opacity="0.35" />
-        <path d="M4 25 L32 25" stroke="#95C11F" strokeWidth="0.5" strokeDasharray="2 5" opacity="0.25" />
+        <circle cx="22" cy="8" r="2.5" fill={palette.brand.DEFAULT} opacity="0.5" />
+        <path d="M4 29 L32 29" stroke={palette.brand.DEFAULT} strokeWidth="0.5" strokeDasharray="2 5" opacity="0.35" />
+        <path d="M4 25 L32 25" stroke={palette.brand.DEFAULT} strokeWidth="0.5" strokeDasharray="2 5" opacity="0.25" />
       </svg>
     ),
   },
@@ -31,22 +33,22 @@ const pillars = [
       'Creamos sistemas de cultivo y manejo del agua que trabajan con los ciclos naturales, aumentando la fertilidad y la biodiversidad año tras año.',
     icon: (
       <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-        <circle cx="18" cy="18" r="7" stroke="#95C11F" strokeWidth="1.4" opacity="0.85" />
+        <circle cx="18" cy="18" r="7" stroke={palette.brand.DEFAULT} strokeWidth="1.4" opacity="0.85" />
         <path
           d="M18 4 C18 4 23 10 23 18 C23 26 18 32 18 32"
-          stroke="#95C11F"
+          stroke={palette.brand.DEFAULT}
           strokeWidth="0.8"
           opacity="0.45"
           strokeDasharray="2 4"
         />
         <path
           d="M4 18 C4 18 10 13 18 13 C26 13 32 18 32 18"
-          stroke="#95C11F"
+          stroke={palette.brand.DEFAULT}
           strokeWidth="0.8"
           opacity="0.45"
           strokeDasharray="2 4"
         />
-        <circle cx="18" cy="18" r="2.5" fill="#95C11F" />
+        <circle cx="18" cy="18" r="2.5" fill={palette.brand.DEFAULT} />
       </svg>
     ),
   },
@@ -59,19 +61,19 @@ const pillars = [
       <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
         <path
           d="M6 30 L6 9 L16 4 L26 9 L26 30"
-          stroke="#95C11F"
+          stroke={palette.brand.DEFAULT}
           strokeWidth="1.4"
           strokeLinecap="round"
           strokeLinejoin="round"
         />
         <path
           d="M11 30 L11 20 L16 17 L21 20 L21 30"
-          stroke="#95C11F"
+          stroke={palette.brand.DEFAULT}
           strokeWidth="1"
           opacity="0.6"
         />
-        <circle cx="16" cy="13" r="2" fill="#95C11F" opacity="0.75" />
-        <path d="M6 14 L26 14" stroke="#95C11F" strokeWidth="0.5" strokeDasharray="2 5" opacity="0.35" />
+        <circle cx="16" cy="13" r="2" fill={palette.brand.DEFAULT} opacity="0.75" />
+        <path d="M6 14 L26 14" stroke={palette.brand.DEFAULT} strokeWidth="0.5" strokeDasharray="2 5" opacity="0.35" />
       </svg>
     ),
   },
@@ -87,10 +89,10 @@ function PillarCard({ pillar, index }: { pillar: (typeof pillars)[0]; index: num
       initial={{ opacity: 0, y: 64 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.9, delay: index * 0.14, ease: [0.22, 1, 0.36, 1] }}
-      className="relative p-8 lg:p-10 border border-white/[0.07] rounded-2xl bg-[#2C2C2A] hover:bg-[#333331] hover:border-[#95C11F]/25 transition-all duration-500 group overflow-hidden"
+      className="relative p-8 lg:p-10 border border-subtle rounded-2xl bg-surface-raised hover:bg-surface-hover hover:border-brand/25 transition-all duration-500 group overflow-hidden"
     >
       {/* Background number */}
-      <div className="font-display text-[6rem] font-bold text-white/[0.03] absolute -top-2 right-6 leading-none select-none group-hover:text-white/[0.055] transition-colors duration-500 pointer-events-none">
+      <div className="font-display text-[6rem] font-bold text-primary/[0.03] absolute -top-2 right-6 leading-none select-none group-hover:text-primary/[0.055] transition-colors duration-500 pointer-events-none">
         {pillar.number}
       </div>
 
@@ -100,14 +102,14 @@ function PillarCard({ pillar, index }: { pillar: (typeof pillars)[0]; index: num
         {pillar.title}
       </h3>
 
-      <p className="text-white/45 leading-relaxed text-[0.95rem]">{pillar.description}</p>
+      <p className="text-secondary leading-relaxed text-[0.95rem]">{pillar.description}</p>
 
       {/* Bottom accent */}
       <motion.div
         initial={{ scaleX: 0 }}
         animate={inView ? { scaleX: 1 } : {}}
         transition={{ duration: 0.7, delay: index * 0.14 + 0.5 }}
-        className="absolute bottom-0 left-8 right-8 h-px bg-gradient-to-r from-[#95C11F]/35 via-[#95C11F]/15 to-transparent origin-left"
+        className="absolute bottom-0 left-8 right-8 h-px bg-gradient-to-r from-brand/35 via-brand/15 to-transparent origin-left"
       />
     </motion.div>
   )
@@ -131,28 +133,18 @@ export default function Pillars() {
       />
       <div className="relative max-w-7xl mx-auto">
         <div ref={ref} className="mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/70" />
-            <span className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium">
-              Nuestra Metodología
-            </span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 36 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-[clamp(2.8rem,6vw,5rem)] font-semibold leading-tight max-w-3xl"
-          >
-            Tres pilares que{' '}
-            <em className="text-[#95C11F] not-italic">transforman</em>
-            {' '}cada finca
-          </motion.h2>
+          <SectionHeader
+            inView={inView}
+            className=""
+            eyebrow="Nuestra Metodología"
+            title={
+              <>
+                Tres pilares que{' '}
+                <Accent>transforman</Accent>
+                {' '}cada finca
+              </>
+            }
+          />
         </div>
 
         <div className="grid md:grid-cols-3 gap-5 lg:gap-6">

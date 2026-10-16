@@ -97,6 +97,19 @@ const TABLA_2_3: Record<BandaLluviaEvap, Record<Confiabilidad, Partial<Record<Su
   },
 }
 
+/**
+ * Banda de la tabla 2.3 a partir de la lluvia y la evaporación anuales (mm).
+ * La tabla no tiene fila para lluvias de 500–899 mm con evaporación > 1.800 mm
+ * ni para < 250 mm: se asigna la fila más cercana (evapAlta / 250-399).
+ */
+export function bandaFromClimate(precipMm: number, evapMm: number): BandaLluviaEvap {
+  if (precipMm >= 1100) return 'mas1100'
+  if (precipMm >= 900) return '900-1099'
+  if (precipMm >= 500) return evapMm < 1300 ? '500-899-evapBaja' : '500-899-evapAlta'
+  if (precipMm >= 400) return '400-499'
+  return evapMm < 1800 ? '250-399-evapBaja' : '250-399-evapAlta'
+}
+
 /** Rango de C anual (fracción 0–1) según tabla 2.3; null si la combinación no aplica (celda "—"). */
 export function annualCRange(banda: BandaLluviaEvap, confiabilidad: Confiabilidad, suelo: SueloTextura): Rango | null {
   const rangoPct = TABLA_2_3[banda]?.[confiabilidad]?.[suelo]

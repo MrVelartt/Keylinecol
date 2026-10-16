@@ -1,4 +1,5 @@
 ﻿'use client'
+import { palette } from '@/lib/theme'
 
 interface Props {
   size?: number
@@ -16,38 +17,38 @@ export default function KeylineLogo({ size = 36, className = '' }: Props) {
       className={className}
     >
       {/* Outer boundary ring */}
-      <circle cx="24" cy="24" r="22.5" stroke="#95C11F" strokeWidth="0.8" opacity="0.9" />
+      <circle cx="24" cy="24" r="22.5" stroke={palette.brand.DEFAULT} strokeWidth="0.8" opacity="0.9" />
 
       {/* Topographic contour lines — offset to suggest terrain elevation */}
       <ellipse
         cx="24" cy="27"
         rx="16.5" ry="11.5"
-        stroke="#95C11F" strokeWidth="0.65"
+        stroke={palette.brand.DEFAULT} strokeWidth="0.65"
         strokeDasharray="2.8 5.5"
         opacity="0.55"
       />
       <ellipse
         cx="24" cy="27"
         rx="11.5" ry="7.5"
-        stroke="#95C11F" strokeWidth="0.65"
+        stroke={palette.brand.DEFAULT} strokeWidth="0.65"
         strokeDasharray="2.8 5.5"
         opacity="0.45"
       />
       <ellipse
         cx="24" cy="26"
         rx="6.5" ry="4"
-        stroke="#95C11F" strokeWidth="0.65"
+        stroke={palette.brand.DEFAULT} strokeWidth="0.65"
         strokeDasharray="2.8 5.5"
         opacity="0.35"
       />
 
       {/* Keyline — horizontal reference at key elevation */}
-      <line x1="2" y1="27" x2="46" y2="27" stroke="#95C11F" strokeWidth="0.4" opacity="0.28" />
+      <line x1="2" y1="27" x2="46" y2="27" stroke={palette.brand.DEFAULT} strokeWidth="0.4" opacity="0.28" />
 
       {/* Keypoint marker */}
-      <circle cx="24" cy="20" r="3.2" fill="#95C11F" opacity="0.92" />
-      <circle cx="24" cy="20" r="1.4" fill="#1D1D1B" />
-      <circle cx="24" cy="20" r="0.6" fill="#95C11F" />
+      <circle cx="24" cy="20" r="3.2" fill={palette.brand.DEFAULT} opacity="0.92" />
+      <circle cx="24" cy="20" r="1.4" fill={palette.surface.DEFAULT} />
+      <circle cx="24" cy="20" r="0.6" fill={palette.brand.DEFAULT} />
     </svg>
   )
 }

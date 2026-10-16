@@ -3,6 +3,9 @@
 import { useId, useMemo, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from 'recharts'
+import { palette } from '@/lib/theme'
+import { toneClass, toneColor, type Tone } from '@/lib/tones'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 interface ParamDef {
   key: string
@@ -62,7 +65,6 @@ function scoreOf(value: number, min: number, max: number, invert?: boolean) {
   return clamp(100 - ((value - max) / max) * 100, 0, 100)
 }
 
-type Tone = 'good' | 'warn' | 'bad'
 
 function toneOf(score: number): Tone {
   if (score >= 90) return 'good'
@@ -86,17 +88,11 @@ function simpleStatus(value: number, min: number, max: number): { label: string;
   return { label: value < min ? 'Bajo' : 'Alto', tone }
 }
 
-const toneClass: Record<Tone, string> = {
-  good: 'text-[#95C11F] bg-[#95C11F]/10 border-[#95C11F]/25',
-  warn: 'text-amber-400 bg-amber-400/10 border-amber-400/25',
-  bad: 'text-red-400 bg-red-400/10 border-red-400/25',
-}
-
 const nf = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 })
 
 const inputClass =
-  'w-full px-3.5 py-2.5 rounded-lg bg-[#1D1D1B] border border-white/[0.08] text-white text-sm ' +
-  'focus:outline-none focus:border-[#95C11F]/50 focus:ring-2 focus:ring-[#95C11F]/20 transition-all'
+  'w-full px-3.5 py-2.5 rounded-lg bg-surface border border-subtle text-primary text-sm ' +
+  'focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/20 transition-all'
 
 function Pill({ tone, label }: { tone: Tone; label: string }) {
   return (
@@ -119,9 +115,9 @@ function ParamField({
 }) {
   const status = statusOf(value, def)
   return (
-    <div className="p-4 rounded-xl bg-[#1D1D1B]/60 border border-white/[0.06]">
+    <div className="p-4 rounded-xl bg-surface/60 border border-subtle">
       <div className="flex items-center justify-between gap-2 mb-2.5">
-        <label htmlFor={`${uid}-${def.key}`} className="text-white/60 text-[13px]">
+        <label htmlFor={`${uid}-${def.key}`} className="text-secondary text-[13px]">
           {def.label}
         </label>
         <Pill tone={status.tone} label={status.label} />
@@ -135,9 +131,9 @@ function ParamField({
           onChange={(e) => onChange(Number(e.target.value) || 0)}
           className={inputClass}
         />
-        {def.unit && <span className="text-white/30 text-[11px] shrink-0 w-16">{def.unit}</span>}
+        {def.unit && <span className="text-mono text-[11px] shrink-0 w-16">{def.unit}</span>}
       </div>
-      <div className="font-mono text-[10px] text-white/25 tracking-wide">
+      <div className="font-mono text-[10px] text-mono tracking-wide">
         Rango adecuado: {def.invert ? `< ${nf.format(def.max)}` : `${nf.format(def.min)} – ${nf.format(def.max)}`}{' '}
         {def.unit}
       </div>
@@ -175,7 +171,7 @@ export default function CalculadoraSuelo() {
   )
 
   const indexTone: Tone = fertilityIndex >= 70 ? 'good' : fertilityIndex >= 40 ? 'warn' : 'bad'
-  const indexColor = indexTone === 'good' ? '#95C11F' : indexTone === 'warn' ? '#fbbf24' : '#f87171'
+  const indexColor = toneColor[indexTone]
 
   const recommendations = useMemo(() => {
     const list: { tone: Tone; text: string }[] = []
@@ -244,37 +240,24 @@ export default function CalculadoraSuelo() {
 
       <div className="max-w-7xl mx-auto relative">
         <div ref={ref} className="mb-16 max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
-              Herramientas Técnicas · 03
-            </span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 36 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-[clamp(2.8rem,6vw,4.8rem)] font-semibold leading-tight mb-6"
-          >
-            Analiza tu <em className="text-[#95C11F] not-italic">suelo</em>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-white/45 leading-relaxed"
-          >
-            Ingresa los valores de tu análisis de laboratorio — o usa los de referencia
-            precargados — y obtén el índice de fertilidad, el estado de cada parámetro
-            frente a su rango adecuado y recomendaciones agronómicas inmediatas.
-          </motion.p>
+          <SectionHeader
+            inView={inView}
+            className=""
+            eyebrow="Herramientas Técnicas"
+            number="03"
+            title={
+              <>
+                Analiza tu <Accent>suelo</Accent>
+              </>
+            }
+            subtitle={
+              <>
+                Ingresa los valores de tu análisis de laboratorio — o usa los de referencia
+                precargados — y obtén el índice de fertilidad, el estado de cada parámetro
+                frente a su rango adecuado y recomendaciones agronómicas inmediatas.
+              </>
+            }
+          />
         </div>
 
         <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
@@ -283,14 +266,14 @@ export default function CalculadoraSuelo() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
             >
               <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">01</span>
+                  <span className="font-mono text-[11px] text-brand/50 tracking-widest">01</span>
                   <h3 className="font-display text-xl font-semibold">Parámetros químicos principales</h3>
                 </div>
-                <button onClick={resetDefaults} className="text-white/30 text-xs hover:text-[#95C11F] transition-colors">
+                <button onClick={resetDefaults} className="text-mono text-xs hover:text-brand transition-colors">
                   Restablecer valores de ejemplo
                 </button>
               </div>
@@ -299,12 +282,12 @@ export default function CalculadoraSuelo() {
                   <ParamField key={p.key} def={p} value={values[p.key]} onChange={(v) => update(p.key, v)} uid={uid} />
                 ))}
               </div>
-              <div className="mt-5 px-1 flex items-center gap-2 text-[12px] text-white/30 flex-wrap">
+              <div className="mt-5 px-1 flex items-center gap-2 text-[12px] text-mono flex-wrap">
                 <span>
-                  Relación Ca/Mg: <span className="font-mono text-white/60">{nf.format(caMg)}</span>
+                  Relación Ca/Mg: <span className="font-mono text-secondary">{nf.format(caMg)}</span>
                 </span>
                 <Pill tone={caMgStatus.tone} label={caMgStatus.label} />
-                <span className="text-white/20">· ideal 3.0 – 5.0</span>
+                <span className="text-mono">· ideal 3.0 – 5.0</span>
               </div>
             </motion.div>
 
@@ -312,10 +295,10 @@ export default function CalculadoraSuelo() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">02</span>
+                <span className="font-mono text-[11px] text-brand/50 tracking-widest">02</span>
                 <h3 className="font-display text-xl font-semibold">Micronutrientes y nitrógeno</h3>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -331,9 +314,9 @@ export default function CalculadoraSuelo() {
             initial={{ opacity: 0, y: 40 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-[#95C11F]/20 bg-[#2C2C2A]"
+            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-brand/20 bg-surface-raised"
           >
-            <div className="font-mono text-[10px] text-[#95C11F]/50 tracking-widest uppercase mb-6">
+            <div className="font-mono text-[10px] text-brand/50 tracking-widest uppercase mb-6">
               Índice de fertilidad
             </div>
 
@@ -341,9 +324,9 @@ export default function CalculadoraSuelo() {
               <span className="font-display text-5xl font-semibold" style={{ color: indexColor }}>
                 {fertilityIndex}
               </span>
-              <span className="text-white/30 text-sm mb-1.5">/100</span>
+              <span className="text-mono text-sm mb-1.5">/100</span>
             </div>
-            <div className="h-2 rounded-full bg-white/[0.06] overflow-hidden mb-6">
+            <div className="h-2 rounded-full bg-veil-strong overflow-hidden mb-6">
               <div
                 className="h-full rounded-full transition-all duration-500"
                 style={{ width: `${fertilityIndex}%`, background: indexColor }}
@@ -356,7 +339,7 @@ export default function CalculadoraSuelo() {
                   <PolarGrid stroke="rgba(255,255,255,0.08)" />
                   <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10 }} />
                   <Radar name="Óptimo" dataKey="optimo" stroke="rgba(255,255,255,0.15)" fill="transparent" strokeDasharray="4 4" />
-                  <Radar name="Actual" dataKey="actual" stroke="#95C11F" fill="#95C11F" fillOpacity={0.18} />
+                  <Radar name="Actual" dataKey="actual" stroke={palette.brand.DEFAULT} fill={palette.brand.DEFAULT} fillOpacity={0.18} />
                   <Tooltip
                     contentStyle={{ background: '#1D1D1B', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
                     labelStyle={{ color: 'rgba(255,255,255,0.5)' }}
@@ -367,7 +350,7 @@ export default function CalculadoraSuelo() {
             </div>
 
             <div className="space-y-2.5 mb-6">
-              <div className="font-mono text-[9px] text-white/30 tracking-widest uppercase mb-1">Recomendaciones</div>
+              <div className="font-mono text-[9px] text-mono tracking-widest uppercase mb-1">Recomendaciones</div>
               {recommendations.map((r, i) => (
                 <div key={i} className={`p-3 rounded-lg border text-[12px] leading-relaxed ${toneClass[r.tone]}`}>
                   {r.text}
@@ -379,12 +362,12 @@ export default function CalculadoraSuelo() {
               href={`https://wa.me/573113650567?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)] hover:scale-[1.02]"
+              className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-brand text-surface rounded-full font-semibold text-sm hover:bg-brand-hover transition-all duration-200 hover:shadow-glow-lg hover:scale-[1.02]"
             >
               Solicitar análisis real de tu finca
             </a>
 
-            <p className="mt-5 text-white/25 text-[11px] leading-relaxed text-center">
+            <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Estimación orientativa — no reemplaza un análisis de laboratorio ni un diseño técnico Keyline.
             </p>
           </motion.div>

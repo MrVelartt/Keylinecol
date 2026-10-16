@@ -4,6 +4,7 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import Image from 'next/image'
 import KeylineLogo from './KeylineLogo'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 const values = [
   {
@@ -64,7 +65,7 @@ function TeamCard({ member, index }: { member: (typeof team)[0]; index: number }
       initial={{ opacity: 0, y: 40 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.85, delay: index * 0.15, ease: [0.22, 1, 0.36, 1] }}
-      className="flex flex-col sm:flex-row gap-5 p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A] hover:border-[#95C11F]/20 hover:bg-[#333331] transition-all duration-500 group"
+      className="flex flex-col sm:flex-row gap-5 p-8 rounded-2xl border border-subtle bg-surface-raised hover:border-brand/20 hover:bg-surface-hover transition-all duration-500 group"
     >
       {/* Foto / Avatar */}
       <div className="shrink-0">
@@ -77,8 +78,8 @@ function TeamCard({ member, index }: { member: (typeof team)[0]; index: number }
             className="w-[180px] h-[180px] rounded-2xl object-cover object-top"
           />
         ) : (
-          <div className="w-[180px] h-[180px] rounded-2xl bg-[#1D1D1B] border border-[#95C11F]/15 flex items-center justify-center shrink-0">
-            <span className="font-display text-4xl font-semibold text-[#95C11F]/60 select-none">
+          <div className="w-[180px] h-[180px] rounded-2xl bg-surface border border-brand/15 flex items-center justify-center shrink-0">
+            <span className="font-display text-4xl font-semibold text-brand/60 select-none">
               {member.initials}
             </span>
           </div>
@@ -88,14 +89,14 @@ function TeamCard({ member, index }: { member: (typeof team)[0]; index: number }
       {/* Info */}
       <div className="flex flex-col justify-center gap-3 min-w-0 flex-1">
         <div>
-          <h3 className="font-display text-[1.625rem] font-medium text-white leading-tight mb-1.5">
+          <h3 className="font-display text-[1.625rem] font-medium text-primary leading-tight mb-1.5">
             {member.name}
           </h3>
-          <p className="font-mono text-[11px] text-[#95C11F] tracking-[0.08em] uppercase">
+          <p className="font-mono text-[11px] text-brand tracking-[0.08em] uppercase">
             {member.role}
           </p>
         </div>
-        <p className="text-[#B4B2A9] text-base leading-[1.8]">
+        <p className="text-secondary text-base leading-[1.8]">
           {member.bio}
         </p>
       </div>
@@ -114,33 +115,23 @@ export default function Nosotros() {
   return (
     <section id="nosotros" className="py-32 lg:py-44 px-6 relative overflow-hidden">
       {/* Bg accent */}
-      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-[#95C11F]/[0.025] rounded-full blur-[180px] pointer-events-none -translate-x-1/2 -translate-y-1/4" />
+      <div className="absolute top-0 left-0 w-[500px] h-[500px] bg-brand/[0.025] rounded-full blur-[180px] pointer-events-none -translate-x-1/2 -translate-y-1/4" />
 
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <div ref={ref} className="mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
-              Sobre Nosotros
-            </span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 36 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-[clamp(2.8rem,6vw,4.8rem)] font-semibold leading-tight max-w-3xl"
-          >
-            Leemos la tierra
-            <br />
-            <em className="text-[#95C11F] not-italic">con precisión.</em>
-          </motion.h2>
+          <SectionHeader
+            inView={inView}
+            className=""
+            eyebrow="Sobre Nosotros"
+            title={
+              <>
+                Leemos la tierra
+                <br />
+                <Accent>con precisión.</Accent>
+              </>
+            }
+          />
         </div>
 
         {/* Main content grid */}
@@ -157,40 +148,40 @@ export default function Nosotros() {
                 <KeylineLogo size={48} />
               </div>
               <div>
-                <div className="font-mono text-[10px] text-[#95C11F]/50 tracking-widest uppercase mb-2">
+                <div className="font-mono text-[10px] text-brand/50 tracking-widest uppercase mb-2">
                   Villavicencio · Meta · Colombia
                 </div>
-                <p className="text-white/70 text-lg leading-relaxed">
+                <p className="text-secondary text-lg leading-relaxed">
                   Somos un equipo de diseñadores de paisajes y consultores Keyline
                   basados en el Piedemonte Llanero colombiano.
                 </p>
               </div>
             </div>
 
-            <p className="text-white/45 leading-relaxed">
+            <p className="text-secondary leading-relaxed">
               Fundamos Keyline Colombia con una certeza: los suelos y el agua de este país
               pueden recuperarse. El Meta, el Casanare, el piedemonte andino — estas tierras
               tienen la capacidad de regenerarse si el diseño trabaja a favor de sus patrones
               naturales, no en su contra.
             </p>
 
-            <p className="text-white/45 leading-relaxed">
+            <p className="text-secondary leading-relaxed">
               Aplicamos la metodología Keyline desarrollada por P.A. Yeomans en los años 50
               en Australia, adaptada a las condiciones tropicales y subtropicales de Colombia:
               alta pluviosidad, suelos lateríticos, gradientes de alta variabilidad y
               ecosistemas de transición savana-bosque.
             </p>
 
-            <div className="pt-4 border-t border-white/[0.06]">
-              <div className="font-mono text-[10px] text-white/20 tracking-widest uppercase mb-4">Certificaciones</div>
+            <div className="pt-4 border-t border-subtle">
+              <div className="font-mono text-[10px] text-mono tracking-widest uppercase mb-4">Certificaciones</div>
               <div className="space-y-2">
                 {[
                   'Regrarians Keyline® Design — Certified Practitioners',
                   'Diseño de Paisajes Regenerativos — ANDES Institute',
                   'Hidrología de Cuencas Aplicada — IDEAM Colombia',
                 ].map((cert) => (
-                  <div key={cert} className="flex items-start gap-3 text-sm text-white/40">
-                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-[#95C11F]/60 shrink-0" />
+                  <div key={cert} className="flex items-start gap-3 text-sm text-mono">
+                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-brand/60 shrink-0" />
                     {cert}
                   </div>
                 ))}
@@ -211,15 +202,15 @@ export default function Nosotros() {
                 initial={{ opacity: 0, y: 24 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.7, delay: 0.35 + i * 0.09 }}
-                className="group p-6 rounded-2xl border border-white/[0.07] bg-[#2C2C2A] hover:border-[#95C11F]/20 hover:bg-[#333331] transition-all duration-400"
+                className="group p-6 rounded-2xl border border-subtle bg-surface-raised hover:border-brand/20 hover:bg-surface-hover transition-all duration-400"
               >
                 <div className="flex items-start gap-4">
-                  <span className="font-mono text-[11px] text-[#95C11F]/40 tracking-widest mt-0.5 shrink-0">
+                  <span className="font-mono text-[11px] text-brand/40 tracking-widest mt-0.5 shrink-0">
                     {v.code}
                   </span>
                   <div>
-                    <div className="text-white/90 font-medium mb-2 text-[15px]">{v.title}</div>
-                    <p className="text-white/35 text-sm leading-relaxed">{v.desc}</p>
+                    <div className="text-primary font-medium mb-2 text-[15px]">{v.title}</div>
+                    <p className="text-mono text-sm leading-relaxed">{v.desc}</p>
                   </div>
                 </div>
               </motion.div>
@@ -235,8 +226,8 @@ export default function Nosotros() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-12"
           >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
+            <div className="w-7 h-px bg-brand/60" />
+            <span className="font-mono text-brand text-[10px] tracking-[0.32em] uppercase">
               Equipo
             </span>
           </motion.div>
@@ -256,8 +247,8 @@ export default function Nosotros() {
             transition={{ duration: 0.7 }}
             className="flex items-center gap-3 mb-12"
           >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
+            <div className="w-7 h-px bg-brand/60" />
+            <span className="font-mono text-brand text-[10px] tracking-[0.32em] uppercase">
               Trayectoria
             </span>
           </motion.div>
@@ -267,7 +258,7 @@ export default function Nosotros() {
               initial={{ scaleY: 0 }}
               animate={tlInView ? { scaleY: 1 } : {}}
               transition={{ duration: 1.2, ease: 'easeOut' }}
-              className="absolute left-[4.5rem] top-0 bottom-0 w-px bg-gradient-to-b from-[#95C11F]/30 via-[#95C11F]/15 to-transparent origin-top hidden md:block"
+              className="absolute left-[4.5rem] top-0 bottom-0 w-px bg-gradient-to-b from-brand/30 via-brand/15 to-transparent origin-top hidden md:block"
             />
 
             <div className="space-y-6">
@@ -279,13 +270,13 @@ export default function Nosotros() {
                   transition={{ duration: 0.6, delay: i * 0.1 }}
                   className="flex items-center gap-6 md:gap-8 group"
                 >
-                  <div className="font-mono text-[13px] text-[#95C11F] w-14 shrink-0 text-right">
+                  <div className="font-mono text-[13px] text-brand w-14 shrink-0 text-right">
                     {item.year}
                   </div>
                   <div className="relative shrink-0 hidden md:block">
-                    <div className="w-2 h-2 rounded-full bg-[#95C11F]/40 group-hover:bg-[#95C11F] transition-colors duration-300" />
+                    <div className="w-2 h-2 rounded-full bg-brand/40 group-hover:bg-brand transition-colors duration-300" />
                   </div>
-                  <p className="text-white/45 text-sm leading-relaxed group-hover:text-white/65 transition-colors duration-300">
+                  <p className="text-secondary text-sm leading-relaxed group-hover:text-secondary transition-colors duration-300">
                     {item.event}
                   </p>
                 </motion.div>

@@ -2,6 +2,7 @@
 
 import { useRef, useState } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
+import { palette, alpha } from '@/lib/theme'
 
 interface LandscapeBreakProps {
   image: string
@@ -28,18 +29,18 @@ export default function LandscapeBreak({ image, quote, sub }: LandscapeBreakProp
           />
         </motion.div>
       ) : (
-        <div className="absolute inset-0 bg-[#0c180c]" />
+        <div className="absolute inset-0 bg-landscape-band" />
       )}
 
       {/* Overlay */}
-      <div className="absolute inset-0 bg-[#1D1D1B]/65" />
+      <div className="absolute inset-0 bg-surface/65" />
 
       {/* Keyline grid overlay */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           backgroundImage:
-            'linear-gradient(rgba(149,193,31,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(149,193,31,0.025) 1px, transparent 1px)',
+            `linear-gradient(${alpha(palette.brand.DEFAULT, 0.025)} 1px, transparent 1px), linear-gradient(90deg, ${alpha(palette.brand.DEFAULT, 0.025)} 1px, transparent 1px)`,
           backgroundSize: '80px 80px',
         }}
       />
@@ -52,12 +53,12 @@ export default function LandscapeBreak({ image, quote, sub }: LandscapeBreakProp
           viewport={{ once: true, margin: '-80px' }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
         >
-          <div className="w-px h-12 bg-gradient-to-b from-transparent via-[#95C11F]/50 to-[#95C11F]/20 mx-auto mb-8" />
-          <blockquote className="font-display text-[clamp(1.6rem,4vw,3rem)] font-semibold text-white leading-tight max-w-3xl">
+          <div className="w-px h-12 bg-gradient-to-b from-transparent via-brand/50 to-brand/20 mx-auto mb-8" />
+          <blockquote className="font-display text-[clamp(1.6rem,4vw,3rem)] font-semibold text-primary leading-tight max-w-3xl">
             {quote}
           </blockquote>
           {sub && (
-            <p className="mt-5 font-mono text-[#95C11F]/60 text-[10px] tracking-[0.35em] uppercase">
+            <p className="mt-5 font-mono text-brand/60 text-[10px] tracking-[0.35em] uppercase">
               {sub}
             </p>
           )}

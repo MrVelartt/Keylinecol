@@ -1,12 +1,15 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* ── Tokens de marca Keyline Colombia ── */
+/* ── Tokens de marca Keyline Colombia ──
+   Los valores viven en lib/theme.ts y llegan aquí vía theme(). */
 :root {
-  --color-keyline-black: #1D1D1B;
-  --color-keyline-green: #95C11F;
-  --color-keyline-pale:  #E9EA9B;
+  --color-surface: theme('colors.surface.DEFAULT');
+  --color-surface-raised: theme('colors.surface.raised');
+  --color-brand: theme('colors.brand.DEFAULT');
+  --color-line-subtle: theme('colors.line.subtle');
+  --color-ink-mono: theme('colors.ink.mono');
 }
 
 /* ── Base ── */
@@ -15,8 +18,8 @@ html {
 }
 
 ::selection {
-  background: #95C11F;
-  color: #1D1D1B;
+  background: theme('colors.brand.DEFAULT');
+  color: theme('colors.surface.DEFAULT');
 }
 
 /* ── Scrollbar ── */
@@ -24,14 +27,14 @@ html {
   width: 3px;
 }
 ::-webkit-scrollbar-track {
-  background: #141412;
+  background: theme('colors.surface.sunken');
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a4a0e;
+  background: theme('colors.brand.deep');
   border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #95C11F;
+  background: theme('colors.brand.DEFAULT');
 }
 
 /* ── Typography ── */
@@ -47,22 +50,29 @@ html {
 @layer utilities {
   .tech-grid {
     background-image:
-      linear-gradient(rgba(149, 193, 31, 0.028) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(149, 193, 31, 0.028) 1px, transparent 1px);
+      linear-gradient(theme('colors.brand.DEFAULT / 2.8%') 1px, transparent 1px),
+      linear-gradient(90deg, theme('colors.brand.DEFAULT / 2.8%') 1px, transparent 1px);
+    background-size: 72px 72px;
+  }
+
+  .tech-grid-faint {
+    background-image:
+      linear-gradient(theme('colors.brand.DEFAULT / 1.8%') 1px, transparent 1px),
+      linear-gradient(90deg, theme('colors.brand.DEFAULT / 1.8%') 1px, transparent 1px);
     background-size: 72px 72px;
   }
 
   .dot-grid {
     background-image: radial-gradient(
       circle,
-      rgba(149, 193, 31, 0.045) 1px,
+      theme('colors.brand.DEFAULT / 4.5%') 1px,
       transparent 1px
     );
     background-size: 36px 36px;
   }
 
   .glow-green {
-    box-shadow: 0 0 32px rgba(149, 193, 31, 0.25);
+    box-shadow: 0 0 32px theme('colors.brand.DEFAULT / 25%');
   }
 
   .text-balance {

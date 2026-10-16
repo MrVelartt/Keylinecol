@@ -36,7 +36,7 @@ export default function StatsBar() {
   const inView = useInView(ref, { once: true, margin: '-60px' })
 
   return (
-    <section ref={ref} className="py-24 border-y border-white/[0.06] bg-[#0c180c]">
+    <section ref={ref} className="py-24 border-y border-subtle bg-landscape-band">
       <div className="max-w-7xl mx-auto px-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-6">
           {stats.map((stat, i) => (
@@ -47,10 +47,10 @@ export default function StatsBar() {
               transition={{ duration: 0.7, delay: i * 0.1 }}
               className="text-center"
             >
-              <div className="font-display text-[clamp(2.8rem,5vw,4rem)] font-bold text-[#95C11F] mb-3 leading-none tabular-nums">
+              <div className="font-display text-[clamp(2.8rem,5vw,4rem)] font-bold text-brand mb-3 leading-none tabular-nums">
                 <CountUp target={stat.value} suffix={stat.suffix} active={inView} />
               </div>
-              <div className="text-white/35 text-sm tracking-wide">{stat.label}</div>
+              <div className="text-mono text-sm tracking-wide">{stat.label}</div>
             </motion.div>
           ))}
         </div>

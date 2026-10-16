@@ -32,7 +32,8 @@ import {
   type SueloPermeabilidad,
   type SueloTextura,
   type SuperficieGuardar,
-} from '@/lib/runoff'
+} from '@/lib/calculos/escorrentia'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 type Modo = 'guardar' | 'evacuar'
 type FuenteGuardar = 'superficie' | 'cuenca'
@@ -43,8 +44,8 @@ const nf2 = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 2 })
 const nf3 = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 3 })
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl bg-[#1D1D1B] border border-white/[0.08] text-white placeholder-white/20 text-sm ' +
-  'focus:outline-none focus:border-[#95C11F]/50 focus:ring-2 focus:ring-[#95C11F]/20 transition-all'
+  'w-full px-4 py-3 rounded-xl bg-surface border border-subtle text-primary placeholder:text-mono text-sm ' +
+  'focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/20 transition-all'
 
 function Field({
   id,
@@ -60,10 +61,10 @@ function Field({
   return (
     <div>
       <div className="flex items-baseline justify-between mb-2">
-        <label htmlFor={id} className="text-white/60 text-sm">
+        <label htmlFor={id} className="text-secondary text-sm">
           {label}
         </label>
-        {hint && <span className="font-mono text-[10px] text-white/25 tracking-wide">{hint}</span>}
+        {hint && <span className="font-mono text-[10px] text-mono tracking-wide">{hint}</span>}
       </div>
       {children}
     </div>
@@ -86,14 +87,14 @@ function ModeTab({
       onClick={onClick}
       className={`flex-1 text-left p-5 rounded-xl border transition-all duration-200 ${
         active
-          ? 'border-[#95C11F]/40 bg-[#95C11F]/[0.07]'
-          : 'border-white/[0.07] bg-[#1D1D1B]/40 hover:border-white/15'
+          ? 'border-brand/40 bg-brand/[0.07]'
+          : 'border-subtle bg-surface/40 hover:border-strong'
       }`}
     >
-      <div className={`font-display text-lg font-semibold mb-1 ${active ? 'text-[#95C11F]' : 'text-white/70'}`}>
+      <div className={`font-display text-lg font-semibold mb-1 ${active ? 'text-brand' : 'text-secondary'}`}>
         {title}
       </div>
-      <div className="text-white/35 text-[12px] leading-relaxed">{subtitle}</div>
+      <div className="text-mono text-[12px] leading-relaxed">{subtitle}</div>
     </button>
   )
 }
@@ -199,39 +200,26 @@ export default function CalculadoraEscorrentia() {
 
       <div className="max-w-7xl mx-auto relative">
         <div ref={ref} className="mb-16 max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
-              Herramientas Técnicas · 06
-            </span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 36 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-[clamp(2.8rem,6vw,4.8rem)] font-semibold leading-tight mb-6"
-          >
-            <em className="text-[#95C11F] not-italic">Guarda</em> o{' '}
-            <em className="text-[#95C11F] not-italic">evacúa</em> el agua
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-white/45 leading-relaxed"
-          >
-            Una misma fórmula — lámina de lluvia × área × fracción que escurre —
-            responde dos preguntas distintas: cuánta agua llega en el año para
-            guardarla (dimensiona reservorios) y con qué caudal pico llega un
-            aguacero para evacuarla sin daño (dimensiona vertederos y canales).
-          </motion.p>
+          <SectionHeader
+            inView={inView}
+            className=""
+            eyebrow="Herramientas Técnicas"
+            number="06"
+            title={
+              <>
+                <Accent>Guarda</Accent> o{' '}
+                <Accent>evacúa</Accent> el agua
+              </>
+            }
+            subtitle={
+              <>
+                Una misma fórmula — lámina de lluvia × área × fracción que escurre —
+                responde dos preguntas distintas: cuánta agua llega en el año para
+                guardarla (dimensiona reservorios) y con qué caudal pico llega un
+                aguacero para evacuarla sin daño (dimensiona vertederos y canales).
+              </>
+            }
+          />
         </div>
 
         <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
@@ -262,7 +250,7 @@ export default function CalculadoraEscorrentia() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.14, ease: [0.22, 1, 0.36, 1] }}
-              className="p-6 lg:p-7 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-6 lg:p-7 rounded-2xl border border-subtle bg-surface-raised"
             >
               <div className="max-w-xs">
                 <Field id={`${uid}-area`} label="Área de la cuenca o superficie" hint="ha">
@@ -283,10 +271,10 @@ export default function CalculadoraEscorrentia() {
                 initial={{ opacity: 0, y: 40 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.85, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+                className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">01</span>
+                  <span className="font-mono text-[11px] text-brand/50 tracking-widest">01</span>
                   <h3 className="font-display text-xl font-semibold">Coeficiente anual (tabla 2.3 / 2.4)</h3>
                 </div>
 
@@ -295,8 +283,8 @@ export default function CalculadoraEscorrentia() {
                     onClick={() => setFuenteGuardar('cuenca')}
                     className={`px-4 py-2 rounded-full text-[12px] border transition-colors ${
                       fuenteGuardar === 'cuenca'
-                        ? 'border-[#95C11F]/40 bg-[#95C11F]/10 text-[#95C11F]'
-                        : 'border-white/10 text-white/40 hover:text-white/60'
+                        ? 'border-brand/40 bg-brand/10 text-brand'
+                        : 'border-strong text-mono hover:text-secondary'
                     }`}
                   >
                     Cuenca rural por suelo
@@ -305,8 +293,8 @@ export default function CalculadoraEscorrentia() {
                     onClick={() => setFuenteGuardar('superficie')}
                     className={`px-4 py-2 rounded-full text-[12px] border transition-colors ${
                       fuenteGuardar === 'superficie'
-                        ? 'border-[#95C11F]/40 bg-[#95C11F]/10 text-[#95C11F]'
-                        : 'border-white/10 text-white/40 hover:text-white/60'
+                        ? 'border-brand/40 bg-brand/10 text-brand'
+                        : 'border-strong text-mono hover:text-secondary'
                     }`}
                   >
                     Superficie específica
@@ -413,11 +401,11 @@ export default function CalculadoraEscorrentia() {
                       step={0.1}
                       value={cGuardarPct}
                       onChange={(e) => setCGuardarPct(Number(e.target.value))}
-                      className="w-full accent-[#95C11F] mt-3.5"
+                      className="w-full accent-brand mt-3.5"
                     />
                   </Field>
                 ) : (
-                  <div className="p-4 rounded-xl border border-red-400/25 bg-red-400/10 text-red-400 text-[12px] leading-relaxed">
+                  <div className="p-4 rounded-xl border border-signal-deficit/25 bg-signal-deficit/10 text-signal-deficit text-[12px] leading-relaxed">
                     La tabla 2.3 no define esta combinación de lluvia/evaporación y textura — elige otra textura de suelo.
                   </div>
                 )}
@@ -428,10 +416,10 @@ export default function CalculadoraEscorrentia() {
                   initial={{ opacity: 0, y: 40 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.85, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-                  className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+                  className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
                 >
                   <div className="flex items-center gap-3 mb-6">
-                    <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">01</span>
+                    <span className="font-mono text-[11px] text-brand/50 tracking-widest">01</span>
                     <h3 className="font-display text-xl font-semibold">Coeficiente de aguacero (método racional)</h3>
                   </div>
                   <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
@@ -492,13 +480,13 @@ export default function CalculadoraEscorrentia() {
                       </select>
                     </Field>
                   </div>
-                  <div className="flex items-center gap-2 text-[12px] text-white/30 flex-wrap">
+                  <div className="flex items-center gap-2 text-[12px] text-mono flex-wrap">
                     <span>
-                      C base: <span className="font-mono text-white/60">{nf2.format(cBase)}</span>
+                      C base: <span className="font-mono text-secondary">{nf2.format(cBase)}</span>
                     </span>
-                    <span className="text-white/20">·</span>
+                    <span className="text-faint">·</span>
                     <span>
-                      C ajustado (× Cf): <span className="font-mono text-[#95C11F]">{nf2.format(cAjustado)}</span>
+                      C ajustado (× Cf): <span className="font-mono text-brand">{nf2.format(cAjustado)}</span>
                     </span>
                   </div>
                 </motion.div>
@@ -507,10 +495,10 @@ export default function CalculadoraEscorrentia() {
                   initial={{ opacity: 0, y: 40 }}
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ duration: 0.85, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-                  className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+                  className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
                 >
                   <div className="flex items-center gap-3 mb-6">
-                    <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">02</span>
+                    <span className="font-mono text-[11px] text-brand/50 tracking-widest">02</span>
                     <h3 className="font-display text-xl font-semibold">Tiempo de concentración e intensidad</h3>
                   </div>
 
@@ -538,16 +526,16 @@ export default function CalculadoraEscorrentia() {
                   </div>
 
                   <div className="mb-5 flex items-center gap-3 flex-wrap text-[12px]">
-                    <span className="text-white/40">
+                    <span className="text-mono">
                       tc por Kirpich:{' '}
-                      <span className="font-mono text-white/70">{nf1.format(tcCalculado)} min</span>
+                      <span className="font-mono text-secondary">{nf1.format(tcCalculado)} min</span>
                     </span>
-                    <label className="flex items-center gap-2 text-white/40">
+                    <label className="flex items-center gap-2 text-mono">
                       <input
                         type="checkbox"
                         checked={tcManual !== null}
                         onChange={(e) => setTcManual(e.target.checked ? tcCalculado : null)}
-                        className="w-3.5 h-3.5 rounded accent-[#95C11F]"
+                        className="w-3.5 h-3.5 rounded accent-brand"
                       />
                       Ajustar tc manualmente
                     </label>
@@ -557,7 +545,7 @@ export default function CalculadoraEscorrentia() {
                         min={1}
                         value={tcManual}
                         onChange={(e) => setTcManual(Number(e.target.value) || 1)}
-                        className="w-24 px-2.5 py-1.5 rounded-lg bg-[#1D1D1B] border border-white/[0.08] text-white text-[12px]"
+                        className="w-24 px-2.5 py-1.5 rounded-lg bg-surface border border-subtle text-primary text-[12px]"
                       />
                     )}
                   </div>
@@ -589,13 +577,13 @@ export default function CalculadoraEscorrentia() {
                     </Field>
                   </div>
 
-                  <div className="mt-5 flex items-center gap-2 text-[12px] text-white/30 flex-wrap">
+                  <div className="mt-5 flex items-center gap-2 text-[12px] text-mono flex-wrap">
                     <span>
-                      Intensidad i: <span className="font-mono text-white/60">{nf1.format(intensidadMmH)} mm/h</span>
+                      Intensidad i: <span className="font-mono text-secondary">{nf1.format(intensidadMmH)} mm/h</span>
                     </span>
-                    <span className="text-white/20">·</span>
+                    <span className="text-faint">·</span>
                     <span>
-                      Lluvia del aguacero: <span className="font-mono text-white/60">{nf1.format(precipAguaceroMm)} mm</span>
+                      Lluvia del aguacero: <span className="font-mono text-secondary">{nf1.format(precipAguaceroMm)} mm</span>
                     </span>
                   </div>
                 </motion.div>
@@ -608,21 +596,21 @@ export default function CalculadoraEscorrentia() {
             initial={{ opacity: 0, y: 40 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-[#95C11F]/20 bg-[#2C2C2A]"
+            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-brand/20 bg-surface-raised"
           >
-            <div className="font-mono text-[10px] text-[#95C11F]/50 tracking-widest uppercase mb-6">
+            <div className="font-mono text-[10px] text-brand/50 tracking-widest uppercase mb-6">
               {modo === 'guardar' ? 'Modo guardar · resumen' : 'Modo evacuar · resumen'}
             </div>
 
             {modo === 'guardar' ? (
               <>
                 <div className="flex items-end gap-2 mb-1">
-                  <span className="font-display text-4xl font-semibold text-[#95C11F]">
+                  <span className="font-display text-4xl font-semibold text-brand">
                     {nf0.format(volumenGuardarM3)}
                   </span>
-                  <span className="text-white/30 text-sm mb-1">m³/año</span>
+                  <span className="text-mono text-sm mb-1">m³/año</span>
                 </div>
-                <p className="text-white/30 text-[12px] mb-6">Volumen que escurre de la cuenca en un año promedio.</p>
+                <p className="text-mono text-[12px] mb-6">Volumen que escurre de la cuenca en un año promedio.</p>
 
                 <div className="space-y-4 mb-2">
                   {[
@@ -630,9 +618,9 @@ export default function CalculadoraEscorrentia() {
                     { label: 'Caudal medio', value: `${nf1.format(caudalMedioLs)} L/s` },
                     { label: 'Coeficiente C usado', value: `${nf1.format(cGuardar * 100)} %` },
                   ].map((row) => (
-                    <div key={row.label} className="flex items-baseline justify-between border-b border-white/[0.06] pb-3">
-                      <span className="text-white/40 text-sm">{row.label}</span>
-                      <span className="font-mono text-white font-medium">{row.value}</span>
+                    <div key={row.label} className="flex items-baseline justify-between border-b border-subtle pb-3">
+                      <span className="text-mono text-sm">{row.label}</span>
+                      <span className="font-mono text-primary font-medium">{row.value}</span>
                     </div>
                   ))}
                 </div>
@@ -640,12 +628,12 @@ export default function CalculadoraEscorrentia() {
             ) : (
               <>
                 <div className="flex items-end gap-2 mb-1">
-                  <span className="font-display text-4xl font-semibold text-[#95C11F]">
+                  <span className="font-display text-4xl font-semibold text-brand">
                     {nf2.format(caudalPicoM3s)}
                   </span>
-                  <span className="text-white/30 text-sm mb-1">m³/s pico</span>
+                  <span className="text-mono text-sm mb-1">m³/s pico</span>
                 </div>
-                <p className="text-white/30 text-[12px] mb-6">
+                <p className="text-mono text-[12px] mb-6">
                   Caudal pico del aguacero de diseño (T = {RETORNO_T_LABEL[retorno]}) para dimensionar la obra de salida.
                 </p>
 
@@ -656,9 +644,9 @@ export default function CalculadoraEscorrentia() {
                     { label: 'Tiempo de concentración', value: `${nf1.format(tcMin)} min` },
                     { label: 'Intensidad de diseño', value: `${nf1.format(intensidadMmH)} mm/h` },
                   ].map((row) => (
-                    <div key={row.label} className="flex items-baseline justify-between border-b border-white/[0.06] pb-3">
-                      <span className="text-white/40 text-sm">{row.label}</span>
-                      <span className="font-mono text-white font-medium">{row.value}</span>
+                    <div key={row.label} className="flex items-baseline justify-between border-b border-subtle pb-3">
+                      <span className="text-mono text-sm">{row.label}</span>
+                      <span className="font-mono text-primary font-medium">{row.value}</span>
                     </div>
                   ))}
                 </div>
@@ -669,12 +657,12 @@ export default function CalculadoraEscorrentia() {
               href={`https://wa.me/573113650567?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)] hover:scale-[1.02]"
+              className="mt-6 flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-brand text-surface rounded-full font-semibold text-sm hover:bg-brand-hover transition-all duration-200 hover:shadow-glow-lg hover:scale-[1.02]"
             >
               {modo === 'guardar' ? 'Dimensionar mi reservorio' : 'Diseñar mi vertedero o canal'}
             </a>
 
-            <p className="mt-5 text-white/25 text-[11px] leading-relaxed text-center">
+            <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Estimación orientativa — en obras con riesgo aguas abajo (viviendas, vías o personas), el diseño final lo
               firma un profesional con la norma vigente.
             </p>

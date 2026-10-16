@@ -2,6 +2,8 @@
 
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { palette } from '@/lib/theme'
+import { Accent, Eyebrow } from '@/components/ui/SectionHeader'
 
 const units = [
   {
@@ -52,11 +54,9 @@ export default function CourseDetails() {
           transition={{ duration: 0.7 }}
           className="max-w-3xl mb-16 lg:mb-20"
         >
-          <div className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium mb-4">
-            Para quién es
-          </div>
-          <p className="text-white/65 text-xl lg:text-2xl leading-snug">
-            Prioridad para <span className="text-white">agrónomos y dueños de tierra</span>, abierto a cualquier
+          <Eyebrow className="mb-4">Para quién es</Eyebrow>
+          <p className="text-secondary text-xl lg:text-2xl leading-snug">
+            Prioridad para <span className="text-primary">agrónomos y dueños de tierra</span>, abierto a cualquier
             interesado. Sin requisitos previos de topografía ni SIG — pero sí computador, QGIS no corre en celular.
           </p>
         </motion.div>
@@ -67,12 +67,9 @@ export default function CourseDetails() {
             initial={{ opacity: 0, y: 16 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, delay: 0.1 }}
-            className="flex items-center gap-3 mb-10"
+            className="mb-10"
           >
-            <div className="w-7 h-px bg-[#95C11F]/70" />
-            <span className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium">
-              Las cuatro unidades
-            </span>
+            <Eyebrow>Las cuatro unidades</Eyebrow>
           </motion.div>
 
           <div className="grid md:grid-cols-2 gap-5">
@@ -82,28 +79,28 @@ export default function CourseDetails() {
                 initial={{ opacity: 0, y: 32 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ duration: 0.8, delay: 0.15 + i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                className="rounded-2xl border border-white/[0.07] bg-[#2C2C2A] p-8 lg:p-9 flex flex-col"
+                className="rounded-2xl border border-subtle bg-surface-raised p-8 lg:p-9 flex flex-col"
               >
                 <div className="flex items-baseline justify-between mb-5">
-                  <span className="font-display text-3xl font-bold text-[#95C11F]/40">{unit.number}</span>
-                  <span className="font-mono text-[10px] text-white/30 tracking-widest uppercase">
+                  <span className="font-display text-3xl font-bold text-brand/40">{unit.number}</span>
+                  <span className="font-mono text-[10px] text-mono tracking-widest uppercase">
                     {unit.weeks}
                   </span>
                 </div>
-                <h3 className="font-display text-2xl lg:text-[1.7rem] font-semibold text-white mb-4">{unit.title}</h3>
-                <p className="text-white/60 text-base leading-relaxed mb-6 flex-1">{unit.description}</p>
-                <div className="flex items-start gap-2.5 pt-5 border-t border-white/[0.06]">
+                <h3 className="font-display text-2xl lg:text-[1.7rem] font-semibold text-primary mb-4">{unit.title}</h3>
+                <p className="text-secondary text-base leading-relaxed mb-6 flex-1">{unit.description}</p>
+                <div className="flex items-start gap-2.5 pt-5 border-t border-subtle">
                   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0 mt-0.5">
                     <path
                       d="M2 8.5l3.5 3.5L14 3"
-                      stroke="#95C11F"
+                      stroke={palette.brand.DEFAULT}
                       strokeWidth="1.5"
                       strokeLinecap="round"
                       strokeLinejoin="round"
                     />
                   </svg>
-                  <span className="text-white/80 text-sm leading-relaxed">
-                    <span className="text-white/40 uppercase tracking-wide">Entregable — </span>
+                  <span className="text-primary text-sm leading-relaxed">
+                    <span className="text-mono uppercase tracking-wide">Entregable — </span>
                     {unit.deliverable}
                   </span>
                 </div>
@@ -118,34 +115,30 @@ export default function CourseDetails() {
             initial={{ opacity: 0, y: 32 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-2xl border border-[#95C11F]/20 bg-[#2C2C2A] p-9 lg:p-10"
+            className="rounded-2xl border border-brand/20 bg-surface-raised p-9 lg:p-10"
           >
-            <div className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium mb-4">
-              La promesa central
-            </div>
-            <p className="font-display text-xl lg:text-2xl leading-snug text-white">
+            <Eyebrow className="mb-4">La promesa central</Eyebrow>
+            <p className="font-display text-xl lg:text-2xl leading-snug text-primary">
               Cada participante trabaja las 8 semanas sobre su propio predio y sale con{' '}
-              <em className="text-[#95C11F] not-italic">plano, presupuesto y video de replanteo</em> — no con
+              <Accent>plano, presupuesto y video de replanteo</Accent> — no con
               apuntes.
             </p>
-            <p className="text-white/40 text-sm mt-4">Quien no tenga predio recibe un caso de estudio completo.</p>
+            <p className="text-mono text-sm mt-4">Quien no tenga predio recibe un caso de estudio completo.</p>
           </motion.div>
 
           <motion.div
             initial={{ opacity: 0, y: 32 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.8, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="rounded-2xl border border-white/[0.07] bg-[#2C2C2A] p-9 lg:p-10"
+            className="rounded-2xl border border-subtle bg-surface-raised p-9 lg:p-10"
           >
-            <div className="text-[#95C11F] text-[10px] tracking-[0.32em] uppercase font-medium mb-4">
-              Lo que lo diferencia
-            </div>
-            <p className="font-display text-xl lg:text-2xl leading-snug text-white">
+            <Eyebrow className="mb-4">Lo que lo diferencia</Eyebrow>
+            <p className="font-display text-xl lg:text-2xl leading-snug text-primary">
               El único curso en español que combina{' '}
-              <em className="text-[#95C11F] not-italic">en vivo, software libre y el diseño de tu propia tierra</em>{' '}
+              <Accent>en vivo, software libre y el diseño de tu propia tierra</Accent>{' '}
               como entregable.
             </p>
-            <p className="text-white/40 text-sm mt-4">
+            <p className="text-mono text-sm mt-4">
               La competencia es presencial y fuera de Colombia, o grabada y conceptual.
             </p>
           </motion.div>
@@ -158,15 +151,15 @@ export default function CourseDetails() {
           transition={{ duration: 0.7, delay: 0.35 }}
           className="grid sm:grid-cols-2 gap-5"
         >
-          <div className="rounded-2xl border border-white/[0.07] p-8">
-            <div className="text-white/30 text-[10px] tracking-[0.28em] uppercase mb-3">Fechas</div>
-            <p className="text-white/60 text-sm leading-relaxed">
+          <div className="rounded-2xl border border-subtle p-8">
+            <div className="text-mono text-[10px] tracking-[0.28em] uppercase mb-3">Fechas</div>
+            <p className="text-secondary text-sm leading-relaxed">
               Inicia miércoles 23 de septiembre, cierra sábado 14 de noviembre de 2026.
             </p>
           </div>
-          <div className="rounded-2xl border border-white/[0.07] p-8">
-            <div className="text-white/30 text-[10px] tracking-[0.28em] uppercase mb-3">Certificación</div>
-            <p className="text-white/60 text-sm leading-relaxed">
+          <div className="rounded-2xl border border-subtle p-8">
+            <div className="text-mono text-[10px] tracking-[0.28em] uppercase mb-3">Certificación</div>
+            <p className="text-secondary text-sm leading-relaxed">
               60 horas. Asistencia al 80% de las sesiones; aprobación con los cuatro entregables más el proyecto
               final.
             </p>

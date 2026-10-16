@@ -4,6 +4,7 @@ import { useId, useMemo, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { jsPDF } from 'jspdf'
 import autoTable from 'jspdf-autotable'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 interface AnimalType {
   id: string
@@ -40,8 +41,8 @@ const nf = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 1 })
 const cop = new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 })
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl bg-[#1D1D1B] border border-white/[0.08] text-white placeholder-white/20 text-sm ' +
-  'focus:outline-none focus:border-[#95C11F]/50 focus:ring-2 focus:ring-[#95C11F]/20 transition-all ' +
+  'w-full px-4 py-3 rounded-xl bg-surface border border-subtle text-primary placeholder:text-mono text-sm ' +
+  'focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/20 transition-all ' +
   'disabled:opacity-40 disabled:cursor-not-allowed'
 
 function Field({
@@ -58,10 +59,10 @@ function Field({
   return (
     <div>
       <div className="flex items-baseline justify-between mb-2">
-        <label htmlFor={id} className="text-white/60 text-sm">
+        <label htmlFor={id} className="text-secondary text-sm">
           {label}
         </label>
-        {hint && <span className="font-mono text-[10px] text-white/25 tracking-wide">{hint}</span>}
+        {hint && <span className="font-mono text-[10px] text-mono tracking-wide">{hint}</span>}
       </div>
       {children}
     </div>
@@ -293,38 +294,24 @@ export default function Herramientas() {
       <div className="max-w-7xl mx-auto relative">
         {/* Header */}
         <div ref={ref} className="mb-16 max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
-              Herramientas Técnicas
-            </span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 36 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-[clamp(2.8rem,6vw,4.8rem)] font-semibold leading-tight mb-6"
-          >
-            Estima tu{' '}
-            <em className="text-[#95C11F] not-italic">reserva de agua</em>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-white/45 leading-relaxed"
-          >
-            Calcula cuánta agua necesita tu hato y cuánta tierra hay que mover para
-            almacenarla. Ajusta los valores según tu finca, descarga la cotización o
-            escríbenos directamente por WhatsApp.
-          </motion.p>
+          <SectionHeader
+            inView={inView}
+            className=""
+            eyebrow="Herramientas Técnicas"
+            title={
+              <>
+                Estima tu{' '}
+                <Accent>reserva de agua</Accent>
+              </>
+            }
+            subtitle={
+              <>
+                Calcula cuánta agua necesita tu hato y cuánta tierra hay que mover para
+                almacenarla. Ajusta los valores según tu finca, descarga la cotización o
+                escríbenos directamente por WhatsApp.
+              </>
+            }
+          />
         </div>
 
         <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
@@ -335,7 +322,7 @@ export default function Herramientas() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-              className="p-6 lg:p-7 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-6 lg:p-7 rounded-2xl border border-subtle bg-surface-raised"
             >
               <Field id={`${uid}-project-name`} label="Nombre de la finca o cliente" hint="opcional · para tu cotización">
                 <input
@@ -354,10 +341,10 @@ export default function Herramientas() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.15, ease: [0.22, 1, 0.36, 1] }}
-              className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">01</span>
+                <span className="font-mono text-[11px] text-brand/50 tracking-widest">01</span>
                 <h3 className="font-display text-xl font-semibold">Demanda hídrica</h3>
               </div>
 
@@ -365,13 +352,13 @@ export default function Herramientas() {
                 {groups.map((group, idx) => (
                   <div
                     key={group.id}
-                    className="relative p-5 rounded-xl bg-[#1D1D1B]/60 border border-white/[0.06]"
+                    className="relative p-5 rounded-xl bg-surface/60 border border-subtle"
                   >
                     {groups.length > 1 && (
                       <button
                         onClick={() => removeGroup(group.id)}
                         aria-label={`Quitar grupo de animales ${idx + 1}`}
-                        className="absolute top-3.5 right-3.5 p-1.5 rounded-lg text-white/25 hover:text-red-400 hover:bg-red-400/10 transition-colors"
+                        className="absolute top-3.5 right-3.5 p-1.5 rounded-lg text-mono hover:text-signal-deficit hover:bg-signal-deficit/10 transition-colors"
                       >
                         <TrashIcon />
                       </button>
@@ -425,16 +412,16 @@ export default function Herramientas() {
 
               <button
                 onClick={addGroup}
-                className="w-full mb-5 py-3 rounded-xl border border-dashed border-white/15 text-white/40 text-sm hover:text-[#95C11F] hover:border-[#95C11F]/40 transition-colors"
+                className="w-full mb-5 py-3 rounded-xl border border-dashed border-strong text-mono text-sm hover:text-brand hover:border-brand/40 transition-colors"
               >
                 + Agregar grupo de animales
               </button>
 
               <div className="flex items-baseline justify-between mb-5 px-1 text-[12px]">
-                <span className="text-white/30">
+                <span className="text-mono">
                   {nf.format(totalAnimals)} animales en total
                 </span>
-                <span className="font-mono text-white/40">{nf.format(totalDailyLiters)} L/día</span>
+                <span className="font-mono text-mono">{nf.format(totalDailyLiters)} L/día</span>
               </div>
 
               <div className="max-w-xs">
@@ -456,10 +443,10 @@ export default function Herramientas() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-              className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">02</span>
+                <span className="font-mono text-[11px] text-brand/50 tracking-widest">02</span>
                 <h3 className="font-display text-xl font-semibold">Movimiento de tierra</h3>
               </div>
 
@@ -469,9 +456,9 @@ export default function Herramientas() {
                   type="checkbox"
                   checked={syncWithCalc1}
                   onChange={(e) => setSyncWithCalc1(e.target.checked)}
-                  className="w-4 h-4 rounded accent-[#95C11F]"
+                  className="w-4 h-4 rounded accent-brand"
                 />
-                <label htmlFor={`${uid}-sync-calc`} className="text-white/50 text-sm">
+                <label htmlFor={`${uid}-sync-calc`} className="text-secondary text-sm">
                   Usar el resultado de la calculadora de demanda hídrica
                 </label>
               </div>
@@ -502,7 +489,7 @@ export default function Herramientas() {
                     step={0.01}
                     value={shrinkFactor}
                     onChange={(e) => setShrinkFactor(Number(e.target.value))}
-                    className="w-full accent-[#95C11F] mt-3.5"
+                    className="w-full accent-brand mt-3.5"
                   />
                 </Field>
 
@@ -559,9 +546,9 @@ export default function Herramientas() {
             initial={{ opacity: 0, y: 40 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-[#95C11F]/20 bg-[#2C2C2A]"
+            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-brand/20 bg-surface-raised"
           >
-            <div className="font-mono text-[10px] text-[#95C11F]/50 tracking-widest uppercase mb-6">
+            <div className="font-mono text-[10px] text-brand/50 tracking-widest uppercase mb-6">
               Resumen en vivo
             </div>
 
@@ -573,17 +560,17 @@ export default function Herramientas() {
               ].map((row) => (
                 <div
                   key={row.label}
-                  className="flex items-baseline justify-between border-b border-white/[0.06] pb-3"
+                  className="flex items-baseline justify-between border-b border-subtle pb-3"
                 >
-                  <span className="text-white/40 text-sm">{row.label}</span>
-                  <span className="font-mono text-lg text-white font-medium">{row.value}</span>
+                  <span className="text-mono text-sm">{row.label}</span>
+                  <span className="font-mono text-lg text-primary font-medium">{row.value}</span>
                 </div>
               ))}
             </div>
 
             {/* Presupuesto itemizado */}
-            <div className="mb-6 p-4 rounded-xl bg-[#1D1D1B]/60 border border-white/[0.06] space-y-2.5">
-              <div className="font-mono text-[9px] text-white/30 tracking-widest uppercase mb-1">
+            <div className="mb-6 p-4 rounded-xl bg-surface/60 border border-subtle space-y-2.5">
+              <div className="font-mono text-[9px] text-mono tracking-widest uppercase mb-1">
                 Presupuesto itemizado
               </div>
               {[
@@ -594,13 +581,13 @@ export default function Herramientas() {
                   : []),
               ].map((row) => (
                 <div key={row.label} className="flex items-baseline justify-between text-[13px]">
-                  <span className="text-white/40">{row.label}</span>
-                  <span className="font-mono text-white/70">{row.value}</span>
+                  <span className="text-mono">{row.label}</span>
+                  <span className="font-mono text-secondary">{row.value}</span>
                 </div>
               ))}
-              <div className="pt-2.5 mt-1 border-t border-white/[0.08] flex items-baseline justify-between">
-                <span className="text-white/50 text-sm font-medium">Total estimado</span>
-                <span className="font-display text-2xl font-semibold text-[#95C11F]">
+              <div className="pt-2.5 mt-1 border-t border-subtle flex items-baseline justify-between">
+                <span className="text-secondary text-sm font-medium">Total estimado</span>
+                <span className="font-display text-2xl font-semibold text-brand">
                   {cop.format(totalBudget)}
                 </span>
               </div>
@@ -609,7 +596,7 @@ export default function Herramientas() {
             <div className="space-y-3">
               <button
                 onClick={handleDownloadPdf}
-                className="flex items-center justify-center gap-2.5 w-full px-6 py-3.5 rounded-full border border-white/15 text-white/75 text-sm font-medium hover:border-[#95C11F]/40 hover:text-[#95C11F] transition-all duration-200"
+                className="flex items-center justify-center gap-2.5 w-full px-6 py-3.5 rounded-full border border-strong text-secondary text-sm font-medium hover:border-brand/40 hover:text-brand transition-all duration-200"
               >
                 Descargar cotización (PDF)
                 <DownloadIcon />
@@ -619,14 +606,14 @@ export default function Herramientas() {
                 href={`https://wa.me/573113650567?text=${waMessage}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)] hover:scale-[1.02]"
+                className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-brand text-surface rounded-full font-semibold text-sm hover:bg-brand-hover transition-all duration-200 hover:shadow-glow-lg hover:scale-[1.02]"
               >
                 Solicitar cotización real
                 <WhatsAppIcon />
               </a>
             </div>
 
-            <p className="mt-5 text-white/25 text-[11px] leading-relaxed text-center">
+            <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Estimación preliminar — no reemplaza un diseño técnico Keyline.
             </p>
           </motion.div>

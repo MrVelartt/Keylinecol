@@ -2,6 +2,8 @@
 
 import { useRef, useState, useEffect } from 'react'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { palette, alpha } from '@/lib/theme'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 interface Project {
   id: string
@@ -294,37 +296,37 @@ const projects: Project[] = [
 ]
 
 const statusConfig = {
-  'Completado':   { color: 'text-[#95C11F]', bg: 'bg-[#95C11F]/10', border: 'border-[#95C11F]/25', dot: 'bg-[#95C11F]' },
-  'En progreso':  { color: 'text-sky-400',   bg: 'bg-sky-400/10',   border: 'border-sky-400/25',   dot: 'bg-sky-400 animate-pulse' },
-  'Planificación':{ color: 'text-amber-400', bg: 'bg-amber-400/10', border: 'border-amber-400/25', dot: 'bg-amber-400' },
+  'Completado':   { color: 'text-brand', bg: 'bg-brand/10', border: 'border-brand/25', dot: 'bg-brand' },
+  'En progreso':  { color: 'text-signal-demand', bg: 'bg-signal-demand/10', border: 'border-signal-demand/25', dot: 'bg-signal-demand animate-pulse' },
+  'Planificación':{ color: 'text-mono', bg: 'bg-veil', border: 'border-strong', dot: 'bg-ink-mono' },
 }
 
 function TerrainSVG({ project }: { project: Project }) {
   return (
     <svg viewBox="0 0 310 165" className="w-full h-full" preserveAspectRatio="xMidYMid slice">
-      <rect width="310" height="165" fill="#080e08" />
+      <rect width="310" height="165" fill={palette.landscape.night} />
       <pattern id={`g-${project.id}`} width="30" height="30" patternUnits="userSpaceOnUse">
-        <path d="M 30 0 L 0 0 0 30" fill="none" stroke="rgba(149,193,31,0.04)" strokeWidth="0.5" />
+        <path d="M 30 0 L 0 0 0 30" fill="none" stroke={alpha(palette.brand.DEFAULT, 0.04)} strokeWidth="0.5" />
       </pattern>
       <rect width="310" height="165" fill={`url(#g-${project.id})`} />
-      <path d={project.terrain} fill="#0e1e0e" />
+      <path d={project.terrain} fill={palette.landscape.far} />
       {project.contours.map((d, i) => (
-        <path key={i} d={d} fill="none" stroke="#95C11F" strokeWidth="0.6" strokeDasharray="3 7" opacity={0.35 - i * 0.08} />
+        <path key={i} d={d} fill="none" stroke={palette.brand.DEFAULT} strokeWidth="0.6" strokeDasharray="3 7" opacity={0.35 - i * 0.08} />
       ))}
-      <line x1="0" y1={project.keypointY + 8} x2="310" y2={project.keypointY + 8} stroke="#95C11F" strokeWidth="0.4" opacity="0.2" strokeDasharray="1 4" />
-      <circle cx={project.keypointX} cy={project.keypointY} r="10" fill="rgba(149,193,31,0.08)" />
-      <circle cx={project.keypointX} cy={project.keypointY} r="3.5" fill="#95C11F" opacity="0.9" />
-      <circle cx={project.keypointX} cy={project.keypointY} r="1.5" fill="#1D1D1B" />
-      <circle cx={project.keypointX} cy={project.keypointY} r="0.7" fill="#95C11F" />
+      <line x1="0" y1={project.keypointY + 8} x2="310" y2={project.keypointY + 8} stroke={palette.brand.DEFAULT} strokeWidth="0.4" opacity="0.2" strokeDasharray="1 4" />
+      <circle cx={project.keypointX} cy={project.keypointY} r="10" fill={alpha(palette.brand.DEFAULT, 0.08)} />
+      <circle cx={project.keypointX} cy={project.keypointY} r="3.5" fill={palette.brand.DEFAULT} opacity="0.9" />
+      <circle cx={project.keypointX} cy={project.keypointY} r="1.5" fill={palette.surface.DEFAULT} />
+      <circle cx={project.keypointX} cy={project.keypointY} r="0.7" fill={palette.brand.DEFAULT} />
       <defs>
         <linearGradient id={`fade-${project.id}`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="60%" stopColor="#080e08" stopOpacity="0" />
-          <stop offset="100%" stopColor="#080e08" stopOpacity="1" />
+          <stop offset="60%" stopColor={palette.landscape.night} stopOpacity="0" />
+          <stop offset="100%" stopColor={palette.landscape.night} stopOpacity="1" />
         </linearGradient>
       </defs>
       <rect width="310" height="165" fill={`url(#fade-${project.id})`} />
-      <text x="8" y="14" fill="rgba(149,193,31,0.45)" fontSize="7.5" fontFamily="monospace" letterSpacing="0.08em">{project.elv}</text>
-      <text x="8" y="24" fill="rgba(149,193,31,0.25)" fontSize="6.5" fontFamily="monospace" letterSpacing="0.06em">{project.id}</text>
+      <text x="8" y="14" fill={alpha(palette.brand.DEFAULT, 0.45)} fontSize="7.5" fontFamily="monospace" letterSpacing="0.08em">{project.elv}</text>
+      <text x="8" y="24" fill={alpha(palette.brand.DEFAULT, 0.25)} fontSize="6.5" fontFamily="monospace" letterSpacing="0.06em">{project.id}</text>
     </svg>
   )
 }
@@ -365,20 +367,20 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
       className="fixed inset-0 z-50 flex items-center justify-center p-4 lg:p-8"
       onClick={onClose}
     >
-      <div className="absolute inset-0 bg-[#080e08]/90 backdrop-blur-2xl" />
+      <div className="absolute inset-0 bg-landscape-night/90 backdrop-blur-2xl" />
 
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 24 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 20 }}
         transition={{ duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-        className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl bg-[#1D1D1B] border border-white/[0.08] shadow-2xl"
+        className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-2xl bg-surface border border-subtle shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
         {/* Close */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/50 hover:text-white hover:bg-black/70 transition-all"
+          className="absolute top-4 right-4 z-20 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-secondary hover:text-primary hover:bg-black/70 transition-all"
           aria-label="Cerrar"
         >
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -388,9 +390,9 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
 
         <div className="grid lg:grid-cols-[1fr_360px]">
           {/* ── Image panel ── */}
-          <div className="flex flex-col gap-2 p-3 bg-[#0c0f0c] min-h-[320px]">
+          <div className="flex flex-col gap-2 p-3 bg-landscape-night min-h-[320px]">
             {/* Main image */}
-            <div className="relative flex-1 min-h-[260px] overflow-hidden rounded-xl bg-[#141814]">
+            <div className="relative flex-1 min-h-[260px] overflow-hidden rounded-xl bg-surface-sunken">
               {activeImage ? (
                 <>
                   <img
@@ -415,7 +417,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
                   <button
                     onClick={() => setActiveIdx(i => Math.max(i - 1, 0))}
                     disabled={safeIdx === 0}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white disabled:opacity-20 transition-all"
+                    className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-secondary hover:text-primary disabled:opacity-20 transition-all"
                   >
                     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
                       <path d="M8 2L4 6.5L8 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -424,7 +426,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
                   <button
                     onClick={() => setActiveIdx(i => Math.min(i + 1, displayImages.length - 1))}
                     disabled={safeIdx === displayImages.length - 1}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white/70 hover:text-white disabled:opacity-20 transition-all"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-secondary hover:text-primary disabled:opacity-20 transition-all"
                   >
                     <svg width="13" height="13" viewBox="0 0 13 13" fill="none">
                       <path d="M5 2L9 6.5L5 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -435,7 +437,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
 
               {/* Counter */}
               {displayImages.length > 1 && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm font-mono text-[10px] text-white/50">
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-black/50 backdrop-blur-sm font-mono text-[10px] text-secondary">
                   {safeIdx + 1} / {displayImages.length}
                 </div>
               )}
@@ -450,7 +452,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
                     onClick={() => setActiveIdx(i)}
                     className={`shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all duration-200 ${
                       i === safeIdx
-                        ? 'border-[#95C11F] opacity-100'
+                        ? 'border-brand opacity-100'
                         : 'border-transparent opacity-40 hover:opacity-70'
                     }`}
                   >
@@ -462,10 +464,10 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
           </div>
 
           {/* ── Info panel ── */}
-          <div className="p-8 flex flex-col gap-5 border-t lg:border-t-0 lg:border-l border-white/[0.06] overflow-y-auto">
+          <div className="p-8 flex flex-col gap-5 border-t lg:border-t-0 lg:border-l border-subtle overflow-y-auto">
             {/* ID + status */}
             <div className="flex items-center justify-between">
-              <span className="font-mono text-[10px] text-white/20 tracking-widest">{project.id}</span>
+              <span className="font-mono text-[10px] text-mono tracking-widest">{project.id}</span>
               <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full border text-[10px] tracking-wide font-medium ${cfg.color} ${cfg.bg} ${cfg.border}`}>
                 <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
                 {project.status}
@@ -475,44 +477,44 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
             {/* Name + location */}
             <div>
               <h2 className="font-display text-[1.7rem] font-semibold leading-tight mb-2">{project.name}</h2>
-              <div className="flex items-center gap-1.5 text-[12px] text-white/35">
+              <div className="flex items-center gap-1.5 text-[12px] text-mono">
                 <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-                  <path d="M5 1C2.79 1 1 2.79 1 5c0 3 4 7 4 7s4-4 4-7c0-2.21-1.79-4-4-4z" stroke="#95C11F" strokeWidth="0.8" fill="none" opacity="0.6" />
+                  <path d="M5 1C2.79 1 1 2.79 1 5c0 3 4 7 4 7s4-4 4-7c0-2.21-1.79-4-4-4z" stroke={palette.brand.DEFAULT} strokeWidth="0.8" fill="none" opacity="0.6" />
                 </svg>
                 {project.location}, {project.dept}
               </div>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 py-4 border-y border-white/[0.06]">
+            <div className="grid grid-cols-3 gap-3 py-4 border-y border-subtle">
               <div>
-                <div className="font-mono text-[9px] text-white/20 tracking-widest uppercase mb-1">Hectáreas</div>
-                <div className="font-mono text-[13px] text-[#95C11F] font-medium">
+                <div className="font-mono text-[9px] text-mono tracking-widest uppercase mb-1">Hectáreas</div>
+                <div className="font-mono text-[13px] text-brand font-medium">
                   {project.ha > 0 ? `${project.ha.toLocaleString('es-CO')} ha` : '—'}
                 </div>
               </div>
               <div>
-                <div className="font-mono text-[9px] text-white/20 tracking-widest uppercase mb-1">Elevación</div>
-                <div className="font-mono text-[13px] text-[#95C11F] font-medium">{project.elv}</div>
+                <div className="font-mono text-[9px] text-mono tracking-widest uppercase mb-1">Elevación</div>
+                <div className="font-mono text-[13px] text-brand font-medium">{project.elv}</div>
               </div>
               <div>
-                <div className="font-mono text-[9px] text-white/20 tracking-widest uppercase mb-1">Año</div>
-                <div className="font-mono text-[13px] text-[#95C11F] font-medium">{project.year}</div>
+                <div className="font-mono text-[9px] text-mono tracking-widest uppercase mb-1">Año</div>
+                <div className="font-mono text-[13px] text-brand font-medium">{project.year}</div>
               </div>
             </div>
 
-            <div className="font-mono text-[10px] text-[#95C11F]/30 tracking-wide">{project.coords}</div>
+            <div className="font-mono text-[10px] text-brand/30 tracking-wide">{project.coords}</div>
 
-            <div className="text-[11px] text-[#95C11F]/50 tracking-wide uppercase font-medium leading-relaxed">{project.type}</div>
+            <div className="text-[11px] text-brand/50 tracking-wide uppercase font-medium leading-relaxed">{project.type}</div>
 
-            <p className="text-white/45 text-sm leading-[1.85] flex-1">{project.description}</p>
+            <p className="text-secondary text-sm leading-[1.85] flex-1">{project.description}</p>
 
             {/* CTA */}
             <a
               href={`https://wa.me/573113650567?text=Hola%2C%20me%20interesa%20el%20proyecto%20${encodeURIComponent(project.name)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full px-5 py-3.5 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_24px_rgba(149,193,31,0.35)] mt-auto"
+              className="flex items-center justify-center gap-2 w-full px-5 py-3.5 bg-brand text-surface rounded-full font-semibold text-sm hover:bg-brand-hover transition-all duration-200 hover:shadow-glow mt-auto"
             >
               Consultar sobre este proyecto
               <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
@@ -540,7 +542,7 @@ function ProjectCard({ project, index, onSelect }: { project: Project; index: nu
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.85, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
       onClick={onSelect}
-      className="group relative flex flex-col border border-white/[0.07] rounded-2xl overflow-hidden bg-[#2C2C2A] hover:border-[#95C11F]/30 transition-all duration-500 hover:bg-[#333331] cursor-pointer"
+      className="group relative flex flex-col border border-subtle rounded-2xl overflow-hidden bg-surface-raised hover:border-brand/30 transition-all duration-500 hover:bg-surface-hover cursor-pointer"
     >
       {/* Visual */}
       <div className="relative h-44 overflow-hidden">
@@ -552,7 +554,7 @@ function ProjectCard({ project, index, onSelect }: { project: Project; index: nu
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
               onError={() => setImgError(true)}
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-[#2C2C2A] via-[#2C2C2A]/10 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-surface-raised via-surface-raised/10 to-transparent" />
           </>
         ) : (
           <TerrainSVG project={project} />
@@ -566,7 +568,7 @@ function ProjectCard({ project, index, onSelect }: { project: Project; index: nu
 
         {/* Photo count */}
         {project.images.length > 1 && (
-          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-white/50 text-[10px] font-mono">
+          <div className="absolute bottom-3 left-3 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/50 backdrop-blur-sm text-secondary text-[10px] font-mono">
             <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
               <rect x="1" y="2" width="8" height="6" rx="1" stroke="currentColor" strokeWidth="0.8" />
               <circle cx="5" cy="5" r="1.5" stroke="currentColor" strokeWidth="0.7" />
@@ -577,7 +579,7 @@ function ProjectCard({ project, index, onSelect }: { project: Project; index: nu
 
         {/* Hover hint */}
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <div className="px-4 py-2 rounded-full bg-[#95C11F]/90 backdrop-blur-sm text-[#1D1D1B] text-xs font-semibold tracking-wide">
+          <div className="px-4 py-2 rounded-full bg-brand/90 backdrop-blur-sm text-surface text-xs font-semibold tracking-wide">
             Ver proyecto
           </div>
         </div>
@@ -586,36 +588,36 @@ function ProjectCard({ project, index, onSelect }: { project: Project; index: nu
       {/* Content */}
       <div className="p-6 flex flex-col gap-4 flex-1">
         <div className="flex items-center justify-between">
-          <span className="font-mono text-[10px] text-white/20 tracking-widest">{project.id}</span>
-          <span className="font-mono text-[10px] text-[#95C11F]/35 tracking-wide">{project.coords}</span>
+          <span className="font-mono text-[10px] text-mono tracking-widest">{project.id}</span>
+          <span className="font-mono text-[10px] text-brand/35 tracking-wide">{project.coords}</span>
         </div>
 
         <div>
           <h3 className="font-display text-xl font-semibold leading-snug mb-1">{project.name}</h3>
-          <div className="flex items-center gap-1.5 text-[12px] text-white/35">
+          <div className="flex items-center gap-1.5 text-[12px] text-mono">
             <svg width="10" height="12" viewBox="0 0 10 12" fill="none">
-              <path d="M5 1C2.79 1 1 2.79 1 5c0 3 4 7 4 7s4-4 4-7c0-2.21-1.79-4-4-4z" stroke="#95C11F" strokeWidth="0.8" fill="none" opacity="0.6" />
+              <path d="M5 1C2.79 1 1 2.79 1 5c0 3 4 7 4 7s4-4 4-7c0-2.21-1.79-4-4-4z" stroke={palette.brand.DEFAULT} strokeWidth="0.8" fill="none" opacity="0.6" />
             </svg>
             {project.location}, {project.dept}
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-3 py-4 border-y border-white/[0.05]">
+        <div className="grid grid-cols-3 gap-3 py-4 border-y border-subtle">
           {[
             { label: 'Hectáreas', value: project.ha > 0 ? `${project.ha.toLocaleString('es-CO')} ha` : '—' },
             { label: 'Elevación', value: project.elv },
             { label: 'Año', value: String(project.year) },
           ].map(({ label, value }) => (
             <div key={label}>
-              <div className="font-mono text-[9px] text-white/20 tracking-widest uppercase mb-1">{label}</div>
-              <div className="font-mono text-[13px] text-[#95C11F] font-medium">{value}</div>
+              <div className="font-mono text-[9px] text-mono tracking-widest uppercase mb-1">{label}</div>
+              <div className="font-mono text-[13px] text-brand font-medium">{value}</div>
             </div>
           ))}
         </div>
 
-        <div className="text-[11px] text-[#95C11F]/50 tracking-wide uppercase font-medium">{project.type}</div>
+        <div className="text-[11px] text-brand/50 tracking-wide uppercase font-medium">{project.type}</div>
 
-        <p className="text-white/35 text-[13px] leading-relaxed line-clamp-2 group-hover:text-white/50 transition-colors duration-300">
+        <p className="text-mono text-[13px] leading-relaxed line-clamp-2 group-hover:text-secondary transition-colors duration-300">
           {project.description}
         </p>
       </div>
@@ -633,53 +635,35 @@ export default function Proyectos() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          backgroundImage: 'radial-gradient(circle, rgba(149,193,31,0.04) 1px, transparent 1px)',
+          backgroundImage: `radial-gradient(circle, ${alpha(palette.brand.DEFAULT, 0.04)} 1px, transparent 1px)`,
           backgroundSize: '40px 40px',
         }}
       />
 
       <div className="max-w-7xl mx-auto relative">
         {/* Header */}
-        <div ref={ref} className="mb-16">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
-              Proyectos en Campo
-            </span>
-          </motion.div>
-
-          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
-            <motion.h2
-              initial={{ opacity: 0, y: 36 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="font-display text-[clamp(2.8rem,6vw,4.8rem)] font-semibold leading-tight max-w-2xl"
-            >
-              Tierra transformada
-              <br />
-              en{' '}
-              <em className="text-[#95C11F] not-italic">datos reales</em>
-            </motion.h2>
-
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={inView ? { opacity: 1 } : {}}
-              transition={{ duration: 0.8, delay: 0.35 }}
-              className="flex items-center gap-6 shrink-0"
-            >
-              {Object.entries(statusConfig).map(([label, cfg]) => (
-                <div key={label} className="flex items-center gap-2">
-                  <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
-                  <span className="text-white/35 text-xs">{label}</span>
-                </div>
-              ))}
-            </motion.div>
-          </div>
+        <div ref={ref}>
+          <SectionHeader
+            inView={inView}
+            eyebrow="Proyectos en Campo"
+            title={
+              <>
+                Tierra transformada
+                <br />
+                en <Accent>datos reales</Accent>
+              </>
+            }
+            aside={
+              <div className="flex items-center gap-6">
+                {Object.entries(statusConfig).map(([label, cfg]) => (
+                  <div key={label} className="flex items-center gap-2">
+                    <span className={`w-1.5 h-1.5 rounded-full ${cfg.dot}`} />
+                    <span className="text-mono text-xs">{label}</span>
+                  </div>
+                ))}
+              </div>
+            }
+          />
         </div>
 
         {/* Grid */}
@@ -700,7 +684,7 @@ export default function Proyectos() {
             href="https://wa.me/573113650567?text=Hola%2C%20quisiera%20iniciar%20un%20proyecto%20Keyline%20en%20mi%20finca"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2.5 px-7 py-3.5 border border-[#95C11F]/30 text-[#95C11F] rounded-full text-sm font-medium hover:bg-[#95C11F]/10 transition-all duration-200 hover:border-[#95C11F]/50 tracking-wide"
+            className="inline-flex items-center gap-2.5 px-7 py-3.5 border border-brand/30 text-brand rounded-full text-sm font-medium hover:bg-brand/10 transition-all duration-200 hover:border-brand/50 tracking-wide"
           >
             Iniciar un proyecto
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">

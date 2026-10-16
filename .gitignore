@@ -25,3 +25,6 @@ next-env.d.ts
 *.mov
 *.MOV
 *.webm
+
+# Prototipos de referencia (fuera del build)
+reference/

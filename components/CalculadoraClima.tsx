@@ -5,6 +5,8 @@ import { motion, useInView } from 'framer-motion'
 import { Bar, CartesianGrid, ComposedChart, Line, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { climateData, DEFAULT_RUNOFF_CN } from '@/lib/climateData'
 import { scsCnAnnualRunoffM3, scsCnMonthlyRunoffMm } from '@/lib/hydrology'
+import { toneClass, type Tone } from '@/lib/tones'
+import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
@@ -28,20 +30,13 @@ const BLUE = '#38bdf8'
 const GREEN = '#95C11F'
 const RED = '#f87171'
 
-type Tone = 'good' | 'warn' | 'bad'
-
-const toneClass: Record<Tone, string> = {
-  good: 'text-[#95C11F] bg-[#95C11F]/10 border-[#95C11F]/25',
-  warn: 'text-amber-400 bg-amber-400/10 border-amber-400/25',
-  bad: 'text-red-400 bg-red-400/10 border-red-400/25',
-}
 
 const nf0 = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 })
 const nf1 = new Intl.NumberFormat('es-CO', { maximumFractionDigits: 1 })
 
 const inputClass =
-  'w-full px-4 py-3 rounded-xl bg-[#1D1D1B] border border-white/[0.08] text-white placeholder-white/20 text-sm ' +
-  'focus:outline-none focus:border-[#95C11F]/50 focus:ring-2 focus:ring-[#95C11F]/20 transition-all'
+  'w-full px-4 py-3 rounded-xl bg-surface border border-subtle text-primary placeholder:text-mono text-sm ' +
+  'focus:outline-none focus:border-brand/50 focus:ring-2 focus:ring-brand/20 transition-all'
 
 function Field({
   id,
@@ -57,10 +52,10 @@ function Field({
   return (
     <div>
       <div className="flex items-baseline justify-between mb-2">
-        <label htmlFor={id} className="text-white/60 text-sm">
+        <label htmlFor={id} className="text-secondary text-sm">
           {label}
         </label>
-        {hint && <span className="font-mono text-[10px] text-white/25 tracking-wide">{hint}</span>}
+        {hint && <span className="font-mono text-[10px] text-mono tracking-wide">{hint}</span>}
       </div>
       {children}
     </div>
@@ -85,10 +80,10 @@ function ChartTooltip({
 }) {
   if (!active || !payload?.length) return null
   return (
-    <div className="rounded-lg border border-white/10 bg-[#1D1D1B] px-3 py-2 shadow-xl">
-      <div className="font-mono text-[10px] text-white/40 mb-1">{label}</div>
+    <div className="rounded-lg border border-strong bg-surface px-3 py-2 shadow-xl">
+      <div className="font-mono text-[10px] text-mono mb-1">{label}</div>
       {payload.map((p) => (
-        <div key={p.dataKey} className="font-mono text-xs text-white">
+        <div key={p.dataKey} className="font-mono text-xs text-primary">
           {p.name}: {nf1.format(p.value)}
           {p.unit ?? ''}
         </div>
@@ -184,37 +179,24 @@ export default function CalculadoraClima() {
 
       <div className="max-w-7xl mx-auto relative">
         <div ref={ref} className="mb-16 max-w-3xl">
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.7 }}
-            className="flex items-center gap-3 mb-7"
-          >
-            <div className="w-7 h-px bg-[#95C11F]/60" />
-            <span className="font-mono text-[#95C11F] text-[10px] tracking-[0.32em] uppercase">
-              Herramientas Técnicas · 04
-            </span>
-          </motion.div>
-
-          <motion.h2
-            initial={{ opacity: 0, y: 36 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.95, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="font-display text-[clamp(2.8rem,6vw,4.8rem)] font-semibold leading-tight mb-6"
-          >
-            Balance <em className="text-[#95C11F] not-italic">clima y agua</em>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="text-white/45 leading-relaxed"
-          >
-            Ingresa la precipitación, evapotranspiración y área de tu finca — o usa los
-            valores de referencia precargados — para estimar el déficit hídrico anual y
-            la escorrentía capturable por diseño Keyline.
-          </motion.p>
+          <SectionHeader
+            inView={inView}
+            className=""
+            eyebrow="Herramientas Técnicas"
+            number="04"
+            title={
+              <>
+                Balance <Accent>clima y agua</Accent>
+              </>
+            }
+            subtitle={
+              <>
+                Ingresa la precipitación, evapotranspiración y área de tu finca — o usa los
+                valores de referencia precargados — para estimar el déficit hídrico anual y
+                la escorrentía capturable por diseño Keyline.
+              </>
+            }
+          />
         </div>
 
         <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
@@ -223,14 +205,14 @@ export default function CalculadoraClima() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
             >
               <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
                 <div className="flex items-center gap-3">
-                  <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">01</span>
+                  <span className="font-mono text-[11px] text-brand/50 tracking-widest">01</span>
                   <h3 className="font-display text-xl font-semibold">Datos climáticos e hidrológicos</h3>
                 </div>
-                <button onClick={resetDefaults} className="text-white/30 text-xs hover:text-[#95C11F] transition-colors">
+                <button onClick={resetDefaults} className="text-mono text-xs hover:text-brand transition-colors">
                   Restablecer valores de ejemplo
                 </button>
               </div>
@@ -275,11 +257,11 @@ export default function CalculadoraClima() {
                     step={1}
                     value={cn}
                     onChange={(e) => setCn(Number(e.target.value))}
-                    className="w-full accent-[#95C11F] mt-3.5"
+                    className="w-full accent-brand mt-3.5"
                   />
                 </Field>
               </div>
-              <p className="text-white/25 text-[11px] leading-relaxed">
+              <p className="text-mono text-[11px] leading-relaxed">
                 CN bajo (30–50): pastos/bosque con buena infiltración. CN medio (50–75): uso mixto o suelo
                 moderadamente compactado. CN alto (75–95): suelo compactado o escorrentía rápida. La
                 distribución mensual se estima proporcionalmente sobre un patrón bimodal tropical de
@@ -291,10 +273,10 @@ export default function CalculadoraClima() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">02</span>
+                <span className="font-mono text-[11px] text-brand/50 tracking-widest">02</span>
                 <h3 className="font-display text-xl font-semibold">Precipitación vs. ETo mensual</h3>
               </div>
               <div className="h-[280px]">
@@ -315,10 +297,10 @@ export default function CalculadoraClima() {
                 </ResponsiveContainer>
               </div>
               <div className="flex items-center gap-5 mt-3">
-                <span className="flex items-center gap-1.5 text-white/25 text-[11px]">
+                <span className="flex items-center gap-1.5 text-mono text-[11px]">
                   <span className="w-2 h-2 rounded-full" style={{ background: BLUE }} /> Precipitación
                 </span>
-                <span className="flex items-center gap-1.5 text-white/25 text-[11px]">
+                <span className="flex items-center gap-1.5 text-mono text-[11px]">
                   <span className="w-2 h-0.5" style={{ background: RED }} /> ETo
                 </span>
               </div>
@@ -328,10 +310,10 @@ export default function CalculadoraClima() {
               initial={{ opacity: 0, y: 40 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ duration: 0.85, delay: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              className="p-7 lg:p-8 rounded-2xl border border-white/[0.07] bg-[#2C2C2A]"
+              className="p-7 lg:p-8 rounded-2xl border border-subtle bg-surface-raised"
             >
               <div className="flex items-center gap-3 mb-6">
-                <span className="font-mono text-[11px] text-[#95C11F]/50 tracking-widest">03</span>
+                <span className="font-mono text-[11px] text-brand/50 tracking-widest">03</span>
                 <h3 className="font-display text-xl font-semibold">Escorrentía capturable por mes</h3>
               </div>
               <div className="h-[220px]">
@@ -350,7 +332,7 @@ export default function CalculadoraClima() {
                   </ComposedChart>
                 </ResponsiveContainer>
               </div>
-              <p className="text-white/25 text-[11px] mt-3">
+              <p className="text-mono text-[11px] mt-3">
                 Estimada con el método del Número de Curva (SCS-CN) sobre la precipitación mensual.
               </p>
             </motion.div>
@@ -361,9 +343,9 @@ export default function CalculadoraClima() {
             initial={{ opacity: 0, y: 40 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.9, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-[#95C11F]/20 bg-[#2C2C2A]"
+            className="lg:sticky lg:top-28 p-7 lg:p-8 rounded-2xl border border-brand/20 bg-surface-raised"
           >
-            <div className="font-mono text-[10px] text-[#95C11F]/50 tracking-widest uppercase mb-6">
+            <div className="font-mono text-[10px] text-brand/50 tracking-widest uppercase mb-6">
               Resumen en vivo
             </div>
 
@@ -375,15 +357,15 @@ export default function CalculadoraClima() {
                 { label: 'Escorrentía capturable', value: `${nf0.format(escorrentiaTotalM3)} m³` },
                 { label: 'Cobertura de la demanda', value: `${nf1.format(coberturaPct)} %` },
               ].map((row) => (
-                <div key={row.label} className="flex items-baseline justify-between border-b border-white/[0.06] pb-3">
-                  <span className="text-white/40 text-sm">{row.label}</span>
-                  <span className="font-mono text-lg text-white font-medium">{row.value}</span>
+                <div key={row.label} className="flex items-baseline justify-between border-b border-subtle pb-3">
+                  <span className="text-mono text-sm">{row.label}</span>
+                  <span className="font-mono text-lg text-primary font-medium">{row.value}</span>
                 </div>
               ))}
             </div>
 
             <div className="space-y-2.5 mb-6">
-              <div className="font-mono text-[9px] text-white/30 tracking-widest uppercase mb-1">Lectura Keyline</div>
+              <div className="font-mono text-[9px] text-mono tracking-widest uppercase mb-1">Lectura Keyline</div>
               {recommendations.map((r, i) => (
                 <div key={i} className={`p-3 rounded-lg border text-[12px] leading-relaxed ${toneClass[r.tone]}`}>
                   {r.text}
@@ -395,12 +377,12 @@ export default function CalculadoraClima() {
               href={`https://wa.me/573113650567?text=${waMessage}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-[#95C11F] text-[#1D1D1B] rounded-full font-semibold text-sm hover:bg-[#a6d42a] transition-all duration-200 hover:shadow-[0_0_32px_rgba(149,193,31,0.4)] hover:scale-[1.02]"
+              className="flex items-center justify-center gap-2.5 w-full px-6 py-4 bg-brand text-surface rounded-full font-semibold text-sm hover:bg-brand-hover transition-all duration-200 hover:shadow-glow-lg hover:scale-[1.02]"
             >
               Solicitar estudio hidrológico real
             </a>
 
-            <p className="mt-5 text-white/25 text-[11px] leading-relaxed text-center">
+            <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Estimación preliminar — el método CN aplicado a promedios mensuales es una
               aproximación; no reemplaza un estudio hidrológico de campo.
             </p>

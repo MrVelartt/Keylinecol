@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { motion } from 'framer-motion'
+import { palette } from '@/lib/theme'
 
 const contourLines = [
   {
@@ -41,17 +42,17 @@ export default function MountainSVG() {
       >
         <defs>
           <radialGradient id="keypointGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#95C11F" stopOpacity="0.9" />
-            <stop offset="40%" stopColor="#95C11F" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="#95C11F" stopOpacity="0" />
+            <stop offset="0%" stopColor={palette.brand.DEFAULT} stopOpacity="0.9" />
+            <stop offset="40%" stopColor={palette.brand.DEFAULT} stopOpacity="0.4" />
+            <stop offset="100%" stopColor={palette.brand.DEFAULT} stopOpacity="0" />
           </radialGradient>
           <linearGradient id="fadeBottom" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="60%" stopColor="#1D1D1B" stopOpacity="0" />
-            <stop offset="100%" stopColor="#1D1D1B" stopOpacity="1" />
+            <stop offset="60%" stopColor={palette.surface.DEFAULT} stopOpacity="0" />
+            <stop offset="100%" stopColor={palette.surface.DEFAULT} stopOpacity="1" />
           </linearGradient>
           <linearGradient id="fadeTop" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1D1D1B" stopOpacity="0.6" />
-            <stop offset="30%" stopColor="#1D1D1B" stopOpacity="0" />
+            <stop offset="0%" stopColor={palette.surface.DEFAULT} stopOpacity="0.6" />
+            <stop offset="30%" stopColor={palette.surface.DEFAULT} stopOpacity="0" />
           </linearGradient>
         </defs>
 
@@ -61,7 +62,7 @@ export default function MountainSVG() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 2.2, ease: 'easeOut' }}
           d="M 0,430 C 100,360 210,270 350,195 C 490,120 640,175 780,145 C 920,115 1060,195 1190,215 C 1300,232 1390,305 1440,340 L 1440,700 L 0,700 Z"
-          fill="#1D1D1B"
+          fill={palette.surface.DEFAULT}
         />
 
         {/* Middle mountains */}
@@ -70,7 +71,7 @@ export default function MountainSVG() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 2.2, delay: 0.15, ease: 'easeOut' }}
           d="M 0,490 C 120,420 250,355 390,310 C 520,268 650,310 790,280 C 930,250 1060,295 1190,268 C 1300,246 1390,330 1440,370 L 1440,700 L 0,700 Z"
-          fill="#0d1b0d"
+          fill={palette.landscape.near}
         />
 
         {/* Foreground mountains */}
@@ -79,7 +80,7 @@ export default function MountainSVG() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 2.2, delay: 0.3, ease: 'easeOut' }}
           d="M 0,550 C 80,495 190,445 320,420 C 450,395 580,440 710,408 C 840,376 970,408 1100,382 C 1230,356 1350,425 1440,460 L 1440,700 L 0,700 Z"
-          fill="#0f1f0f"
+          fill={palette.landscape.mid}
         />
 
         {/* Topographic dotted contour lines */}
@@ -88,7 +89,7 @@ export default function MountainSVG() {
             key={i}
             d={line.d}
             fill="none"
-            stroke="#95C11F"
+            stroke={palette.brand.DEFAULT}
             strokeWidth="0.75"
             strokeDasharray="4 9"
             strokeLinecap="round"
@@ -114,7 +115,7 @@ export default function MountainSVG() {
             cy="145"
             r="9"
             fill="none"
-            stroke="#95C11F"
+            stroke={palette.brand.DEFAULT}
             strokeWidth="0.6"
             animate={{ r: [9, 22], opacity: [0.7, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 0.8, ease: 'easeOut' }}
@@ -126,15 +127,15 @@ export default function MountainSVG() {
             cy="145"
             r="9"
             fill="none"
-            stroke="#95C11F"
+            stroke={palette.brand.DEFAULT}
             strokeWidth="0.4"
             animate={{ r: [9, 32], opacity: [0.4, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 0.8, delay: 0.6, ease: 'easeOut' }}
           />
 
           {/* Core dot */}
-          <circle cx="780" cy="145" r="3.5" fill="#95C11F" />
-          <circle cx="780" cy="145" r="1.8" fill="white" />
+          <circle cx="780" cy="145" r="3.5" fill={palette.brand.DEFAULT} />
+          <circle cx="780" cy="145" r="1.8" fill={palette.ink.primary} />
         </motion.g>
 
         {/* Keypoint label */}
@@ -148,7 +149,7 @@ export default function MountainSVG() {
             y1="145"
             x2="850"
             y2="112"
-            stroke="#95C11F"
+            stroke={palette.brand.DEFAULT}
             strokeWidth="0.5"
             strokeDasharray="2 5"
             opacity="0.7"
@@ -156,7 +157,7 @@ export default function MountainSVG() {
           <text
             x="857"
             y="109"
-            fill="#95C11F"
+            fill={palette.brand.DEFAULT}
             fontSize="9"
             fontFamily="monospace"
             letterSpacing="0.12em"
