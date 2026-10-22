@@ -9,6 +9,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "exceljs": "^4.4.0",
     "framer-motion": "^11.3.0",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.8",

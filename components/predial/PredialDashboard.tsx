@@ -15,7 +15,8 @@ import type { PanelProps } from './ui'
 // ── Diseño Keyline Predial — tablero por capas de la escala de permanencia ──
 // Un solo estado (PredialState) alimenta el motor puro calcPredial; cada panel
 // se carga bajo demanda. El borrador se guarda en este navegador.
-// El informe PDF sale de components/predial/reporte.ts. Excel: fuera de alcance por ahora.
+// El informe PDF sale de components/predial/reporte.ts y el Excel editable
+// (fórmulas vivas) de components/predial/excel.ts; ambos se cargan al pedirlos.
 
 const CATALOGOS: PredialCatalogos = {
   fondos: FONDOS,
@@ -96,6 +97,36 @@ function fusionar(base: PredialState, guardado: Partial<PredialState>): PredialS
     out[k] = typeof b === 'object' && !Array.isArray(b) && typeof g === 'object' ? { ...b, ...g } : g
   }
   return out as unknown as PredialState
+}
+
+function BotonExcel({ s, r }: { s: PredialState; r: ReturnType<typeof calcPredial> }) {
+  const [estado, setEstado] = useState<'listo' | 'generando' | 'error'>('listo')
+  const descargar = async () => {
+    setEstado('generando')
+    try {
+      const { descargarExcelPredial } = await import('./excel')
+      await descargarExcelPredial(s, r)
+      setEstado('listo')
+    } catch (e) {
+      console.error('[Excel]', e)
+      setEstado('error')
+    }
+  }
+  return (
+    <button
+      type="button"
+      onClick={descargar}
+      disabled={estado === 'generando'}
+      title="Libro .xlsx con fórmulas: cambie los datos en azul y todo se recalcula"
+      className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full border border-strong text-[13px] text-primary hover:border-brand/50 hover:text-brand transition-colors disabled:opacity-60 disabled:cursor-wait"
+    >
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+        <rect x="2" y="2" width="12" height="12" rx="2" stroke="currentColor" strokeWidth="1.3" />
+        <path d="M2 6h12M2 10h12M6 2v12" stroke="currentColor" strokeWidth="1.1" />
+      </svg>
+      {estado === 'generando' ? 'Generando…' : estado === 'error' ? 'Error · reintentar' : 'Excel editable'}
+    </button>
+  )
 }
 
 export default function PredialDashboard() {
@@ -199,6 +230,7 @@ export default function PredialDashboard() {
               ))}
             </dl>
             <ExportarPDF conCliente={false} etiqueta="Informe PDF" construir={() => reportePredial(s, r)} />
+            <BotonExcel s={s} r={r} />
             <button
               type="button"
               onClick={restablecer}
