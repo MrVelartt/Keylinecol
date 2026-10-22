@@ -1,14 +1,14 @@
 ﻿'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import Image from 'next/image'
+import { TOOLS, isToolsPath } from '@/lib/tools'
 
 const links = [
   { label: 'Metodología', href: '/#metodologia', type: 'anchor' as const },
-  { label: 'Herramientas', href: '/herramientas', type: 'route' as const },
-  { label: 'Analítica', href: '/analitica', type: 'route' as const },
+  { label: 'Herramientas', href: '/herramientas', type: 'tools' as const },
   { label: 'Proyectos', href: '/#proyectos', type: 'anchor' as const },
   { label: 'Cursos', href: '/#cursos', type: 'anchor' as const },
   { label: 'Nosotros', href: '/#nosotros', type: 'anchor' as const },
@@ -42,7 +42,65 @@ export default function Nav() {
   }, [isHome])
 
   const isLinkActive = (link: (typeof links)[number]) =>
-    link.type === 'route' ? pathname === link.href : isHome && active === link.href.replace('/#', '')
+    link.type === 'tools' ? isToolsPath(pathname) : isHome && active === link.href.replace('/#', '')
+
+  // Menú «Herramientas ▾»: se abre con clic o teclado, se cierra con Escape,
+  // clic fuera o al navegar.
+  const [toolsOpen, setToolsOpen] = useState(false)
+  const [mobileToolsOpen, setMobileToolsOpen] = useState(false)
+  const toolsRef = useRef<HTMLDivElement>(null)
+  const toolsButtonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    setToolsOpen(false)
+    setMenuOpen(false)
+  }, [pathname])
+
+  useEffect(() => {
+    if (!toolsOpen) return
+    const onPointer = (e: PointerEvent) => {
+      if (!toolsRef.current?.contains(e.target as Node)) setToolsOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setToolsOpen(false)
+        toolsButtonRef.current?.focus()
+      }
+    }
+    document.addEventListener('pointerdown', onPointer)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('pointerdown', onPointer)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [toolsOpen])
+
+  const focusTool = (dir: 1 | -1 | 'first' | 'last') => {
+    const items = Array.from(toolsRef.current?.querySelectorAll<HTMLAnchorElement>('[data-tool-item]') ?? [])
+    if (!items.length) return
+    const i = items.indexOf(document.activeElement as HTMLAnchorElement)
+    const next = dir === 'first' ? 0 : dir === 'last' ? items.length - 1 : (i + dir + items.length) % items.length
+    items[next].focus()
+  }
+
+  const onToolsKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault()
+      if (!toolsOpen) setToolsOpen(true)
+      requestAnimationFrame(() => focusTool(toolsOpen ? 1 : 'first'))
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault()
+      focusTool(-1)
+    } else if (e.key === 'Home' && toolsOpen) {
+      e.preventDefault()
+      focusTool('first')
+    } else if (e.key === 'End' && toolsOpen) {
+      e.preventDefault()
+      focusTool('last')
+    }
+  }
+
+  const isToolActive = (href: string) => href === pathname
 
   return (
     <>
@@ -80,6 +138,88 @@ export default function Nav() {
           <div className="hidden md:flex items-center gap-1">
             {links.map((link) => {
               const isActive = isLinkActive(link)
+              if (link.type === 'tools') {
+                return (
+                  <div key={link.label} ref={toolsRef} className="relative" onKeyDown={onToolsKeyDown}>
+                    <button
+                      ref={toolsButtonRef}
+                      type="button"
+                      aria-haspopup="true"
+                      aria-expanded={toolsOpen}
+                      aria-controls="nav-herramientas"
+                      onClick={() => setToolsOpen((o) => !o)}
+                      className={`relative flex items-center gap-1.5 px-4 py-2 text-[13px] tracking-wide transition-colors duration-200 rounded-lg ${
+                        isActive || toolsOpen ? 'text-brand' : 'text-secondary hover:text-primary'
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.span
+                          layoutId="nav-pill"
+                          className="absolute inset-0 bg-brand/[0.08] border border-brand/20 rounded-lg"
+                          transition={{ type: 'spring', stiffness: 380, damping: 32 }}
+                        />
+                      )}
+                      <span className="relative">{link.label}</span>
+                      <svg
+                        aria-hidden="true"
+                        width="10"
+                        height="10"
+                        viewBox="0 0 10 10"
+                        className={`relative transition-transform duration-200 ${toolsOpen ? 'rotate-180' : ''}`}
+                      >
+                        <path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+
+                    <AnimatePresence>
+                      {toolsOpen && (
+                        <motion.div
+                          id="nav-herramientas"
+                          initial={{ opacity: 0, y: -6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.18, ease: 'easeOut' }}
+                          className="absolute top-full right-0 lg:left-1/2 lg:right-auto lg:-translate-x-1/2 mt-3 w-[min(600px,calc(100vw-48px))] p-3 rounded-2xl border border-subtle bg-surface-raised shadow-2xl"
+                        >
+                          <ul className="grid sm:grid-cols-2 gap-1">
+                            {TOOLS.map((t) => {
+                              const on = isToolActive(t.href)
+                              return (
+                                <li key={t.slug}>
+                                  <a
+                                    data-tool-item
+                                    href={t.href}
+                                    aria-current={on ? 'page' : undefined}
+                                    onClick={() => setToolsOpen(false)}
+                                    className={`flex gap-3 p-3 rounded-xl transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 ${
+                                      on ? 'bg-brand/10' : 'hover:bg-veil focus-visible:bg-veil'
+                                    }`}
+                                  >
+                                    <span className="font-mono text-[11px] text-brand tabular-nums pt-0.5">{t.numero}</span>
+                                    <span className="min-w-0">
+                                      <span className={`block text-[13px] font-medium ${on ? 'text-brand' : 'text-primary'}`}>{t.nombre}</span>
+                                      <span className="block text-[12px] text-mono leading-snug mt-0.5">{t.descripcion}</span>
+                                    </span>
+                                  </a>
+                                </li>
+                              )
+                            })}
+                          </ul>
+                          <a
+                            data-tool-item
+                            href="/herramientas"
+                            onClick={() => setToolsOpen(false)}
+                            className="mt-2 flex items-center justify-between px-3 py-2.5 rounded-xl border-t border-subtle text-[12px] text-secondary hover:text-brand focus:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 transition-colors"
+                          >
+                            Ver todas las herramientas
+                            <span aria-hidden="true">→</span>
+                          </a>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )
+              }
               return (
                 <a
                   key={link.label}
@@ -153,7 +293,50 @@ export default function Nav() {
             className="fixed top-[72px] left-0 right-0 z-40 bg-surface-sunken/95 backdrop-blur-2xl border-b border-subtle"
           >
             <div className="max-w-7xl mx-auto px-6 py-6 flex flex-col gap-1">
-              {links.map((link) => (
+              {links.map((link) =>
+                link.type === 'tools' ? (
+                  <div key={link.label}>
+                    <button
+                      type="button"
+                      aria-expanded={mobileToolsOpen}
+                      aria-controls="nav-herramientas-movil"
+                      onClick={() => setMobileToolsOpen((o) => !o)}
+                      className={`w-full flex items-center justify-between py-3.5 px-4 rounded-lg transition-all duration-200 text-sm tracking-wide border border-transparent hover:bg-veil hover:border-subtle ${
+                        isLinkActive(link) ? 'text-brand' : 'text-secondary hover:text-primary'
+                      }`}
+                    >
+                      {link.label}
+                      <svg
+                        aria-hidden="true"
+                        width="12"
+                        height="12"
+                        viewBox="0 0 10 10"
+                        className={`transition-transform duration-200 ${mobileToolsOpen ? 'rotate-180' : ''}`}
+                      >
+                        <path d="M2 3.5 5 6.5 8 3.5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                    </button>
+                    {mobileToolsOpen && (
+                      <ul id="nav-herramientas-movil" className="ml-4 pl-3 border-l border-subtle my-1 space-y-0.5">
+                        {TOOLS.map((t) => (
+                          <li key={t.slug}>
+                            <a
+                              href={t.href}
+                              aria-current={isToolActive(t.href) ? 'page' : undefined}
+                              onClick={() => setMenuOpen(false)}
+                              className={`flex gap-3 py-2.5 px-3 rounded-lg text-sm transition-colors hover:bg-veil ${
+                                isToolActive(t.href) ? 'text-brand' : 'text-secondary hover:text-primary'
+                              }`}
+                            >
+                              <span className="font-mono text-[11px] text-brand tabular-nums pt-0.5">{t.numero}</span>
+                              {t.nombre}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                ) : (
                 <a
                   key={link.label}
                   href={link.href}
@@ -162,7 +345,8 @@ export default function Nav() {
                 >
                   {link.label}
                 </a>
-              ))}
+                )
+              )}
               <a
                 href="https://wa.me/573113650567"
                 target="_blank"

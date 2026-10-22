@@ -9,7 +9,8 @@ import { PRECIOS as PU } from './precios'
 import { etoPorAltitud } from '../../lib/calculos/clima'
 
 let seq = 0
-export const nuevoId = (prefijo = 'f') => `${prefijo}${++seq}`
+// Sufijo aleatorio: los ids no chocan con los de un borrador restaurado.
+export const nuevoId = (prefijo = 'f') => `${prefijo}${++seq}${Math.random().toString(36).slice(2, 6)}`
 
 const fila = (nombre: string, cantidad: number, unidad: string, precio: number, diseno = false): FilaCosto => ({
   id: nuevoId('c'),
