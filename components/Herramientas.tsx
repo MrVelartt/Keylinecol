@@ -166,7 +166,7 @@ export default function Herramientas() {
   const handleDownloadPdf = async () => {
     const { descargarPDF } = await import('@/lib/pdf/reporte')
     await descargarPDF({
-      herramienta: 'Demanda hídrica y movimiento de tierra',
+      herramienta: 'Demanda hídrica pecuaria y movimiento de tierra',
       titulo: 'Cotización preliminar de reservorio',
       subtitulo: 'Demanda hídrica del hato, volumen a almacenar, movimiento de tierra y presupuesto estimado.',
       cliente: projectName,
@@ -182,7 +182,7 @@ export default function Herramientas() {
             { k: 'Presupuesto estimado', v: cop.format(totalBudget), sub: `${nf.format(machineHours)} h de máquina` },
           ],
         },
-        { tipo: 'titulo', texto: '1. Demanda hídrica' },
+        { tipo: 'titulo', texto: '1. Demanda hídrica pecuaria' },
         {
           tipo: 'tabla',
           head: ['Tipo de animal', 'Cantidad', 'L/día por animal', 'L/día total'],
@@ -286,7 +286,7 @@ export default function Herramientas() {
             >
               <div className="flex items-center gap-3 mb-6">
                 <span className="font-mono text-[11px] text-brand/50 tracking-widest">01</span>
-                <h3 className="font-display text-xl font-semibold">Demanda hídrica</h3>
+                <h3 className="font-display text-xl font-semibold">Demanda hídrica pecuaria</h3>
               </div>
 
               <div className="space-y-4 mb-5">
@@ -400,7 +400,7 @@ export default function Herramientas() {
                   className="w-4 h-4 rounded accent-brand"
                 />
                 <label htmlFor={`${uid}-sync-calc`} className="text-secondary text-sm">
-                  Usar el resultado de la calculadora de demanda hídrica
+                  Usar el resultado de la calculadora de demanda hídrica pecuaria
                 </label>
               </div>
 

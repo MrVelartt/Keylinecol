@@ -16,7 +16,7 @@ export const TOOLS: Tool[] = [
   {
     slug: 'demanda-hidrica',
     numero: '01',
-    nombre: 'Demanda hídrica',
+    nombre: 'Demanda hídrica pecuaria',
     descripcion: 'Agua que necesita el hato y días de autonomía.',
     href: '/herramientas#herramientas',
   },
