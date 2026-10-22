@@ -584,7 +584,7 @@ export default function Agua({ s, r, set }: PanelProps) {
                   return (
                     <tr key={f.id}>
                       <td className="text-secondary whitespace-nowrap">{fe.rol}</td>
-                      <td>
+                      <td className="min-w-[200px]">
                         <TextCell label="Equipo" value={fe.equipo} onChange={(v) => set((d) => void (d.tierra.frentes[i].equipo = v))} />
                       </td>
                       <Num>

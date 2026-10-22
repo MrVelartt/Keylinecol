@@ -33,7 +33,8 @@ import {
   type SueloTextura,
   type SuperficieGuardar,
 } from '@/lib/calculos/escorrentia'
-import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import { Accent } from '@/components/ui/SectionHeader'
+import ToolFrame from '@/components/tools/ToolFrame'
 import ExportarPDF from '@/components/pdf/ExportarPDF'
 import type { Reporte } from '@/lib/pdf/reporte'
 
@@ -278,34 +279,26 @@ export default function CalculadoraEscorrentia() {
   )
 
   return (
-    <section id="calculadora-escorrentia" className="py-32 lg:py-44 px-6 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none dot-grid" />
-
-      <div className="max-w-7xl mx-auto relative">
-        <div ref={ref} className="mb-16 max-w-3xl">
-          <SectionHeader
-            inView={inView}
-            className=""
-            eyebrow="Herramientas Técnicas"
-            number="07"
-            title={
-              <>
-                <Accent>Guarda</Accent> o{' '}
-                <Accent>evacúa</Accent> el agua
-              </>
-            }
-            subtitle={
-              <>
-                Una misma fórmula — lámina de lluvia × área × fracción que escurre —
-                responde dos preguntas distintas: cuánta agua llega en el año para
-                guardarla (dimensiona reservorios) y con qué caudal pico llega un
-                aguacero para evacuarla sin daño (dimensiona vertederos y canales).
-              </>
-            }
-          />
-        </div>
-
-        <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
+    <ToolFrame
+      id="calculadora-escorrentia"
+      fondo="dot-grid"
+      number="07"
+      title={
+        <>
+          <Accent>Guarda</Accent> o{' '}
+          <Accent>evacúa</Accent> el agua
+        </>
+      }
+      subtitle={
+        <>
+          Una misma fórmula — lámina de lluvia × área × fracción que escurre —
+          responde dos preguntas distintas: cuánta agua llega en el año para
+          guardarla (dimensiona reservorios) y con qué caudal pico llega un
+          aguacero para evacuarla sin daño (dimensiona vertederos y canales).
+        </>
+      }
+    >
+      <div ref={ref} className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
           {/* ── Columna izquierda ── */}
           <div className="space-y-6">
             <motion.div
@@ -752,8 +745,7 @@ export default function CalculadoraEscorrentia() {
               firma un profesional con la norma vigente.
             </p>
           </motion.div>
-        </div>
       </div>
-    </section>
+    </ToolFrame>
   )
 }

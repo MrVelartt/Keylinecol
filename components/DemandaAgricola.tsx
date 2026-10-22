@@ -2,7 +2,8 @@
 
 import { useMemo, useRef, useState } from 'react'
 import { Bar, BarChart, CartesianGrid, Tooltip, XAxis, YAxis } from 'recharts'
-import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import { Accent } from '@/components/ui/SectionHeader'
+import ToolFrame from '@/components/tools/ToolFrame'
 import ChartFrame from '@/components/charts/ChartFrame'
 import ChartTooltip from '@/components/charts/ChartTooltip'
 import ExportarPDF from '@/components/pdf/ExportarPDF'
@@ -278,14 +279,10 @@ export default function DemandaAgricola() {
   const btnBase = 'px-3 py-1.5 rounded-lg border text-[13px] transition-colors'
 
   return (
-    <section id="demanda-agricola" className="py-32 lg:py-44 px-6 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none tech-grid" />
-
-      <div className="max-w-7xl mx-auto relative">
-        <SectionHeader
-          className="mb-12 max-w-3xl"
-          eyebrow="Herramientas Técnicas"
-          number="04"
+    <ToolFrame
+      id="demanda-agricola"
+      fondo="tech-grid"
+      number="04"
           title={
             <>
               Demanda hídrica <Accent>agrícola</Accent>
@@ -298,7 +295,7 @@ export default function DemandaAgricola() {
               casilla sugiere un rango según los demás datos.
             </>
           }
-        />
+    >
 
         <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
           <div className="space-y-6 min-w-0">
@@ -700,7 +697,6 @@ export default function DemandaAgricola() {
             </Note>
           </aside>
         </div>
-      </div>
-    </section>
+    </ToolFrame>
   )
 }

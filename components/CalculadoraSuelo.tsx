@@ -3,9 +3,10 @@
 import { useId, useMemo, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tooltip } from 'recharts'
-import { palette } from '@/lib/theme'
+import { areaFill, axisTick, nativeTooltipProps, neutralLine, polarGridStroke, series } from '@/lib/chart-theme'
 import { toneClass, toneColor, type Tone } from '@/lib/tones'
-import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import { Accent } from '@/components/ui/SectionHeader'
+import ToolFrame from '@/components/tools/ToolFrame'
 import ExportarPDF from '@/components/pdf/ExportarPDF'
 import { graficaAPng } from '@/lib/pdf/grafica'
 import type { Bloque, Reporte } from '@/lib/pdf/reporte'
@@ -327,32 +328,24 @@ export default function CalculadoraSuelo() {
   )
 
   return (
-    <section id="calculadora-suelo" className="py-32 lg:py-44 px-6 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none dot-grid" />
-
-      <div className="max-w-7xl mx-auto relative">
-        <div ref={ref} className="mb-16 max-w-3xl">
-          <SectionHeader
-            inView={inView}
-            className=""
-            eyebrow="Herramientas Técnicas"
-            number="03"
-            title={
-              <>
-                Analiza tu <Accent>suelo</Accent>
-              </>
-            }
-            subtitle={
-              <>
-                Ingresa los valores de tu análisis de laboratorio — o usa los de referencia
-                precargados — y obtén el índice de fertilidad, el estado de cada parámetro
-                frente a su rango adecuado y recomendaciones agronómicas inmediatas.
-              </>
-            }
-          />
-        </div>
-
-        <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
+    <ToolFrame
+      id="calculadora-suelo"
+      fondo="dot-grid"
+      number="03"
+      title={
+        <>
+          Analiza tu <Accent>suelo</Accent>
+        </>
+      }
+      subtitle={
+        <>
+          Ingresa los valores de tu análisis de laboratorio — o usa los de referencia
+          precargados — y obtén el índice de fertilidad, el estado de cada parámetro
+          frente a su rango adecuado y recomendaciones agronómicas inmediatas.
+        </>
+      }
+    >
+      <div ref={ref} className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
           <div className="space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 40 }}
@@ -479,15 +472,11 @@ export default function CalculadoraSuelo() {
             <div ref={radarRef} className="h-[220px] mb-6 -ml-2">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="72%">
-                  <PolarGrid stroke="rgba(255,255,255,0.08)" />
-                  <PolarAngleAxis dataKey="subject" tick={{ fill: 'rgba(255,255,255,0.4)', fontSize: 10 }} />
-                  <Radar name="Óptimo" dataKey="optimo" stroke="rgba(255,255,255,0.15)" fill="transparent" strokeDasharray="4 4" />
-                  <Radar name="Actual" dataKey="actual" stroke={palette.brand.DEFAULT} fill={palette.brand.DEFAULT} fillOpacity={0.18} />
-                  <Tooltip
-                    contentStyle={{ background: '#1D1D1B', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 8 }}
-                    labelStyle={{ color: 'rgba(255,255,255,0.5)' }}
-                    itemStyle={{ color: 'rgba(255,255,255,0.8)' }}
-                  />
+                  <PolarGrid stroke={polarGridStroke} />
+                  <PolarAngleAxis dataKey="subject" tick={axisTick} />
+                  <Radar name="Óptimo" dataKey="optimo" {...neutralLine} fill="transparent" />
+                  <Radar name="Actual" dataKey="actual" stroke={series.water} fill={areaFill('water', 0.18)} />
+                  <Tooltip {...nativeTooltipProps} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -516,8 +505,7 @@ export default function CalculadoraSuelo() {
               Estimación orientativa — no reemplaza un análisis de laboratorio ni un diseño técnico Keyline.
             </p>
           </motion.div>
-        </div>
       </div>
-    </section>
+    </ToolFrame>
   )
 }

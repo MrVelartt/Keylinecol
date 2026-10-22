@@ -9,7 +9,8 @@ import {
   type PermanenceStatus,
 } from '@/lib/permanenceScale'
 import { toneClass, toneColor, type Tone } from '@/lib/tones'
-import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import { Accent } from '@/components/ui/SectionHeader'
+import ToolFrame from '@/components/tools/ToolFrame'
 import ExportarPDF from '@/components/pdf/ExportarPDF'
 import type { Reporte } from '@/lib/pdf/reporte'
 
@@ -138,33 +139,25 @@ export default function EscalaPermanencia() {
   )
 
   return (
-    <section id="escala-permanencia" className="py-32 lg:py-44 px-6 relative overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none dot-grid" />
-
-      <div className="max-w-7xl mx-auto relative">
-        <div ref={ref} className="mb-16 max-w-3xl">
-          <SectionHeader
-            inView={inView}
-            className=""
-            eyebrow="Herramientas Técnicas"
-            number="06"
-            title={
-              <>
-                Ordena tu <Accent>finca</Accent>
-              </>
-            }
-            subtitle={
-              <>
-                La Escala de Permanencia de P.A. Yeomans ordena las decisiones de diseño
-                de lo más fijo (clima, topografía) a lo más flexible (economía, estética).
-                Marca el estado real de cada factor en tu finca y descubre cuál necesitas
-                resolver primero antes de fijar los siguientes.
-              </>
-            }
-          />
-        </div>
-
-        <div className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
+    <ToolFrame
+      id="escala-permanencia"
+      fondo="dot-grid"
+      number="06"
+      title={
+        <>
+          Ordena tu <Accent>finca</Accent>
+        </>
+      }
+      subtitle={
+        <>
+          La Escala de Permanencia de P.A. Yeomans ordena las decisiones de diseño
+          de lo más fijo (clima, topografía) a lo más flexible (economía, estética).
+          Marca el estado real de cada factor en tu finca y descubre cuál necesitas
+          resolver primero antes de fijar los siguientes.
+        </>
+      }
+    >
+      <div ref={ref} className="grid lg:grid-cols-[1fr_400px] gap-8 lg:gap-10 items-start">
           {/* ── Columna izquierda: los 10 factores ── */}
           <div className="space-y-6">
             <motion.div
@@ -332,8 +325,7 @@ export default function EscalaPermanencia() {
               Autoevaluación orientativa — no reemplaza una visita técnica ni un diseño Keyline en campo.
             </p>
           </motion.div>
-        </div>
       </div>
-    </section>
+    </ToolFrame>
   )
 }

@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
@@ -110,10 +110,9 @@ export default function Nav() {
         transition={{ duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
         className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
           scrolled
-            ? 'backdrop-blur-2xl border-b border-subtle'
+            ? 'bg-surface/[0.88] backdrop-blur-2xl border-b border-subtle'
             : 'bg-transparent'
         }`}
-        style={scrolled ? { backgroundColor: 'rgba(29,29,27,0.88)' } : {}}
       >
         <div className="max-w-7xl mx-auto px-6 lg:px-12 h-[72px] flex items-center justify-between gap-8">
           {/* Logo real */}
