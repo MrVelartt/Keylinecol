@@ -35,11 +35,11 @@ export const TOOLS: Tool[] = [
     href: '/herramientas#calculadora-suelo',
   },
   {
-    slug: 'balance-hidrico',
+    slug: 'demanda-hidrica-agricola',
     numero: '04',
-    nombre: 'Balance hídrico',
-    descripcion: 'Lluvia, ETo y déficit mes a mes.',
-    href: '/herramientas#calculadora-clima',
+    nombre: 'Demanda hídrica agrícola',
+    descripcion: 'Riego mes a mes frente a la lluvia que escurre.',
+    href: '/herramientas#demanda-agricola',
   },
   {
     slug: 'diseno-keyline-predial',

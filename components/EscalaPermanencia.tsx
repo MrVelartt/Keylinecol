@@ -147,7 +147,7 @@ export default function EscalaPermanencia() {
             inView={inView}
             className=""
             eyebrow="Herramientas Técnicas"
-            number="05"
+            number="06"
             title={
               <>
                 Ordena tu <Accent>finca</Accent>

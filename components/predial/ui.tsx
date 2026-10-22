@@ -92,6 +92,7 @@ export function NumField({
   min,
   max,
   readOnly,
+  hint,
 }: {
   label: string
   unit?: string
@@ -101,6 +102,8 @@ export function NumField({
   min?: number
   max?: number
   readOnly?: boolean
+  /** Rango sugerido o ayuda contextual bajo la casilla. */
+  hint?: ReactNode
 }) {
   const id = useId()
   const props = useNumText(value, onChange ?? (() => {}))
@@ -116,8 +119,10 @@ export function NumField({
         max={max}
         readOnly={readOnly}
         className={`${fieldBase} font-mono-data ${readOnly ? 'text-mono bg-veil' : ''}`}
+        aria-describedby={hint ? `${id}-hint` : undefined}
         {...props}
       />
+      {hint && <Hint id={`${id}-hint`}>{hint}</Hint>}
     </div>
   )
 }
@@ -156,11 +161,13 @@ export function SelectField<T extends string | number>({
   value,
   options,
   onChange,
+  hint,
 }: {
   label: string
   value: T
   options: { value: T; label: string }[]
   onChange: (v: T) => void
+  hint?: ReactNode
 }) {
   const id = useId()
   return (
@@ -181,12 +188,34 @@ export function SelectField<T extends string | number>({
           </option>
         ))}
       </select>
+      {hint && <Hint>{hint}</Hint>}
     </div>
   )
 }
 
+/** Texto de ayuda bajo una casilla: rango sugerido según los demás datos. */
+export function Hint({ children, id }: { children: ReactNode; id?: string }) {
+  return (
+    <p id={id} className="mt-1.5 text-[11px] leading-snug text-mono">
+      {children}
+    </p>
+  )
+}
+
 // ── Celdas editables de tabla ──
-export function NumCell({ value, onChange, step, label }: { value: number; onChange: (n: number) => void; step?: number; label: string }) {
+export function NumCell({
+  value,
+  onChange,
+  step,
+  label,
+  className = '',
+}: {
+  value: number
+  onChange: (n: number) => void
+  step?: number
+  label: string
+  className?: string
+}) {
   const props = useNumText(value, onChange)
   return (
     <input
@@ -194,7 +223,7 @@ export function NumCell({ value, onChange, step, label }: { value: number; onCha
       inputMode="decimal"
       step={step ?? 'any'}
       aria-label={label}
-      className={`${cellBase} font-mono-data text-right`}
+      className={`${cellBase} font-mono-data text-right ${className}`}
       {...props}
     />
   )

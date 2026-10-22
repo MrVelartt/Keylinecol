@@ -79,9 +79,9 @@ export default function ExportarPDF({
       : 'border border-strong text-primary hover:border-brand/50 hover:text-brand'
 
   return (
-    <div className={`flex flex-col sm:flex-row sm:items-end gap-3 ${className}`}>
+    <div className={`flex flex-col gap-3 ${conCliente ? '' : 'sm:flex-row sm:items-center'} ${className}`}>
       {conCliente && (
-        <div className="flex-1 min-w-0">
+        <div className="min-w-0">
           <label htmlFor={id} className="block text-secondary text-[13px] mb-1.5">
             Finca o cliente <span className="text-mono text-[11px]">· opcional, va en el PDF</span>
           </label>

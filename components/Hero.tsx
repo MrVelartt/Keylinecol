@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 
 import { useRef } from 'react'
 import { motion, useScroll, useTransform } from 'framer-motion'
@@ -7,7 +7,6 @@ import { palette, alpha } from '@/lib/theme'
 import { Accent } from '@/components/ui/SectionHeader'
 
 const VIDEO_SRC = '/video/hero.mp4'
-const VIDEO_WEBM = '/video/hero.webm'
 const VIDEO_POSTER = '/video/hero-poster.png'
 
 export default function Hero() {
@@ -34,7 +33,6 @@ export default function Hero() {
         playsInline
         poster={VIDEO_POSTER}
       >
-        <source src={VIDEO_WEBM} type="video/webm" />
         <source src={VIDEO_SRC} type="video/mp4" />
       </video>
 

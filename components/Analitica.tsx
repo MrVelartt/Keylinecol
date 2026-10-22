@@ -24,7 +24,7 @@ import ExportarPDF from '@/components/pdf/ExportarPDF'
 import { graficasAPng } from '@/lib/pdf/grafica'
 import type { Bloque, Reporte } from '@/lib/pdf/reporte'
 
-const WET_MONTHS = new Set([4, 5, 6, 7, 8, 9]) // Mayo–Octubre
+const WET_MONTHS = new Set([3, 4, 5, 6, 7, 8, 9, 10]) // Abril–Noviembre (≈ 94 % de la lluvia anual)
 
 const climate = proyectos.baranoa
 
@@ -218,13 +218,12 @@ export default function Analitica() {
     []
   )
 
+  // Máximos diarios reales del año elegido (no un promedio escalado).
   const maxDailyData = useMemo(() => {
-    const selectedRecord =
-      selectedYear === 'avg' ? null : climate.annualSeries.find((r) => r.year === selectedYear)
-    const scaleFactor = selectedRecord ? selectedRecord.precipMm / climate.kpis.precipMmYear : 1
+    const serie = selectedYear === 'avg' ? climate.monthlyMaxDailyAvg : (climate.monthlyMaxDailyByYear?.[selectedYear] ?? climate.monthlyMaxDailyAvg)
     return MONTH_LABELS_ES.map((label, i) => ({
       month: label,
-      mm: Math.round(climate.monthlyMaxDailyAvg[i] * scaleFactor * 10) / 10,
+      mm: Math.round(serie[i] * 10) / 10,
       wet: WET_MONTHS.has(i),
     }))
   }, [selectedYear])
@@ -258,7 +257,7 @@ export default function Analitica() {
         tipo: 'kv',
         filas: [
           ['Ubicación', `${climate.location} · ${climate.coords} · ${climate.elevation}`],
-          ['Área de la finca', `${climate.areaHa} ha`],
+          ['Área de captación', `${climate.areaHa} ha`],
           ['Estación', climate.station],
           ['Suelo · confiabilidad (tabla 2.3)', `${SUELO_TEXTURA_LABEL[runoff.suelo]} · ${CONFIABILIDAD_LABEL[runoff.confiabilidad]}`],
           ['Máximo anual histórico', `${nf0(climate.historicMaxAnnual.mm)} mm (${climate.historicMaxAnnual.year})`],
@@ -332,7 +331,7 @@ export default function Analitica() {
                   </span>
                 </div>
                 <div className="font-mono text-mono text-[11px] tracking-wide">
-                  {climate.location} · {climate.coords} · {climate.elevation} · Finca {climate.areaHa} ha
+                  {climate.location} · {climate.coords} · {climate.elevation} · Captación {climate.areaHa} ha
                 </div>
               </div>
 
@@ -341,7 +340,7 @@ export default function Analitica() {
                   { label: 'Precipitación', value: nf1(climate.kpis.precipMmYear), unit: 'mm/año' },
                   { label: 'ETo (FAO-56)', value: nf0(climate.kpis.etoMmYear), unit: 'mm/año' },
                   { label: 'Escorrentía', value: nf0(climate.kpis.runoffM3Year), unit: 'm³/año' },
-                  { label: 'Área total finca', value: `${climate.areaHa}`, unit: 'ha' },
+                  { label: 'Área de captación', value: `${climate.areaHa}`, unit: 'ha' },
                 ].map((kpi) => (
                   <div key={kpi.label}>
                     <div className="font-mono text-lg text-brand font-semibold leading-none mb-1.5">
@@ -449,12 +448,12 @@ export default function Analitica() {
                 <ChartFrame
                   title="Precipitación mensual"
                   icon={<CloudRainIcon className="text-mono shrink-0" />}
-                  note="Régimen bimodal con pico principal en agosto–septiembre."
+                  note="Régimen bimodal: un primer pico en mayo y el principal en agosto–octubre. Años incompletos (1999, 2004) excluidos."
                 >
                   <BarChart data={monthlyData} margin={CHART_MARGIN}>
                     <CartesianGrid {...gridProps} />
                     <XAxis dataKey="month" {...xAxisProps} />
-                    <YAxis domain={[0, 120]} {...yAxisProps} />
+                    <YAxis domain={[0, (max: number) => Math.ceil(max / 50) * 50]} {...yAxisProps} />
                     <Tooltip content={<ChartTooltip unit="mm" />} cursor={barCursor} />
                     <Bar dataKey="p" name="Precipitación" fill={series.water} radius={[4, 4, 0, 0]} />
                   </BarChart>
@@ -471,7 +470,7 @@ export default function Analitica() {
                   <LineChart data={annualTrendData} margin={CHART_MARGIN}>
                     <CartesianGrid {...gridProps} />
                     <XAxis dataKey="year" {...xAxisProps} tick={axisTickSmall} interval={2} />
-                    <YAxis domain={[0, 1800]} {...yAxisProps} />
+                    <YAxis domain={[0, (max: number) => Math.ceil(max / 250) * 250]} {...yAxisProps} />
                     <Tooltip content={<ChartTooltip unit="mm/año" />} cursor={lineCursor} />
                     <ReferenceLine y={climate.kpis.precipMmYear} {...neutralLine} />
                     <Line
@@ -498,7 +497,7 @@ export default function Analitica() {
                   </>
                 }
                 icon={<BoltIcon className="text-mono shrink-0" />}
-                note="Tono pleno: temporada de lluvias (may–oct). Tono atenuado: temporada seca."
+                note="Tono pleno: temporada de lluvias (abr–nov). Tono atenuado: temporada seca (dic–mar, ≈ 6 % de la lluvia anual)."
               >
                 <BarChart data={maxDailyData} margin={CHART_MARGIN}>
                   <CartesianGrid {...gridProps} />
@@ -552,7 +551,7 @@ export default function Analitica() {
                   { role: 'water', label: 'Precipitación' },
                   { role: 'demand', label: 'ETo (FAO-56 PM)' },
                 ]}
-                note="ETo estimada con climatología satelital NASA POWER (2001–2020, resolución ~50 km) sobre las coordenadas de la finca — no reemplaza una estación meteorológica en sitio."
+                note={`ETo: ${climate.etoSource}, con las temperaturas, humedad, viento y brillo solar de la zona.`}
               >
                 <ComposedChart data={monthlyData} margin={CHART_MARGIN}>
                   <CartesianGrid {...gridProps} />
@@ -598,7 +597,7 @@ export default function Analitica() {
                   Icon={CloudRainIcon}
                   eyebrow="Precipitación efectiva anual"
                   value={`${nf0(balance.precipEfectivaM3)} m³`}
-                  caption={`sobre ${climate.areaHa} ha de finca`}
+                  caption={`sobre ${climate.areaHa} ha de captación`}
                 />
               </div>
 
@@ -687,14 +686,14 @@ export default function Analitica() {
                   value={maxRunoffMonth.month}
                   caption={`${nf0(maxRunoffMonth.m3)} m³`}
                 />
-                <SummaryCard Icon={AreaIcon} eyebrow="Área de captación" value={`${climate.areaHa} ha`} caption="superficie total de la finca" />
+                <SummaryCard Icon={AreaIcon} eyebrow="Área de captación" value={`${climate.areaHa} ha`} caption="microcuencas Norte, Nororiente, Oriente y Sur" />
               </div>
 
               <ChartFrame
                 height={260}
                 title="Escorrentía capturable por mes"
                 icon={<DropletIcon className="text-mono shrink-0" />}
-                note={`Fórmula unificada, modo GUARDAR: V = 10 · C · A · P (Regrarians §2.19, tabla 2.3). Suelo: ${SUELO_TEXTURA_LABEL[runoff.suelo].toLowerCase()}, confiabilidad ${CONFIABILIDAD_LABEL[runoff.confiabilidad]} — el mismo método que usan las calculadoras de /herramientas.`}
+                note={`Fórmula unificada, modo GUARDAR: V = 10 · C · A · P (Regrarians §2.19, tabla 2.3). Suelo: ${SUELO_TEXTURA_LABEL[runoff.suelo].toLowerCase()}, confiabilidad ${CONFIABILIDAD_LABEL[runoff.confiabilidad]} — el mismo método que usan las calculadoras de /herramientas. Contraste del estudio de la finca: 30.962 m³/año con SCS-CN diario (CN 68) y 112.601 m³/año con Ce = 0,2.`}
               >
                 <BarChart data={monthlyData} margin={CHART_MARGIN}>
                   <CartesianGrid {...gridProps} />
@@ -708,9 +707,9 @@ export default function Analitica() {
           )}
 
           <p className="mt-6 text-mono text-[11px] text-center leading-relaxed">
-            Proyecto: {climate.name} — más proyectos próximamente. Precipitación: estación IDEAM Montebello ·
-            ETo: NASA POWER + FAO-56 Penman-Monteith · Escorrentía: fórmula unificada GUARDAR (C anual{' '}
-            {pct(runoff.cAnual)}). La serie histórica anual (1997–2025) sigue pendiente de control de calidad.
+            Proyecto: {climate.name} — más proyectos próximamente. Precipitación: {climate.precipSource} (años
+            incompletos 1999 y 2004 excluidos de los totales anuales) · ETo: {climate.etoSource} · Escorrentía: fórmula
+            unificada GUARDAR (C anual {pct(runoff.cAnual)}) sobre el área de captación.
           </p>
         </motion.div>
       </div>

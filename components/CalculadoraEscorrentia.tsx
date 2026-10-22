@@ -287,7 +287,7 @@ export default function CalculadoraEscorrentia() {
             inView={inView}
             className=""
             eyebrow="Herramientas Técnicas"
-            number="06"
+            number="07"
             title={
               <>
                 <Accent>Guarda</Accent> o{' '}

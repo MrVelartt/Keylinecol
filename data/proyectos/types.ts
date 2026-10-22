@@ -34,6 +34,18 @@ export interface ProjectClimate {
   monthlyPrecipAvg: number[] // 12 valores, Ene → Dic, mm promedio histórico
   monthlyEtoAvg: number[] // 12 valores, Ene → Dic, mm ETo de referencia (FAO-56 PM)
   monthlyMaxDailyAvg: number[] // 12 valores, Ene → Dic, mm máximo diario promedio
+  /** Lluvia máxima diaria de cada mes, por año (mm). */
+  monthlyMaxDailyByYear?: Record<number, number[]>
+  /** Lluvia del año seco (P80: superada 4 de cada 5 años), Ene → Dic, mm. */
+  monthlyPrecipP80?: number[]
+  /** Temperaturas medias mensuales (°C), para estimar ETo por Hargreaves. */
+  monthlyTmax?: number[]
+  monthlyTmin?: number[]
+  /** Latitud en grados decimales (negativa al sur). */
+  latitude?: number
+  /** Área regada de referencia (ha). */
+  irrigatedHa?: number
+  precipSource?: string
   annualSeries: AnnualRecord[]
   wettestMonth: { label: string; mm: number }
   historicMaxAnnual: { mm: number; year: number; note: string }

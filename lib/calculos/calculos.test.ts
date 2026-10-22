@@ -12,6 +12,7 @@ import { FONDOS, FONDO_GEOMEMBRANA, MATERIALES, MAQUINARIA } from '../../data/ca
 import { ZONAS } from '../../data/catalogos/clima'
 import { PRECIOS } from '../../data/catalogos/precios'
 import { baranoa } from '../../data/proyectos/baranoa'
+import { demandaAgricola, etoHargreavesMensual, peUsdaScs } from './agricola'
 
 const cat = { fondos: FONDOS, fondoGeomembrana: FONDO_GEOMEMBRANA, materiales: MATERIALES, precios: PRECIOS }
 
@@ -134,7 +135,10 @@ describe('escorrentía y balance (método oficial)', () => {
       etoShape: baranoa.monthlyEtoAvg,
     })
     expect(Math.round(b.escorrentiaM3)).toBe(baranoa.kpis.runoffM3Year)
-    expect(baranoa.kpis.etoMmYear).toBeCloseTo(1747.2)
+    // Datos corregidos del estudio Finca Alma Luz (17-oct-2026)
+    expect(baranoa.kpis.precipMmYear).toBeCloseTo(1253.3, 1)
+    expect(baranoa.kpis.etoMmYear).toBeCloseTo(1637.5, 1)
+    expect(baranoa.runoff.banda).toBe('mas1100')
     const sumaMensual = b.meses.reduce((s, m) => s + m.escorrentiaM3, 0)
     expect(sumaMensual).toBeCloseTo(b.escorrentiaM3)
   })
@@ -210,5 +214,51 @@ describe('Diseño Keyline Predial', () => {
     const r = calcPredial(estadoInicialPredial(), cat)
     const suma = r.cronograma.semestres.reduce((s, x) => s + totalSemestre(x), 0)
     expect(suma).toBeCloseTo(r.total, -2)
+  })
+})
+
+describe('demanda hídrica agrícola (estudio Finca Alma Luz)', () => {
+  const base = {
+    eto: baranoa.monthlyEtoAvg,
+    metodoPe: 'porcentaje' as const,
+    eficiencia: 0.75,
+    captacionHa: 44.9233,
+    c: 0,
+  }
+  // Escenarios de la hoja «Balance hídrico» del Excel corregido
+  it('crítico: P80, Pe 30 %, Kc 1,0, FS 1,2 → 367.451 m³', () => {
+    const r = demandaAgricola({ ...base, p: baranoa.monthlyPrecipP80!, cultivos: [{ nombre: 'Pasturas', ha: 16.22, kc: 1 }], pePct: 0.3, factorSeguridad: 1.2 })
+    expect(r.volDiseno).toBeCloseTo(367_451, -2)
+    expect(r.volNeto).toBeCloseTo(229_657, -2)
+  })
+  it('promedio: P media, Pe 40 %, Kc 0,9, FS 1,1 → 231.334 m³', () => {
+    const r = demandaAgricola({ ...base, p: baranoa.monthlyPrecipAvg, cultivos: [{ nombre: 'Pasturas', ha: 16.22, kc: 0.9 }], pePct: 0.4, factorSeguridad: 1.1 })
+    expect(r.volDiseno).toBeCloseTo(231_334, -2)
+  })
+  it('ideal: P media, Pe 40 %, Kc 0,85, FS 1,0 → 192.597 m³', () => {
+    const r = demandaAgricola({ ...base, p: baranoa.monthlyPrecipAvg, cultivos: [{ nombre: 'Pasturas', ha: 16.22, kc: 0.85 }], pePct: 0.4, factorSeguridad: 1 })
+    expect(r.volDiseno).toBeCloseTo(192_597, -2)
+  })
+  it('oferta GUARDAR y almacenamiento', () => {
+    const r = demandaAgricola({ ...base, p: [100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], eto: Array(12).fill(0), cultivos: [], pePct: 0.4, factorSeguridad: 1, captacionHa: 10, c: 0.1 })
+    expect(r.oferta).toBeCloseTo(1000)
+    expect(r.almacenamiento).toBe(0)
+  })
+  it('almacenamiento: con déficit anual solo se guarda el excedente', () => {
+    const r = demandaAgricola({ ...base, p: baranoa.monthlyPrecipAvg, cultivos: [{ nombre: 'Pasturas', ha: 16.22, kc: 0.9 }], pePct: 0.4, factorSeguridad: 1.1, c: 0.125 })
+    const excedente = r.meses.reduce((s, m) => s + Math.max(0, m.balance), 0)
+    expect(r.oferta).toBeLessThan(r.volDiseno)
+    expect(r.almacenamiento).toBeCloseTo(excedente)
+    expect(r.almacenamiento).toBeLessThan(r.oferta)
+  })
+  it('USDA-SCS (CROPWAT)', () => {
+    expect(peUsdaScs(100)).toBeCloseTo(84)
+    expect(peUsdaScs(300)).toBeCloseTo(155)
+  })
+  it('Hargreaves: ETo plausible en Baranoa (trópico cálido)', () => {
+    const eto = etoHargreavesMensual(10.79, baranoa.monthlyTmax!, baranoa.monthlyTmin!)
+    const anual = eto.reduce((a, b) => a + b, 0)
+    expect(anual).toBeGreaterThan(1500)
+    expect(anual).toBeLessThan(2100)
   })
 })
