@@ -10,6 +10,8 @@ import {
 } from '@/lib/permanenceScale'
 import { toneClass, toneColor, type Tone } from '@/lib/tones'
 import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import ExportarPDF from '@/components/pdf/ExportarPDF'
+import type { Reporte } from '@/lib/pdf/reporte'
 
 
 const STATUS_TONE: Record<PermanenceStatus, Tone> = {
@@ -85,6 +87,49 @@ export default function EscalaPermanencia() {
 
   const readinessTone: Tone = readinessPct >= 80 ? 'good' : readinessPct >= 40 ? 'warn' : 'bad'
   const readinessColor = toneColor[readinessTone]
+
+  const construirPDF = (cliente: string): Reporte => ({
+    herramienta: 'Escala de Permanencia',
+    titulo: 'Diagnóstico con la Escala de Permanencia',
+    subtitulo: 'Los 10 factores de diseño de P.A. Yeomans, de lo más fijo a lo más flexible, con el estado real de la finca.',
+    cliente,
+    slug: 'escala-de-permanencia',
+    disclaimer: 'Autoevaluación orientativa: no reemplaza una visita técnica ni un diseño Keyline en campo.',
+    bloques: [
+      {
+        tipo: 'kpis',
+        items: [
+          { k: 'Avance', v: `${readinessPct} % resuelto` },
+          { k: 'Prioridad', v: bottleneck ? `${String(bottleneck.order).padStart(2, '0')} · ${bottleneck.title}` : 'Todo resuelto' },
+          { k: 'Decisiones prematuras', v: String(atRiskFactors.length), sub: atRiskFactors.map((f) => f.shortLabel).join(', ') || undefined },
+        ],
+      },
+      ...(bottleneck
+        ? [{ tipo: 'nota' as const, tono: 'warn' as const, texto: `Resolver primero: ${bottleneck.title}. ${bottleneck.why}` }]
+        : [{ tipo: 'nota' as const, tono: 'good' as const, texto: 'Los 10 factores están resueltos: la finca tiene una base sólida para afinar economía y estética.' }]),
+      ...(atRiskFactors.length > 0
+        ? [
+            {
+              tipo: 'parrafo' as const,
+              texto: `Marcados como resueltos antes de resolver ${bottleneck?.title ?? ''}: ${atRiskFactors.map((f) => f.title).join(', ')}. Conviene revisarlos cuando ese factor cambie.`,
+            },
+          ]
+        : []),
+      { tipo: 'titulo', texto: 'Los 10 factores, en orden' },
+      {
+        tipo: 'tabla',
+        head: ['#', 'Factor', 'Estado', 'Nota de la finca'],
+        body: PERMANENCE_FACTORS.map((f) => [
+          String(f.order).padStart(2, '0'),
+          f.title,
+          STATUS_LABEL[statuses[f.id] ?? 'pendiente'],
+          notes[f.id]?.trim() || '—',
+        ]),
+        alinear: ['left', 'left', 'left', 'left'],
+        anchos: [6, 24, 14, 56],
+      },
+    ],
+  })
 
   const waMessage = encodeURIComponent(
     `Hola, quiero un diagnóstico real de mi finca con la Escala de Permanencia.\n` +
@@ -280,6 +325,8 @@ export default function EscalaPermanencia() {
             >
               Solicitar diagnóstico Keyline real
             </a>
+
+            <ExportarPDF className="mt-5" variante="secundario" etiqueta="Descargar diagnóstico (PDF)" construir={construirPDF} />
 
             <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Autoevaluación orientativa — no reemplaza una visita técnica ni un diseño Keyline en campo.

@@ -34,6 +34,8 @@ import {
   type SuperficieGuardar,
 } from '@/lib/calculos/escorrentia'
 import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import ExportarPDF from '@/components/pdf/ExportarPDF'
+import type { Reporte } from '@/lib/pdf/reporte'
 
 type Modo = 'guardar' | 'evacuar'
 type FuenteGuardar = 'superficie' | 'cuenca'
@@ -183,6 +185,87 @@ export default function CalculadoraEscorrentia() {
   const volumenEvacuarM3 = runoffVolumeM3(cAjustado, areaHa, precipAguaceroMm)
   const caudalPicoM3s = rationalPeakFlowM3s(cAjustado, areaHa, intensidadMmH)
   const caudalPicoLs = m3sToLs(caudalPicoM3s)
+
+  const construirPDF = (cliente: string): Reporte => {
+    const comun = {
+      herramienta: 'Escorrentía GUARDAR / EVACUAR',
+      cliente,
+      slug: modo === 'guardar' ? 'escorrentia-guardar' : 'escorrentia-evacuar',
+      disclaimer:
+        'Estimación orientativa: en obras con riesgo aguas abajo (viviendas, vías o personas), el diseño final lo firma un profesional con la norma vigente. Método: Regrarians Handbook §2.19 y Manual de Drenaje INVÍAS (2009).',
+    }
+    if (modo === 'guardar') {
+      return {
+        ...comun,
+        titulo: 'Escorrentía anual — modo GUARDAR',
+        subtitulo: 'Volumen que escurre en un año promedio: dimensiona reservorios y cosecha de agua. V = 10 · C · A · P.',
+        bloques: [
+          {
+            tipo: 'kpis',
+            items: [
+              { k: 'Volumen anual', v: `${nf0.format(volumenGuardarM3)} m³/año` },
+              { k: 'Caudal medio', v: `${nf1.format(caudalMedioLs)} L/s`, sub: `${nf3.format(caudalMedioM3s)} m³/s` },
+              { k: 'Coeficiente C', v: `${nf1.format(cGuardar * 100)} %` },
+            ],
+          },
+          { tipo: 'titulo', texto: 'Datos de entrada' },
+          {
+            tipo: 'kv',
+            filas: [
+              ['Área', `${nf1.format(areaHa)} ha`],
+              ['Precipitación anual', `${nf0.format(precipAnualMm)} mm`],
+              ...(fuenteGuardar === 'cuenca'
+                ? ([
+                    ['Fuente del coeficiente', 'Cuenca (tabla 2.3)'],
+                    ['Lluvia y evaporación', BANDA_LLUVIA_EVAP_LABEL[banda]],
+                    ['Confiabilidad', CONFIABILIDAD_LABEL[confiabilidad]],
+                    ['Suelo', SUELO_TEXTURA_LABEL[textura]],
+                  ] as [string, string][])
+                : ([
+                    ['Fuente del coeficiente', 'Tipo de superficie (tabla 2.4)'],
+                    ['Superficie', SUPERFICIE_GUARDAR_LABEL[superficie]],
+                  ] as [string, string][])),
+              [
+                'Rango de C de la tabla',
+                rangoGuardarActivo ? `${nf1.format(rangoGuardarActivo[0] * 100)} – ${nf1.format(rangoGuardarActivo[1] * 100)} %` : 'sin dato',
+              ],
+              ['Coeficiente C usado', `${nf1.format(cGuardar * 100)} %`],
+            ],
+          },
+        ],
+      }
+    }
+    return {
+      ...comun,
+      titulo: 'Caudal pico — modo EVACUAR',
+      subtitulo: `Caudal del aguacero de diseño (T = ${RETORNO_T_LABEL[retorno]}) para dimensionar vertederos, canales y zanjas. Q = C · i · A / 360.`,
+      bloques: [
+        {
+          tipo: 'kpis',
+          items: [
+            { k: 'Caudal pico', v: `${nf2.format(caudalPicoM3s)} m³/s`, sub: `${nf0.format(caudalPicoLs)} L/s` },
+            { k: 'Volumen del aguacero', v: `${nf0.format(volumenEvacuarM3)} m³` },
+            { k: 'Intensidad de diseño', v: `${nf1.format(intensidadMmH)} mm/h`, sub: `Tc ${nf1.format(tcMin)} min` },
+          ],
+        },
+        { tipo: 'titulo', texto: 'Datos de entrada' },
+        {
+          tipo: 'kv',
+          filas: [
+            ['Área', `${nf1.format(areaHa)} ha`],
+            ['Cobertura', COBERTURA_LABEL[cobertura]],
+            ['Suelo', SUELO_PERMEABILIDAD_LABEL[sueloPerm]],
+            ['Pendiente', PENDIENTE_BANDA_LABEL[pendiente]],
+            ['C base · C ajustado por retorno', `${nf2.format(cBase)} · ${nf2.format(cAjustado)}`],
+            ['Periodo de retorno', RETORNO_T_LABEL[retorno]],
+            ['Longitud del cauce · desnivel', `${nf0.format(longitudM)} m · ${nf0.format(desnivelM)} m`],
+            ['Tiempo de concentración', `${nf1.format(tcMin)} min${tcManual !== null ? ' (manual)' : ' (Kirpich)'}`],
+            ['Región IDF · lluvia máxima 24 h', `${REGION_IDF_LABEL[region]} · ${nf0.format(mMax24h)} mm`],
+          ],
+        },
+      ],
+    }
+  }
 
   const waMessage = encodeURIComponent(
     modo === 'guardar'
@@ -661,6 +744,8 @@ export default function CalculadoraEscorrentia() {
             >
               {modo === 'guardar' ? 'Dimensionar mi reservorio' : 'Diseñar mi vertedero o canal'}
             </a>
+
+            <ExportarPDF className="mt-5" variante="secundario" etiqueta="Descargar cálculo (PDF)" construir={construirPDF} />
 
             <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Estimación orientativa — en obras con riesgo aguas abajo (viviendas, vías o personas), el diseño final lo

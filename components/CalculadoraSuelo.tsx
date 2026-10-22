@@ -6,6 +6,9 @@ import { PolarAngleAxis, PolarGrid, Radar, RadarChart, ResponsiveContainer, Tool
 import { palette } from '@/lib/theme'
 import { toneClass, toneColor, type Tone } from '@/lib/tones'
 import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import ExportarPDF from '@/components/pdf/ExportarPDF'
+import { graficaAPng } from '@/lib/pdf/grafica'
+import type { Bloque, Reporte } from '@/lib/pdf/reporte'
 
 interface ParamDef {
   key: string
@@ -107,11 +110,15 @@ function ParamField({
   value,
   onChange,
   uid,
+  editRange,
+  onRange,
 }: {
   def: ParamDef
   value: number
   onChange: (v: number) => void
   uid: string
+  editRange: boolean
+  onRange: (r: { min: number; max: number }) => void
 }) {
   const status = statusOf(value, def)
   return (
@@ -133,10 +140,40 @@ function ParamField({
         />
         {def.unit && <span className="text-mono text-[11px] shrink-0 w-16">{def.unit}</span>}
       </div>
-      <div className="font-mono text-[10px] text-mono tracking-wide">
-        Rango adecuado: {def.invert ? `< ${nf.format(def.max)}` : `${nf.format(def.min)} – ${nf.format(def.max)}`}{' '}
-        {def.unit}
-      </div>
+      {editRange ? (
+        <div className="flex items-center gap-1.5 font-mono text-[10px] text-mono">
+          <span>Rango</span>
+          {def.invert ? (
+            <span>{'<'}</span>
+          ) : (
+            <>
+              <input
+                type="number"
+                step={def.step}
+                aria-label={`Mínimo adecuado de ${def.label}`}
+                value={def.min}
+                onChange={(e) => onRange({ min: Number(e.target.value) || 0, max: def.max })}
+                className="w-16 px-1.5 py-1 rounded bg-surface border border-subtle text-primary"
+              />
+              <span>–</span>
+            </>
+          )}
+          <input
+            type="number"
+            step={def.step}
+            aria-label={`Máximo adecuado de ${def.label}`}
+            value={def.max}
+            onChange={(e) => onRange({ min: def.min, max: Number(e.target.value) || 0 })}
+            className="w-16 px-1.5 py-1 rounded bg-surface border border-subtle text-primary"
+          />
+          <span>{def.unit}</span>
+        </div>
+      ) : (
+        <div className="font-mono text-[10px] text-mono tracking-wide">
+          Rango adecuado: {def.invert ? `< ${nf.format(def.max)}` : `${nf.format(def.min)} – ${nf.format(def.max)}`}{' '}
+          {def.unit}
+        </div>
+      )}
     </div>
   )
 }
@@ -148,26 +185,42 @@ export default function CalculadoraSuelo() {
 
   const defaults = useMemo(() => Object.fromEntries(ALL_PARAMS.map((p) => [p.key, p.default])), [])
   const [values, setValues] = useState<Record<string, number>>(defaults)
+  // Rangos adecuados editables (por textura o región).
+  const [ranges, setRanges] = useState<Record<string, { min: number; max: number }>>({})
+  const [editRanges, setEditRanges] = useState(false)
+  const [caMgRange, setCaMgRange] = useState({ min: 3.0, max: 5.0 })
+  const radarRef = useRef<HTMLDivElement>(null)
+  const eff = (p: ParamDef): ParamDef => ({ ...p, ...ranges[p.key] })
+  const MAIN = MAIN_PARAMS.map(eff)
+  const MICRO = MICRO_PARAMS.map(eff)
+  const ALL = [...MAIN, ...MICRO]
+  const setRange = (key: string, r: { min: number; max: number }) => setRanges((prev) => ({ ...prev, [key]: r }))
 
-  const resetDefaults = () => setValues(defaults)
+  const resetDefaults = () => {
+    setValues(defaults)
+    setRanges({})
+    setCaMgRange({ min: 3.0, max: 5.0 })
+  }
   const update = (key: string, v: number) => setValues((prev) => ({ ...prev, [key]: v }))
 
   const fertilityIndex = useMemo(() => {
-    const total = ALL_PARAMS.reduce((sum, p) => sum + scoreOf(values[p.key], p.min, p.max, p.invert) * p.weight, 0)
+    const total = ALL.reduce((sum, p) => sum + scoreOf(values[p.key], p.min, p.max, p.invert) * p.weight, 0)
     return Math.round(clamp(total, 0, 100))
-  }, [values])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values, ranges])
 
   const caMg = values.mg > 0 ? values.ca / values.mg : 0
-  const caMgStatus = simpleStatus(caMg, 3.0, 5.0)
+  const caMgStatus = simpleStatus(caMg, caMgRange.min, caMgRange.max)
 
   const radarData = useMemo(
     () =>
-      MAIN_PARAMS.map((p) => ({
+      MAIN.map((p) => ({
         subject: p.short,
         actual: Math.round(scoreOf(values[p.key], p.min, p.max, p.invert)),
         optimo: 100,
       })),
-    [values]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [values, ranges]
   )
 
   const indexTone: Tone = fertilityIndex >= 70 ? 'good' : fertilityIndex >= 40 ? 'warn' : 'bad'
@@ -175,13 +228,13 @@ export default function CalculadoraSuelo() {
 
   const recommendations = useMemo(() => {
     const list: { tone: Tone; text: string }[] = []
-    const phMin = MAIN_PARAMS[0].min
-    const alMax = MAIN_PARAMS.find((p) => p.key === 'al')!.max
-    const pMin = MAIN_PARAMS.find((p) => p.key === 'p')!.min
-    const moMin = MAIN_PARAMS.find((p) => p.key === 'mo')!.min
-    const bMin = MICRO_PARAMS.find((p) => p.key === 'b')!.min
-    const znMin = MICRO_PARAMS.find((p) => p.key === 'zn')!.min
-    const cuMin = MICRO_PARAMS.find((p) => p.key === 'cu')!.min
+    const phMin = MAIN[0].min
+    const alMax = MAIN.find((p) => p.key === 'al')!.max
+    const pMin = MAIN.find((p) => p.key === 'p')!.min
+    const moMin = MAIN.find((p) => p.key === 'mo')!.min
+    const bMin = MICRO.find((p) => p.key === 'b')!.min
+    const znMin = MICRO.find((p) => p.key === 'zn')!.min
+    const cuMin = MICRO.find((p) => p.key === 'cu')!.min
 
     if (values.ph < phMin) {
       list.push({
@@ -207,10 +260,10 @@ export default function CalculadoraSuelo() {
         text: 'Materia orgánica baja: incorpora humus de lombriz o compost (referencia 5–8 ton/ha) para mejorar la CIC efectiva, la retención de agua y la actividad biológica.',
       })
     }
-    if (caMg < 3.0) {
+    if (caMg < caMgRange.min) {
       list.push({
         tone: 'warn',
-        text: `Relación Ca/Mg baja (${nf.format(caMg)}, ideal 3.0–5.0): usa fuentes de calcio sin magnesio (cal calcítica, yeso agrícola) para no acentuar el desbalance.`,
+        text: `Relación Ca/Mg baja (${nf.format(caMg)}, ideal ${nf.format(caMgRange.min)}–${nf.format(caMgRange.max)}): usa fuentes de calcio sin magnesio (cal calcítica, yeso agrícola) para no acentuar el desbalance.`,
       })
     }
     if (values.b < bMin) {
@@ -226,7 +279,46 @@ export default function CalculadoraSuelo() {
       list.push({ tone: 'good', text: 'Los parámetros principales están dentro de rango. Mantén el monitoreo anual y las prácticas actuales.' })
     }
     return list
-  }, [values, caMg])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [values, caMg, ranges, caMgRange])
+
+  const construirPDF = async (cliente: string): Promise<Reporte> => {
+    const radar = await graficaAPng(radarRef.current)
+    const filas = (ps: ParamDef[]) =>
+      ps.map((p) => [
+        p.label,
+        `${nf.format(values[p.key])} ${p.unit}`.trim(),
+        p.invert ? `< ${nf.format(p.max)}` : `${nf.format(p.min)} – ${nf.format(p.max)}`,
+        statusOf(values[p.key], p).label,
+      ])
+    const bloques: Bloque[] = [
+      {
+        tipo: 'kpis',
+        items: [
+          { k: 'Índice de fertilidad', v: `${fertilityIndex} / 100` },
+          { k: 'Relación Ca/Mg', v: nf.format(caMg), sub: `${caMgStatus.label} · ideal ${nf.format(caMgRange.min)}–${nf.format(caMgRange.max)}` },
+          { k: 'pH', v: nf.format(values.ph), sub: statusOf(values.ph, MAIN[0]).label },
+        ],
+      },
+      ...(radar ? [{ tipo: 'grafica' as const, titulo: 'Puntaje por parámetro (100 = dentro del rango)', png: radar.png, ratio: radar.ratio }] : []),
+      { tipo: 'titulo', texto: 'Parámetros químicos principales' },
+      { tipo: 'tabla', head: ['Parámetro', 'Valor', 'Rango adecuado', 'Estado'], body: filas(MAIN), alinear: ['left', 'right', 'right', 'left'] },
+      { tipo: 'titulo', texto: 'Micronutrientes y nitrógeno' },
+      { tipo: 'tabla', head: ['Parámetro', 'Valor', 'Rango adecuado', 'Estado'], body: filas(MICRO), alinear: ['left', 'right', 'right', 'left'] },
+      { tipo: 'titulo', texto: 'Recomendaciones' },
+      ...recommendations.map((r) => ({ tipo: 'nota' as const, texto: r.text, tono: r.tone === 'good' ? ('good' as const) : ('warn' as const) })),
+    ]
+    return {
+      herramienta: 'Análisis de suelo',
+      titulo: 'Diagnóstico de fertilidad del suelo',
+      subtitulo: 'Estado de cada parámetro frente a su rango adecuado e índice de fertilidad ponderado.',
+      cliente,
+      slug: 'analisis-de-suelo',
+      disclaimer:
+        'Estimación orientativa: no reemplaza un análisis de laboratorio ni un diseño técnico Keyline. Rangos de referencia para suelo tropical; ajústelos por textura y región.',
+      bloques,
+    }
+  }
 
   const waMessage = encodeURIComponent(
     `Hola, quiero un análisis de suelo real para mi finca.\n` +
@@ -273,13 +365,31 @@ export default function CalculadoraSuelo() {
                   <span className="font-mono text-[11px] text-brand/50 tracking-widest">01</span>
                   <h3 className="font-display text-xl font-semibold">Parámetros químicos principales</h3>
                 </div>
-                <button onClick={resetDefaults} className="text-mono text-xs hover:text-brand transition-colors">
-                  Restablecer valores de ejemplo
-                </button>
+                <div className="flex items-center gap-4">
+                  <button
+                    type="button"
+                    aria-pressed={editRanges}
+                    onClick={() => setEditRanges((v) => !v)}
+                    className={`text-xs transition-colors ${editRanges ? 'text-brand' : 'text-mono hover:text-brand'}`}
+                  >
+                    {editRanges ? 'Listo con los rangos' : 'Editar rangos adecuados'}
+                  </button>
+                  <button onClick={resetDefaults} className="text-mono text-xs hover:text-brand transition-colors">
+                    Restablecer valores de ejemplo
+                  </button>
+                </div>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {MAIN_PARAMS.map((p) => (
-                  <ParamField key={p.key} def={p} value={values[p.key]} onChange={(v) => update(p.key, v)} uid={uid} />
+                {MAIN.map((p) => (
+                  <ParamField
+                    key={p.key}
+                    def={p}
+                    value={values[p.key]}
+                    onChange={(v) => update(p.key, v)}
+                    uid={uid}
+                    editRange={editRanges}
+                    onRange={(r) => setRange(p.key, r)}
+                  />
                 ))}
               </div>
               <div className="mt-5 px-1 flex items-center gap-2 text-[12px] text-mono flex-wrap">
@@ -287,7 +397,32 @@ export default function CalculadoraSuelo() {
                   Relación Ca/Mg: <span className="font-mono text-secondary">{nf.format(caMg)}</span>
                 </span>
                 <Pill tone={caMgStatus.tone} label={caMgStatus.label} />
-                <span className="text-mono">· ideal 3.0 – 5.0</span>
+                {editRanges ? (
+                  <span className="flex items-center gap-1.5 font-mono text-[11px]">
+                    · ideal
+                    <input
+                      type="number"
+                      step={0.1}
+                      aria-label="Relación Ca/Mg mínima"
+                      value={caMgRange.min}
+                      onChange={(e) => setCaMgRange((r) => ({ ...r, min: Number(e.target.value) || 0 }))}
+                      className="w-14 px-1.5 py-1 rounded bg-surface border border-subtle text-primary"
+                    />
+                    –
+                    <input
+                      type="number"
+                      step={0.1}
+                      aria-label="Relación Ca/Mg máxima"
+                      value={caMgRange.max}
+                      onChange={(e) => setCaMgRange((r) => ({ ...r, max: Number(e.target.value) || 0 }))}
+                      className="w-14 px-1.5 py-1 rounded bg-surface border border-subtle text-primary"
+                    />
+                  </span>
+                ) : (
+                  <span className="text-mono">
+                    · ideal {nf.format(caMgRange.min)} – {nf.format(caMgRange.max)}
+                  </span>
+                )}
               </div>
             </motion.div>
 
@@ -302,8 +437,16 @@ export default function CalculadoraSuelo() {
                 <h3 className="font-display text-xl font-semibold">Micronutrientes y nitrógeno</h3>
               </div>
               <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                {MICRO_PARAMS.map((p) => (
-                  <ParamField key={p.key} def={p} value={values[p.key]} onChange={(v) => update(p.key, v)} uid={uid} />
+                {MICRO.map((p) => (
+                  <ParamField
+                    key={p.key}
+                    def={p}
+                    value={values[p.key]}
+                    onChange={(v) => update(p.key, v)}
+                    uid={uid}
+                    editRange={editRanges}
+                    onRange={(r) => setRange(p.key, r)}
+                  />
                 ))}
               </div>
             </motion.div>
@@ -333,7 +476,7 @@ export default function CalculadoraSuelo() {
               />
             </div>
 
-            <div className="h-[220px] mb-6 -ml-2">
+            <div ref={radarRef} className="h-[220px] mb-6 -ml-2">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData} outerRadius="72%">
                   <PolarGrid stroke="rgba(255,255,255,0.08)" />
@@ -366,6 +509,8 @@ export default function CalculadoraSuelo() {
             >
               Solicitar análisis real de tu finca
             </a>
+
+            <ExportarPDF className="mt-5" variante="secundario" etiqueta="Descargar diagnóstico (PDF)" construir={construirPDF} />
 
             <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Estimación orientativa — no reemplaza un análisis de laboratorio ni un diseño técnico Keyline.

@@ -127,6 +127,8 @@ export interface PredialState {
     /** null = usar el volumen calculado. */
     volumenManualM3: number | null
     impermeabilizar: boolean
+    /** Precios de impermeabilización (COP/m² y COP/ml); editables. */
+    preciosGeo?: { geomembrana: number; geotextil: number; anclaje: number }
     tanquesM3: number
   }
   tierra: {
@@ -294,7 +296,7 @@ export function calcPredial(s: PredialState, cat: PredialCatalogos): PredialResu
     viajes: s.tierra.viajes,
     indirectosPct: s.tierra.indirectosPct,
   })
-  const costoGeo = agua.impermeabilizar ? costoGeomembrana(areaVaso, espejoDiseno, cat.precios) : 0
+  const costoGeo = agua.impermeabilizar ? costoGeomembrana(areaVaso, espejoDiseno, agua.preciosGeo ?? cat.precios) : 0
   const copM3Almacenado = volumenDiseno > 0 ? (tierra.costoTotal + costoGeo) / volumenDiseno : 0
 
   // Costos por capa

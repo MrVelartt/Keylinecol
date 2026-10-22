@@ -4,6 +4,7 @@ import { Accent } from '@/components/ui/SectionHeader'
 import { ANIMALES, CULTIVOS, FACTORES_TEMPERATURA, RIEGOS } from '@/data/catalogos/agua'
 import { FONDOS, MATERIALES, RANGO_COP_M3_ALMACENADO, TIPOLOGIAS } from '@/data/catalogos/obra'
 import { cMedio, nuevoId } from '@/data/catalogos/predial'
+import { PRECIOS } from '@/data/catalogos/precios'
 import { SUPERFICIE_GUARDAR_LABEL, SUPERFICIE_GUARDAR_RANGE, type SuperficieGuardar } from '@/lib/calculos/escorrentia'
 import CostTable from '../CostTable'
 import { cop, copC, nf, nf1, nf2 } from '../fmt'
@@ -495,6 +496,37 @@ export default function Agua({ s, r, set }: PanelProps) {
             />
             <NumField label="Almacenamiento en tanques" unit="m³" min={0} step={1} value={ag.tanquesM3} onChange={n('tanquesM3')} />
           </Grid>
+          {ag.impermeabilizar && (
+            <Grid cols={3} className="mt-4 pt-4 border-t border-subtle">
+              {(
+                [
+                  ['geomembrana', 'Geomembrana HDPE instalada', 'COP/m²'],
+                  ['geotextil', 'Geotextil de protección', 'COP/m²'],
+                  ['anclaje', 'Zanja de anclaje perimetral', 'COP/ml'],
+                ] as const
+              ).map(([k, label, unit]) => (
+                <NumField
+                  key={k}
+                  label={label}
+                  unit={unit}
+                  min={0}
+                  step={500}
+                  value={ag.preciosGeo?.[k] ?? PRECIOS[k]}
+                  onChange={(v) =>
+                    set((d) => {
+                      d.agua.preciosGeo = {
+                        geomembrana: PRECIOS.geomembrana,
+                        geotextil: PRECIOS.geotextil,
+                        anclaje: PRECIOS.anclaje,
+                        ...d.agua.preciosGeo,
+                        [k]: v,
+                      }
+                    })
+                  }
+                />
+              ))}
+            </Grid>
+          )}
           <div className="grid grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5 gap-3 mt-5">
             <Stat k="Déficit a cubrir" v={`${nf(r.deficitSeca)} m³`} sub={`${nf(ag.coberturaDeficitPct)} % del déficit de la época seca`} />
             <Stat k="Volumen útil requerido" v={`${nf(r.volumenRequerido)} m³`} sub={`factor de seguridad ${nf2(ag.factorSeguridad)}`} />

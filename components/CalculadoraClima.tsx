@@ -7,6 +7,9 @@ import { climateData, DEFAULT_RUNOFF_CN } from '@/lib/climateData'
 import { scsCnAnnualRunoffM3, scsCnMonthlyRunoffMm } from '@/lib/hydrology'
 import { toneClass, type Tone } from '@/lib/tones'
 import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import ExportarPDF from '@/components/pdf/ExportarPDF'
+import { graficaAPng } from '@/lib/pdf/grafica'
+import type { Bloque, Reporte } from '@/lib/pdf/reporte'
 
 const MESES = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic']
 
@@ -24,6 +27,12 @@ const DEFAULTS = {
   precipAnual: climateData.baranoa.kpis.precipMmYear,
   etoAnual: climateData.baranoa.kpis.etoMmYear,
   cn: DEFAULT_RUNOFF_CN,
+}
+
+/** Escala un patrón mensual a un total anual (si el actual suma 0, usa el patrón de referencia). */
+function escalar(m: readonly number[], sumaActual: number, total: number, ref: readonly number[] = m, sumaRef = sumaActual) {
+  if (sumaActual > 0) return m.map((x) => (x / sumaActual) * total)
+  return ref.map((x) => (sumaRef > 0 ? (x / sumaRef) * total : total / 12))
 }
 
 const BLUE = '#38bdf8'
@@ -98,40 +107,45 @@ export default function CalculadoraClima() {
   const uid = useId()
 
   const [areaHa, setAreaHa] = useState(DEFAULTS.areaHa)
-  const [precipAnual, setPrecipAnual] = useState(DEFAULTS.precipAnual)
-  const [etoAnual, setEtoAnual] = useState(DEFAULTS.etoAnual)
   const [cn, setCn] = useState(DEFAULTS.cn)
+  // Lluvia y ETo mes a mes (editables). Los totales anuales reescalan el patrón.
+  const [pMes, setPMes] = useState(() => escalar(PP_SHAPE, PP_SHAPE_SUM, DEFAULTS.precipAnual))
+  const [etoMes, setEtoMes] = useState(() => escalar(ETO_SHAPE, ETO_SHAPE_SUM, DEFAULTS.etoAnual))
+  const [editarMeses, setEditarMeses] = useState(false)
+  const graficaLluviaRef = useRef<HTMLDivElement>(null)
+  const graficaEscRef = useRef<HTMLDivElement>(null)
+
+  const suma = (a: number[]) => a.reduce((x, y) => x + y, 0)
+  const precipAnual = Math.round(suma(pMes))
+  const etoAnual = Math.round(suma(etoMes))
+  const setPrecipAnual = (v: number) => setPMes((m) => escalar(m, suma(m), v, PP_SHAPE, PP_SHAPE_SUM))
+  const setEtoAnual = (v: number) => setEtoMes((m) => escalar(m, suma(m), v, ETO_SHAPE, ETO_SHAPE_SUM))
+  const setMes = (arr: 'p' | 'eto', i: number, v: number) =>
+    (arr === 'p' ? setPMes : setEtoMes)((m) => m.map((x, k) => (k === i ? Math.max(0, v) : x)))
 
   const resetDefaults = () => {
     setAreaHa(DEFAULTS.areaHa)
-    setPrecipAnual(DEFAULTS.precipAnual)
-    setEtoAnual(DEFAULTS.etoAnual)
+    setPMes(escalar(PP_SHAPE, PP_SHAPE_SUM, DEFAULTS.precipAnual))
+    setEtoMes(escalar(ETO_SHAPE, ETO_SHAPE_SUM, DEFAULTS.etoAnual))
     setCn(DEFAULTS.cn)
   }
 
   const monthly = useMemo(() => {
-    const monthlyP = PP_SHAPE.map((shape) => (shape / PP_SHAPE_SUM) * precipAnual)
-    const monthlyQ = scsCnMonthlyRunoffMm(monthlyP, cn)
-    return MESES.map((mes, i) => {
-      const eto = (ETO_SHAPE[i] / ETO_SHAPE_SUM) * etoAnual
-      return {
-        mes,
-        p: Math.round(monthlyP[i] * 10) / 10,
-        eto: Math.round(eto * 10) / 10,
-        escorrentia: Math.round(monthlyQ[i] * areaHa * 10),
-      }
-    })
-  }, [precipAnual, etoAnual, cn, areaHa])
+    const monthlyQ = scsCnMonthlyRunoffMm(pMes, cn)
+    return MESES.map((mes, i) => ({
+      mes,
+      p: Math.round(pMes[i] * 10) / 10,
+      eto: Math.round(etoMes[i] * 10) / 10,
+      escorrentia: Math.round(monthlyQ[i] * areaHa * 10),
+    }))
+  }, [pMes, etoMes, cn, areaHa])
 
   const deficitAnual = precipAnual - etoAnual
   const precipEfectivaM3 = precipAnual * areaHa * 10
   const demandaEtoM3 = etoAnual * areaHa * 10
   // Escorrentía total calculada sobre los mm sin redondear (no sumando las
   // barras del gráfico, ya redondeadas mes a mes) — misma cifra exacta que /analitica.
-  const escorrentiaTotalM3 = useMemo(() => {
-    const monthlyP = PP_SHAPE.map((shape) => (shape / PP_SHAPE_SUM) * precipAnual)
-    return scsCnAnnualRunoffM3(monthlyP, areaHa, cn)
-  }, [precipAnual, cn, areaHa])
+  const escorrentiaTotalM3 = useMemo(() => scsCnAnnualRunoffM3(pMes, areaHa, cn), [pMes, cn, areaHa])
   const coberturaPct = demandaEtoM3 > 0 ? (escorrentiaTotalM3 / demandaEtoM3) * 100 : 0
 
   const recommendations = useMemo(() => {
@@ -164,6 +178,51 @@ export default function CalculadoraClima() {
     }
     return list
   }, [deficitAnual, coberturaPct, escorrentiaTotalM3, cn])
+
+  const construirPDF = async (cliente: string): Promise<Reporte> => {
+    const [g1, g2] = await Promise.all([graficaAPng(graficaLluviaRef.current), graficaAPng(graficaEscRef.current)])
+    const bloques: Bloque[] = [
+      {
+        tipo: 'kpis',
+        items: [
+          { k: 'Balance anual P − ETo', v: `${nf0.format(deficitAnual)} mm`, sub: deficitAnual < 0 ? 'déficit' : 'excedente' },
+          { k: 'Escorrentía capturable', v: `${nf0.format(escorrentiaTotalM3)} m³/año`, sub: `CN ${cn}` },
+          { k: 'Cobertura de la demanda', v: `${nf1.format(coberturaPct)} %`, sub: `de ${nf0.format(demandaEtoM3)} m³ de ETo` },
+        ],
+      },
+      { tipo: 'titulo', texto: 'Datos de entrada' },
+      {
+        tipo: 'kv',
+        filas: [
+          ['Área de la finca', `${nf1.format(areaHa)} ha`],
+          ['Precipitación anual', `${nf0.format(precipAnual)} mm`],
+          ['ETo anual (FAO-56)', `${nf0.format(etoAnual)} mm`],
+          ['Número de curva (CN)', String(cn)],
+        ],
+      },
+      ...(g1 ? [{ tipo: 'grafica' as const, titulo: 'Precipitación (barras) vs. ETo (línea) por mes, mm', png: g1.png, ratio: g1.ratio }] : []),
+      { tipo: 'titulo', texto: 'Balance mensual' },
+      {
+        tipo: 'tabla',
+        head: ['Mes', 'Precipitación mm', 'ETo mm', 'P − ETo mm', 'Escorrentía m³'],
+        body: monthly.map((m) => [m.mes, nf1.format(m.p), nf1.format(m.eto), nf1.format(m.p - m.eto), nf0.format(m.escorrentia)]),
+        foot: [['Año', nf0.format(precipAnual), nf0.format(etoAnual), nf0.format(deficitAnual), nf0.format(escorrentiaTotalM3)]],
+      },
+      ...(g2 ? [{ tipo: 'grafica' as const, titulo: 'Escorrentía capturable por mes, m³', png: g2.png, ratio: g2.ratio }] : []),
+      { tipo: 'titulo', texto: 'Lectura Keyline' },
+      ...recommendations.map((r) => ({ tipo: 'nota' as const, texto: r.text, tono: r.tone === 'good' ? ('good' as const) : ('warn' as const) })),
+    ]
+    return {
+      herramienta: 'Balance hídrico',
+      titulo: 'Balance de clima y agua',
+      subtitulo: 'Precipitación, evapotranspiración y escorrentía capturable mes a mes.',
+      cliente,
+      slug: 'balance-hidrico',
+      disclaimer:
+        'Estimación preliminar: el método CN aplicado a promedios mensuales es una aproximación y no reemplaza un estudio hidrológico de campo.',
+      bloques,
+    }
+  }
 
   const waMessage = encodeURIComponent(
     `Hola, quiero un estudio hidrológico real para mi finca.\n` +
@@ -261,6 +320,54 @@ export default function CalculadoraClima() {
                   />
                 </Field>
               </div>
+              <button
+                type="button"
+                aria-expanded={editarMeses}
+                onClick={() => setEditarMeses((v) => !v)}
+                className="mb-4 text-xs text-mono hover:text-brand transition-colors"
+              >
+                {editarMeses ? 'Ocultar valores mensuales' : 'Editar lluvia y ETo mes a mes'}
+              </button>
+              {editarMeses && (
+                <div className="mb-5 overflow-x-auto">
+                  <table className="w-full min-w-[640px] text-[12px] font-mono">
+                    <thead>
+                      <tr>
+                        <th className="text-left text-mono font-normal pb-2 pr-2">mm</th>
+                        {MESES.map((m) => (
+                          <th key={m} className="text-mono font-normal pb-2 px-0.5">
+                            {m}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {(
+                        [
+                          ['p', 'Lluvia', pMes],
+                          ['eto', 'ETo', etoMes],
+                        ] as const
+                      ).map(([k, label, arr]) => (
+                        <tr key={k}>
+                          <td className="text-secondary pr-2 py-1">{label}</td>
+                          {arr.map((v, i) => (
+                            <td key={i} className="px-0.5 py-1">
+                              <input
+                                type="number"
+                                min={0}
+                                aria-label={`${label} de ${MESES[i]}`}
+                                value={Math.round(v)}
+                                onChange={(e) => setMes(k, i, Number(e.target.value) || 0)}
+                                className="w-full min-w-[44px] px-1 py-1.5 rounded bg-surface border border-subtle text-primary text-right focus:outline-none focus:border-brand/50"
+                              />
+                            </td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
               <p className="text-mono text-[11px] leading-relaxed">
                 CN bajo (30–50): pastos/bosque con buena infiltración. CN medio (50–75): uso mixto o suelo
                 moderadamente compactado. CN alto (75–95): suelo compactado o escorrentía rápida. La
@@ -279,7 +386,7 @@ export default function CalculadoraClima() {
                 <span className="font-mono text-[11px] text-brand/50 tracking-widest">02</span>
                 <h3 className="font-display text-xl font-semibold">Precipitación vs. ETo mensual</h3>
               </div>
-              <div className="h-[280px]">
+              <div ref={graficaLluviaRef} className="h-[280px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={monthly} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
@@ -316,7 +423,7 @@ export default function CalculadoraClima() {
                 <span className="font-mono text-[11px] text-brand/50 tracking-widest">03</span>
                 <h3 className="font-display text-xl font-semibold">Escorrentía capturable por mes</h3>
               </div>
-              <div className="h-[220px]">
+              <div ref={graficaEscRef} className="h-[220px]">
                 <ResponsiveContainer width="100%" height="100%">
                   <ComposedChart data={monthly} margin={{ top: 8, right: 8, left: -16, bottom: 0 }}>
                     <CartesianGrid stroke="rgba(255,255,255,0.06)" vertical={false} />
@@ -381,6 +488,8 @@ export default function CalculadoraClima() {
             >
               Solicitar estudio hidrológico real
             </a>
+
+            <ExportarPDF className="mt-5" variante="secundario" etiqueta="Descargar balance (PDF)" construir={construirPDF} />
 
             <p className="mt-5 text-mono text-[11px] leading-relaxed text-center">
               Estimación preliminar — el método CN aplicado a promedios mensuales es una

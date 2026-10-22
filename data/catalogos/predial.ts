@@ -191,6 +191,7 @@ export function estadoInicialPredial(): PredialState {
       reservorios: 2,
       volumenManualM3: null,
       impermeabilizar: false,
+      preciosGeo: { geomembrana: PU.geomembrana, geotextil: PU.geotextil, anclaje: PU.anclaje },
       tanquesM3: 0,
     },
     tierra: {

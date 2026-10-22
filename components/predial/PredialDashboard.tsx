@@ -7,13 +7,15 @@ import { calcPredial, type PredialCatalogos, type PredialState } from '@/lib/cal
 import { DISCLAIMER_PREDIAL, estadoInicialPredial } from '@/data/catalogos/predial'
 import { FONDOS, FONDO_GEOMEMBRANA, MATERIALES } from '@/data/catalogos/obra'
 import { PRECIOS } from '@/data/catalogos/precios'
+import ExportarPDF from '@/components/pdf/ExportarPDF'
 import { copC, nf } from './fmt'
+import { reportePredial } from './reporte'
 import type { PanelProps } from './ui'
 
 // ── Diseño Keyline Predial — tablero por capas de la escala de permanencia ──
 // Un solo estado (PredialState) alimenta el motor puro calcPredial; cada panel
 // se carga bajo demanda. El borrador se guarda en este navegador.
-// TODO: informe PDF (lib/pdf, pendiente) y exportación a Excel (fuera de alcance por ahora).
+// El informe PDF sale de components/predial/reporte.ts. Excel: fuera de alcance por ahora.
 
 const CATALOGOS: PredialCatalogos = {
   fondos: FONDOS,
@@ -196,6 +198,7 @@ export default function PredialDashboard() {
                 </div>
               ))}
             </dl>
+            <ExportarPDF conCliente={false} etiqueta="Informe PDF" construir={() => reportePredial(s, r)} />
             <button
               type="button"
               onClick={restablecer}

@@ -2,8 +2,6 @@
 
 import { useId, useMemo, useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { jsPDF } from 'jspdf'
-import autoTable from 'jspdf-autotable'
 import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
 
 interface AnimalType {
@@ -165,126 +163,69 @@ export default function Herramientas() {
       `- Presupuesto estimado: ${cop.format(totalBudget)}`
   )
 
-  const handleDownloadPdf = () => {
-    const doc = new jsPDF({ unit: 'mm', format: 'a4' })
-    const marginX = 16
-    const pageWidth = 210
-    let y = 20
-
-    // Header band
-    doc.setFillColor(29, 29, 27)
-    doc.rect(0, 0, pageWidth, 34, 'F')
-    doc.setFillColor(149, 193, 31)
-    doc.rect(0, 34, pageWidth, 1.2, 'F')
-
-    doc.setTextColor(149, 193, 31)
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(16)
-    doc.text('KEYLINE COLOMBIA', marginX, 16)
-
-    doc.setTextColor(255, 255, 255)
-    doc.setFont('helvetica', 'normal')
-    doc.setFontSize(10)
-    doc.text('Cotización preliminar · Herramientas técnicas', marginX, 24)
-
-    const today = new Date().toLocaleDateString('es-CO', { day: '2-digit', month: 'long', year: 'numeric' })
-    doc.setFontSize(8)
-    doc.setTextColor(210, 210, 210)
-    doc.text(`Generado el ${today}`, pageWidth - marginX, 16, { align: 'right' })
-    if (projectName.trim()) {
-      doc.text(`Finca / cliente: ${projectName.trim()}`, pageWidth - marginX, 24, { align: 'right' })
-    }
-
-    y = 46
-    doc.setTextColor(29, 29, 27)
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(12)
-    doc.text('1. Demanda hídrica', marginX, y)
-    y += 4
-
-    autoTable(doc, {
-      startY: y,
-      margin: { left: marginX, right: marginX },
-      head: [['Tipo de animal', 'Cantidad', 'Consumo (L/día/animal)', 'Consumo total (L/día)']],
-      body: groups.map((g) => {
-        const type = ANIMAL_TYPES.find((a) => a.id === g.animalTypeId)
-        return [
-          type?.label ?? g.animalTypeId,
-          nf.format(g.count),
-          nf.format(g.litersPerDay),
-          nf.format(g.litersPerDay * g.count),
-        ]
-      }),
-      foot: [['', 'Total', nf.format(totalAnimals), nf.format(totalDailyLiters)]],
-      headStyles: { fillColor: [29, 29, 27], textColor: [149, 193, 31], fontSize: 9 },
-      footStyles: { fillColor: [240, 240, 235], textColor: [29, 29, 27], fontStyle: 'bold', fontSize: 9 },
-      styles: { fontSize: 9, cellPadding: 3 },
-      theme: 'grid',
-    })
-    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 8
-
-    doc.setFontSize(9)
-    doc.setFont('helvetica', 'normal')
-    doc.text(`Días de autonomía deseados: ${autonomyDays}`, marginX, y)
-    y += 6
-    doc.setFont('helvetica', 'bold')
-    doc.text(`Volumen de agua requerido: ${nf.format(effectiveWaterVolume)} m³`, marginX, y)
-    y += 12
-
-    doc.setFontSize(12)
-    doc.text('2. Movimiento de tierra', marginX, y)
-    y += 4
-
-    autoTable(doc, {
-      startY: y,
-      margin: { left: marginX, right: marginX },
-      body: [
-        ['Volumen de agua a almacenar', `${nf.format(effectiveWaterVolume)} m³`],
-        ['Factor de esponjamiento', shrinkFactor.toFixed(2)],
-        ['Volumen de excavación', `${nf.format(excavationVolumeM3)} m³`],
-        ['Rendimiento de excavadora', `${nf.format(excavatorRate)} m³/hr`],
-        ['Horas de máquina estimadas', `${nf.format(machineHours)} hr`],
+  const handleDownloadPdf = async () => {
+    const { descargarPDF } = await import('@/lib/pdf/reporte')
+    await descargarPDF({
+      herramienta: 'Demanda hídrica y movimiento de tierra',
+      titulo: 'Cotización preliminar de reservorio',
+      subtitulo: 'Demanda hídrica del hato, volumen a almacenar, movimiento de tierra y presupuesto estimado.',
+      cliente: projectName,
+      slug: 'demanda-y-movimiento',
+      disclaimer:
+        'Estimación preliminar: no reemplaza un diseño técnico Keyline. Los consumos, tarifas y rendimientos son de referencia y deben calibrarse con datos reales de campo.',
+      bloques: [
+        {
+          tipo: 'kpis',
+          items: [
+            { k: 'Agua a almacenar', v: `${nf.format(effectiveWaterVolume)} m³`, sub: syncWithCalc1 ? `${autonomyDays} días de autonomía` : 'volumen fijado a mano' },
+            { k: 'Tierra a excavar', v: `${nf.format(excavationVolumeM3)} m³`, sub: `factor ${shrinkFactor.toFixed(2)}` },
+            { k: 'Presupuesto estimado', v: cop.format(totalBudget), sub: `${nf.format(machineHours)} h de máquina` },
+          ],
+        },
+        { tipo: 'titulo', texto: '1. Demanda hídrica' },
+        {
+          tipo: 'tabla',
+          head: ['Tipo de animal', 'Cantidad', 'L/día por animal', 'L/día total'],
+          body: groups.map((g) => [
+            ANIMAL_TYPES.find((a) => a.id === g.animalTypeId)?.label ?? g.animalTypeId,
+            nf.format(g.count),
+            nf.format(g.litersPerDay),
+            nf.format(g.litersPerDay * g.count),
+          ]),
+          foot: [['Total', nf.format(totalAnimals), '', nf.format(totalDailyLiters)]],
+        },
+        {
+          tipo: 'kv',
+          filas: [
+            ['Días de autonomía deseados', String(autonomyDays)],
+            ['Volumen de agua requerido', `${nf.format(waterVolumeM3)} m³`],
+          ],
+        },
+        { tipo: 'titulo', texto: '2. Movimiento de tierra' },
+        {
+          tipo: 'kv',
+          filas: [
+            ['Volumen de agua a almacenar', `${nf.format(effectiveWaterVolume)} m³`],
+            ['Factor de esponjamiento', shrinkFactor.toFixed(2)],
+            ['Volumen de excavación', `${nf.format(excavationVolumeM3)} m³`],
+            ['Rendimiento de excavadora', `${nf.format(excavatorRate)} m³/h`],
+            ['Horas de máquina estimadas', `${nf.format(machineHours)} h`],
+          ],
+        },
+        { tipo: 'titulo', texto: '3. Presupuesto estimado' },
+        {
+          tipo: 'tabla',
+          head: ['Concepto', 'Valor'],
+          body: [
+            [`Excavación (${nf.format(machineHours)} h × ${cop.format(machineHourValue)})`, cop.format(machineCost)],
+            ['Transporte', cop.format(transportCost)],
+            ['Subtotal', cop.format(subtotal)],
+            [`Contingencia (${contingencyPct} %)`, cop.format(contingencyAmount)],
+          ],
+          foot: [['TOTAL ESTIMADO', cop.format(totalBudget)]],
+        },
       ],
-      styles: { fontSize: 9, cellPadding: 3 },
-      columnStyles: { 0: { fontStyle: 'bold' } },
-      theme: 'grid',
     })
-    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 12
-
-    doc.setFontSize(12)
-    doc.text('3. Presupuesto estimado', marginX, y)
-    y += 4
-
-    autoTable(doc, {
-      startY: y,
-      margin: { left: marginX, right: marginX },
-      body: [
-        ['Excavación (máquina)', cop.format(machineCost)],
-        ['Transporte', cop.format(transportCost)],
-        ['Subtotal', cop.format(subtotal)],
-        [`Contingencia (${contingencyPct}%)`, cop.format(contingencyAmount)],
-      ],
-      foot: [['TOTAL ESTIMADO', cop.format(totalBudget)]],
-      styles: { fontSize: 9, cellPadding: 3 },
-      footStyles: { fillColor: [149, 193, 31], textColor: [29, 29, 27], fontStyle: 'bold', fontSize: 11 },
-      theme: 'grid',
-    })
-    y = (doc as unknown as { lastAutoTable: { finalY: number } }).lastAutoTable.finalY + 14
-
-    doc.setFontSize(8)
-    doc.setTextColor(130, 130, 130)
-    doc.text('Estimación preliminar — no reemplaza un diseño técnico Keyline. Los valores de consumo,', marginX, y)
-    y += 4
-    doc.text('tarifas y rendimientos son de referencia y deben calibrarse con datos reales de campo.', marginX, y)
-    y += 8
-
-    doc.setTextColor(29, 29, 27)
-    doc.setFont('helvetica', 'bold')
-    doc.setFontSize(9)
-    doc.text('Contacto: WhatsApp +57 311 365 0567 · keylinecolombia.com', marginX, y)
-
-    const filenameSlug = projectName.trim() ? `-${projectName.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-')}` : ''
-    doc.save(`cotizacion-keyline${filenameSlug}.pdf`)
   }
 
   return (

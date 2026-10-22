@@ -20,6 +20,9 @@ import {
 import ChartFrame from '@/components/charts/ChartFrame'
 import ChartTooltip from '@/components/charts/ChartTooltip'
 import SectionHeader, { Accent } from '@/components/ui/SectionHeader'
+import ExportarPDF from '@/components/pdf/ExportarPDF'
+import { graficasAPng } from '@/lib/pdf/grafica'
+import type { Bloque, Reporte } from '@/lib/pdf/reporte'
 
 const WET_MONTHS = new Set([4, 5, 6, 7, 8, 9]) // Mayo–Octubre
 
@@ -237,6 +240,57 @@ export default function Analitica() {
   const closestToBalance = monthlyData.reduce((a, b) => (Math.abs(b.deficit) < Math.abs(a.deficit) ? b : a))
   const maxRunoffMonth = monthlyData.reduce((a, b) => (b.m3 > a.m3 ? b : a))
   const { runoff } = climate
+  const vistaRef = useRef<HTMLDivElement>(null)
+
+  const construirPDF = async (): Promise<Reporte> => {
+    const graficas = await graficasAPng(vistaRef.current)
+    const vista = subTabs.find((t) => t.id === activeTab)?.label ?? ''
+    const bloques: Bloque[] = [
+      {
+        tipo: 'kpis',
+        items: [
+          { k: 'Precipitación', v: `${nf1(climate.kpis.precipMmYear)} mm/año`, sub: climate.period },
+          { k: 'ETo (FAO-56)', v: `${nf0(climate.kpis.etoMmYear)} mm/año`, sub: climate.etoSource },
+          { k: 'Escorrentía', v: `${nf0(climate.kpis.runoffM3Year)} m³/año`, sub: `C ${pct(runoff.cAnual)} · GUARDAR` },
+        ],
+      },
+      {
+        tipo: 'kv',
+        filas: [
+          ['Ubicación', `${climate.location} · ${climate.coords} · ${climate.elevation}`],
+          ['Área de la finca', `${climate.areaHa} ha`],
+          ['Estación', climate.station],
+          ['Suelo · confiabilidad (tabla 2.3)', `${SUELO_TEXTURA_LABEL[runoff.suelo]} · ${CONFIABILIDAD_LABEL[runoff.confiabilidad]}`],
+          ['Máximo anual histórico', `${nf0(climate.historicMaxAnnual.mm)} mm (${climate.historicMaxAnnual.year})`],
+          ['Mínimo anual histórico', `${nf0(climate.historicMinAnnual.mm)} mm (${climate.historicMinAnnual.year})`],
+          ['Máximo diario histórico', `${nf0(climate.historicMaxDaily.mm)} mm (${climate.historicMaxDaily.date})`],
+        ],
+      },
+      ...(graficas.length ? [{ tipo: 'titulo' as const, texto: `Vista: ${vista}` }] : []),
+      ...graficas.map((g) => ({ tipo: 'grafica' as const, png: g.png, ratio: g.ratio })),
+      { tipo: 'titulo', texto: 'Balance mensual' },
+      {
+        tipo: 'tabla',
+        head: ['Mes', 'Precipitación mm', 'ETo mm', 'P − ETo mm', 'Escorrentía m³', 'P / ETo'],
+        body: monthlyData.map((m) => [m.month, nf1(m.p), nf1(m.eto), nf1(m.deficit), nf0(m.m3), `${nf1(m.coberturaPct)} %`]),
+      },
+      { tipo: 'titulo', texto: 'Precipitación anual' },
+      {
+        tipo: 'tabla',
+        head: ['Año', 'Precipitación mm'],
+        body: climate.annualSeries.map((r) => [String(r.year), nf0(r.precipMm)]),
+      },
+    ]
+    return {
+      herramienta: 'Analítica climática',
+      titulo: `Dashboard climático — ${climate.name}`,
+      subtitulo: 'Series históricas de precipitación, evapotranspiración y escorrentía (método GUARDAR).',
+      cliente: climate.name,
+      slug: 'analitica',
+      disclaimer: 'Datos históricos de referencia de la estación indicada. La escorrentía usa el método oficial GUARDAR (Regrarians §2.19) con parámetros pendientes de validación en campo.',
+      bloques,
+    }
+  }
 
   return (
     <section id="analitica" className="py-32 lg:py-44 px-6 relative overflow-hidden">
@@ -259,6 +313,7 @@ export default function Analitica() {
         </div>
 
         <motion.div
+          ref={vistaRef}
           initial={{ opacity: 0, y: 40 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.9, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
@@ -298,6 +353,13 @@ export default function Analitica() {
                 ))}
               </div>
             </div>
+            <ExportarPDF
+              className="mt-6 pt-6 border-t border-subtle sm:justify-end"
+              conCliente={false}
+              variante="secundario"
+              etiqueta="Descargar informe (PDF)"
+              construir={construirPDF}
+            />
           </div>
 
           {/* Sub-nav */}
